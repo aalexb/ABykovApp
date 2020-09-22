@@ -51,6 +51,13 @@ namespace WorkApp
             BitmapImage largeImage4 = new BitmapImage(uriImage4);
             button4.LargeImage = largeImage4;
 
+            PushButton button5 = panel.AddItem(new PushButtonData("Аннотации", "Аннотации", thisAssemblyPath, "WorkApp.annot")) as PushButton;
+            button5.ToolTip = "Обновить инвалидов";
+            var globePath5 = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "14463930391582863594-32.png");
+            Uri uriImage5 = new Uri(globePath5);
+            BitmapImage largeImage5 = new BitmapImage(uriImage5);
+            button5.LargeImage = largeImage5;
+
             a.ApplicationClosing += a_ApplicationClosing;
             a.Idling += A_Idling;
 
