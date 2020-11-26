@@ -7,6 +7,9 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Windows.Media.Imaging;
 using Autodesk.Revit.UI.Events;
+using System.IO;
+using System.Drawing;
+using System.Windows.Media;
 
 namespace WorkApp
 {
@@ -15,6 +18,21 @@ namespace WorkApp
 
     public class App : IExternalApplication
     {
+        public BitmapImage ConvertBitmap(System.Drawing.Bitmap bitmap)
+        {
+            MemoryStream ms = new MemoryStream();
+            bitmap.Save(ms, System.Drawing.Imaging.ImageFormat.Bmp);
+            BitmapImage image = new BitmapImage();
+            image.BeginInit();
+            ms.Seek(0, SeekOrigin.Begin);
+            image.StreamSource = ms;
+            image.EndInit();
+
+            return image;
+        }
+
+
+
         public Result OnStartup(UIControlledApplication a)
         {
             RibbonPanel panel = ribbonPanel(a);
@@ -57,7 +75,25 @@ namespace WorkApp
             Uri uriImage5 = new Uri(globePath5);
             BitmapImage largeImage5 = new BitmapImage(uriImage5);
             button5.LargeImage = largeImage5;
+            
+            PushButton button6 = panel.AddItem(new PushButtonData("Металл", "Металл", thisAssemblyPath, "WorkApp.metall")) as PushButton;
+            button6.ToolTip = "Обновить спецификации металла";
+            var globePath6 = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "14463930391582863594-32.png");
+            //Uri uriImage6 = new Uri();
 
+            //BitmapImage largeImage6 = WorkApp.Properties.Resources.gear as BitmapImage;
+            BitmapImage pic6 =       ConvertBitmap( WorkApp.Properties.Resources.gear);
+
+            button6.LargeImage = pic6;
+
+
+            PushButton button7 = panel.AddItem(new PushButtonData("Спецификация", "Спецификация", thisAssemblyPath, "WorkApp.grouping")) as PushButton;
+            button7.ToolTip = "Спецификация по группированию";
+
+            PushButton testButton = panel.AddItem(new PushButtonData("Test", "Test", thisAssemblyPath, "WorkApp.test")) as PushButton;
+
+
+            
             a.ApplicationClosing += a_ApplicationClosing;
             a.Idling += A_Idling;
 
@@ -68,7 +104,7 @@ namespace WorkApp
         {
 
         }
-
+        
         void a_ApplicationClosing(object sender, ApplicationClosingEventArgs e)
         {
             throw new NotImplementedException();

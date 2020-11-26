@@ -29,7 +29,19 @@ namespace WorkApp
                 .WhereElementIsNotElementType()
                 .Cast<FamilyInstance>()
                 .ToList();
+
+            List<Element> allUzl = new FilteredElementCollector(doc)
+                .OfCategory(BuiltInCategory.OST_DetailComponents)
+                .OfClass(typeof(FamilyInstance))
+                .WhereElementIsNotElementType()
+                .ToElements()
+                .ToList();
+
+
+
+            
             List<FamilyInstance> myAnnot = new List<FamilyInstance>();
+            List<FamilyInstance> myUzl = new List<FamilyInstance>();
             foreach (FamilyInstance item in allAnnot)
             {
                 if (item.Symbol.FamilyName=="Значки1")
@@ -37,11 +49,21 @@ namespace WorkApp
                     myAnnot.Add(item);
                 }
             }
-            
+            foreach (FamilyInstance i in allUzl)
+            {
+                if (i.Symbol.FamilyName=="ЛинияИнв")
+                {
+                    myUzl.Add(i);
+                }
+            }
             using (Transaction tr=new Transaction(doc,"annot"))
             {
                 tr.Start();
                 foreach (FamilyInstance i in myAnnot)
+                {
+                    i.LookupParameter("view").Set(doc.GetElement(i.OwnerViewId).Name);
+                }
+                foreach (FamilyInstance i in myUzl)
                 {
                     i.LookupParameter("view").Set(doc.GetElement(i.OwnerViewId).Name);
                 }

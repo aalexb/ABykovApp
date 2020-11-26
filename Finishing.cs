@@ -23,7 +23,7 @@ namespace WorkApp
 			Application app = uiapp.Application;
 			Document doc = uidoc.Document;
 
-			//double FT = 0.3048;
+			double FT = 0.3048;
 			PhaseArray xcom = doc.Phases;
 			Phase lastPhase = xcom.get_Item(xcom.Size - 1);
 			ElementId idPhase = lastPhase.Id;
@@ -49,7 +49,13 @@ namespace WorkApp
 			FilterableValueProvider provider = new ParameterValueProvider(new ElementId((int)BuiltInParameter.PHASE_CREATED));
 			FilterElementIdRule fRule = new FilterElementIdRule(provider, evaluator, idPhase);
 			ElementParameterFilter door_filter = new ElementParameterFilter(fRule);
-			
+
+			//doors
+			List<FamilyInstance> doors = new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Doors)
+				.WhereElementIsNotElementType()
+				.Cast<FamilyInstance>()
+				.ToList();
+
 
 
 			IList<Element> rooms = new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Rooms)
@@ -106,6 +112,7 @@ namespace WorkApp
 			List<List<String>> FloorTextByLevel = new List<List<string>>();
 			List<List<List<Element>>> FinishTable = new List<List<List<Element>>>();
 			List<List<List<String>>> FinishTableNum = new List<List<List<String>>>();
+			List<List<List<double>>> FinishTableW3S = new List<List<List<double>>>();
 			List<List<Element>> wallByLevel = new List<List<Element>>();
 			List<List<String>> wallNumByLevel = new List<List<String>>();
 			List<List<double>> wallAreaByLevel = new List<List<double>>();
@@ -114,7 +121,10 @@ namespace WorkApp
 			List<List<string>> WallT2 = new List<List<string>>();
 			List< List < List < Element >>> floorTable = new List<List<List<Element>>>();
 			List<List<List<string>>> floorTableNum = new List<List<List<string>>>();
-
+			List<List<List<double>>> plintTable = new List<List<List<double>>>();
+			List<List<double>> plintByLevel = new List<List<double>>();
+			List<List<double>> perimByLevel = new List<List<double>>();
+			
 
 			foreach (ElementId lev in Levels.Distinct().OrderBy(x => doc.GetElement(x).Name))
             {
@@ -124,7 +134,10 @@ namespace WorkApp
 				List<String> mt = new List<String>();
 				List<String> ft = new List<String>();
 				List<double> ws = new List<double>();
+				List<double> ws2 = new List<double>();
 				List<string> wt = new List<string>();
+				List<double> pl = new List<double>();
+				List<double> pr = new List<double>();
 
 				for (int i = 0; i < Levels.Count(); i++)
 				{
@@ -135,7 +148,10 @@ namespace WorkApp
 						ct.Add(rooms.ElementAt(i).LookupParameter("Отделка потолка").AsString());
 						mt.Add(rooms.ElementAt(i).LookupParameter("Отделка стен").AsString());
 						ft.Add(rooms.ElementAt(i).LookupParameter("Отделка пола").AsString());
+						pr.Add(rooms.ElementAt(i).get_Parameter(BuiltInParameter.ROOM_PERIMETER).AsDouble());
 						ws.Add(0);
+						ws2.Add(0);
+						pl.Add(0);
 						wt.Add("");
 
 						CeilText.Add(rooms.ElementAt(i).LookupParameter("Отделка потолка").AsString());
@@ -153,8 +169,10 @@ namespace WorkApp
 				MainTextByLevel.Add(mt);
 				FloorTextByLevel.Add(ft);
 				WallS1.Add(ws);
-				WallS2.Add(ws);
+				WallS2.Add(ws2);
 				WallT2.Add(wt);
+				plintByLevel.Add(pl);
+				perimByLevel.Add(pr);
 
 
 				List<Element> w = new List<Element>();
@@ -181,24 +199,45 @@ namespace WorkApp
             {
                 for (int r = 0; r < roomNumByLevel[lev].Count(); r++)
                 {
+					
+                    //Плинтус
+                    for (int i = 0; i < doors.Count(); i++)
+                    {
+                        try
+                        {
+							if (doors[i].get_FromRoom(lastPhase).Id == roomByLevel[lev][r].Id | doors[i].get_ToRoom(lastPhase).Id == roomByLevel[lev][r].Id)
+							{
+								plintByLevel[lev][r] += doors[i].LookupParameter("Ширина").AsDouble();
+							}
+						}
+                        catch (Exception)
+                        {
+
+                        }
+                        
+                    }
+					
+					//Стены
                     for (int w = 0; w < wallNumByLevel[lev].Count(); w++)
                     {
-						FamilyInstance checkWall = wallByLevel[lev][w] as FamilyInstance;
+						Wall checkWall = (Wall)wallByLevel[lev][w];
 						if (roomNumByLevel[lev][r]==wallNumByLevel[lev][w])
                         {
 							
-                            if (checkWall.Symbol.LookupParameter("rykomoika").AsInteger()==1)
+                            if (checkWall.WallType.LookupParameter("rykomoika").AsInteger()==1)
                             {
 								WallS2[lev][r]+= wallAreaByLevel[lev][w];
-								WallT2[lev][r] = checkWall.Symbol.LookupParameter("СоставОтделкиСтен").AsString();
-								WT2.Add(checkWall.Symbol.LookupParameter("СоставОтделкиСтен").AsString());
+								WallT2[lev][r] = checkWall.WallType.LookupParameter("СоставОтделкиСтен").AsString();
+								WT2.Add(checkWall.WallType.LookupParameter("СоставОтделкиСтен").AsString());
 								continue;
 							}
 							WallS1[lev][r] += wallAreaByLevel[lev][w];
+							WT2.Add("");
                         }
                     }
                 }
             }
+			WT2 = WT2.OrderBy(x=>x).ToList();
 			int finishTypes = 0;
 			//Сортируем помещения по типу отделки потолка и стен
 			foreach (string wt2 in WT2.Distinct())
@@ -209,10 +248,13 @@ namespace WorkApp
 					{
 						FinishTable.Add(new List<List<Element>>());
 						FinishTableNum.Add(new List<List<string>>());
+						FinishTableW3S.Add(new List<List<double>>());
+
 						for (int lev = 0; lev < Levels.Distinct().Count(); lev++)
 						{
 							List<Element> SimilarFinish = new List<Element>();
 							List<String> SimilarFinishNum = new List<String>();
+							List<double> SimW3S = new List<double>();
 							for (int r = 0; r < roomByLevel[lev].Count(); r++)
 							{
 
@@ -220,42 +262,48 @@ namespace WorkApp
 								{
 									SimilarFinish.Add(roomByLevel[lev][r]);
 									SimilarFinishNum.Add(roomNumByLevel[lev][r]);
+									SimW3S.Add(WallS2[lev][r]);
+
 								}
 							}
 							FinishTable[finishTypes].Add(SimilarFinish);
 							FinishTableNum[finishTypes].Add(SimilarFinishNum);
+							FinishTableW3S[finishTypes].Add(SimW3S);
 						}
 						finishTypes++;
 					}
 				}
 			}
-          
+			//Сортируем помещения по типу пола  
 			int floorTypes = 0;
             foreach (string i in FloorText.Distinct())
             {
 				floorTable.Add(new List<List<Element>>());
-				floorTableNum.Add(new List<List<string>>());				
+				floorTableNum.Add(new List<List<string>>());
+				plintTable.Add(new List<List<double>>());
                 for (int lev = 0; lev < Levels.Distinct().Count(); lev++)
                 {
 					List<Element> simFloor = new List<Element>();
 					List<string> simFloorNum = new List<string>();
+					List<double> simPlint = new List<double>();
 					for (int r = 0; r < roomByLevel[lev].Count(); r++)
                     {
 						if (FloorTextByLevel[lev][r] == i)
                         {
 							simFloor.Add(roomByLevel[lev][r]);
 							simFloorNum.Add(roomNumByLevel[lev][r]);
+							simPlint.Add(perimByLevel[lev][r]-plintByLevel[lev][r]);
                         }
                     }
 					floorTable[floorTypes].Add(simFloor);
 					floorTableNum[floorTypes].Add(simFloorNum);
+					plintTable[floorTypes].Add(simPlint);
 				}
 				
 				floorTypes++;
 
             }
-			
-			
+
 
             using (Transaction tr = new Transaction(doc, "otdelka"))
             {
@@ -266,13 +314,17 @@ namespace WorkApp
                     for (int r = 0; r < roomByLevel[lev].Count(); r++)
                     {
 						roomByLevel[lev][r].LookupParameter("SanT").Set(WallT2[lev][r]);
-                    }
-                }
+						roomByLevel[lev][r].LookupParameter("ДлинаПроемов").Set(plintByLevel[lev][r]);
+					}
+				}
 				for (int i = 0; i < FinishTable.Count(); i++)
 				{
 					String fillText = "";
+					//String fillText2 = "";
+					double sumW3S =0;
 					for (int lev = 0; lev < FinishTable[i].Count(); lev++)
 					{
+						sumW3S+= FinishTableW3S[i][lev].Sum()*(FT*FT);
 						if (FinishTable[i][lev].Count() == 0)
 						{
 							continue;
@@ -280,7 +332,7 @@ namespace WorkApp
 						else
 						{
 							fillText += (lev + 1).ToString() + " этаж:\n";
-							fillText += String.Join(", ", FinishTableNum[i][lev]);
+							fillText += shortLists(FinishTableNum[i][lev]);
 							fillText += "\n";
 						}
 					}
@@ -289,6 +341,9 @@ namespace WorkApp
 						for (int r = 0; r < FinishTable[i][lev].Count(); r++)
 						{
 							FinishTable[i][lev][r].LookupParameter("testW").Set(fillText);
+							//FinishTable[i][lev][r].LookupParameter("unitTest").Set(fillText2);
+							FinishTable[i][lev][r].LookupParameter("SanS").Set(sumW3S>0?sumW3S.ToString("F1"):"");
+							FinishTable[i][lev][r].LookupParameter("snS").Set(FinishTableW3S[i][lev][r]);
 						}
 					}					
 				}
@@ -303,9 +358,11 @@ namespace WorkApp
 				//Передаем номера помещений с одинаковым типом отделки пола
 				for (int i = 0; i < floorTable.Count(); i++)
 				{
+					double sumPlint=0;
 					String fillText = "";
                     for (int lev = 0; lev < floorTable[i].Count(); lev++)
                     {
+						sumPlint += plintTable[i][lev].Sum() * FT;
                         if (floorTable[i][lev].Count()==0)
                         {
 							continue;
@@ -313,7 +370,7 @@ namespace WorkApp
                         else
                         {
 							fillText += (lev+1).ToString() + " этаж:\n";
-							fillText += String.Join(", ", floorTableNum[i][lev]);
+							fillText += shortLists(floorTableNum[i][lev]);							
 							fillText += "\n";
                         }
                     }
@@ -322,6 +379,8 @@ namespace WorkApp
                         for (int r = 0; r < floorTable[i][lev].Count(); r++)
                         {
 							floorTable[i][lev][r].LookupParameter("testF").Set(fillText);
+							floorTable[i][lev][r].LookupParameter("PlintusTotal").Set(sumPlint);
+							
                         }						
                     }		
 				}
@@ -336,6 +395,83 @@ namespace WorkApp
 
 			return Result.Succeeded;
 		}
+
+		string shortLists(List<string> IN)
+        {
+			string Out = "";
+			int first=-1;
+			int current;
+			int previous=-2;
+			bool inQueue=false;
+			int value;
+			string str = "";
+			string sym = " - ";
+			string sep = ", ";
+			
+            for (int i = 0; i < IN.Count(); i++)
+            {
+                if (int.TryParse(IN[i], out value))
+                {
+                    if (inQueue)
+                    {
+                        if (value==previous+1& previous==first)
+                        {
+							
+							previous = value;
+							str = first.ToString("D") + sep + IN[i] + sep;
+                        }
+                        else if (previous + 1 == value & previous != first)
+                        {
+							
+							previous = value;
+							str = first.ToString("D") + sym + IN[i] + sep;
+                        }
+                        else
+                        {
+                            if (previous!=first)
+                            {
+								Out += str;
+								str = "";
+							}
+                            else
+                            {
+								Out += first.ToString("D") + sep;
+								str = "";
+							}
+							
+							inQueue = false;
+							first = -1;
+							previous = -2;
+							i--;
+                        }
+                    }
+                    else
+                    {
+						first = value;
+						previous = value;
+						inQueue = true;
+						str = IN[i] + ", ";
+                    }
+
+                }
+                else
+                {
+					Out += str+IN[i] + sep;
+					first = -1;
+					previous = -2;
+					str = "";
+				}
+            }
+            if (first>0)
+            {
+				Out += str;
+			}
+			
+			
+          
+
+			return Out.Remove(Out.Length-2);
+        }
 	}
 
 }

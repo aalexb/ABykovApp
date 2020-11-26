@@ -4,6 +4,8 @@ using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Events;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
@@ -36,6 +38,8 @@ namespace WorkApp
 			a = doc.GetElement(elt.First()) as ViewSheet;
 			ViewSet b = new ViewSet();
 			List<List<Element>> elementOnSheet = new List<List<Element>>();
+
+
             for (int i = 0; i < elt.Count(); i++)
             {
 				List<Element> sheetEl = new List<Element>();
@@ -46,6 +50,8 @@ namespace WorkApp
 				elementOnSheet.Add(sheetEl);
             }
 			List<Element> titleOnSheet = new List<Element>();
+
+
             for (int i = 0; i < elt.Count(); i++)
             {
 				titleOnSheet.Add(null);
@@ -71,14 +77,23 @@ namespace WorkApp
 				knign.Add(titleOnSheet[i].LookupParameter("Книжная ориентация").AsInteger());
 
 			}
-
+			string namePrefix = "Export";
+			//string nameOfExportDWFX = "AutoExport " + DateTime.Now.Hour.ToString() + "_" + DateTime.Now.Minute.ToString() + "_" + DateTime.Now.Second.ToString();
+			List<string> viewName = new List<string>();
+			List<ViewSheet> listNum = new List<ViewSheet>();
 			foreach (ElementId i in elt)
 			{
+
 				b.Insert(doc.GetElement(i) as ViewSheet);
+				listNum.Add(doc.GetElement(i) as ViewSheet);
 			}
+            
+            
 			DWFXExportOptions options = new DWFXExportOptions();
-			options.MergedViews = false;
+			options.MergedViews = true;
 			
+			
+            
 			string dir = doc.PathName.Substring(0, doc.PathName.Length - doc.Title.Length - 4);
 			ModelPath mp=doc.GetWorksharingCentralModelPath();
 			string vmp=ModelPathUtils.ConvertModelPathToUserVisiblePath(mp);
@@ -91,36 +106,74 @@ namespace WorkApp
 					break;
                 }
             }
-			string newPath = vmp.Substring(0, arr+1)+"PDF";
+			string newPath = Path.GetTempPath();
+			//string newPath = vmp.Substring(0, arr+1)+"PDF";
+			for (int i = 0; i < listNum.Count(); i++)
+			{
+				viewName.Add(newPath + listNum[i].SheetNumber+listNum[i].Name+".dwfx");
+
+			}
+			string fileName = newPath+ namePrefix+".dwfx";
+			System.IO.DirectoryInfo printDir = System.IO.Directory.CreateDirectory(newPath);
 			
-            System.IO.DirectoryInfo printDir = System.IO.Directory.CreateDirectory(newPath);
-            string nameOfExportDWFX = "AutoExport " + DateTime.Now.Hour.ToString() + "_" + DateTime.Now.Minute.ToString() + "_" + DateTime.Now.Second.ToString();
 			
 			using (Transaction tr = new Transaction(doc, "MyExort"))
 				
 			{
 				tr.Start();
-
-
-				doc.Export(newPath, nameOfExportDWFX, b, options);
+				/*
+				foreach (ViewSheet i in listNum)
+				{
+					ViewSet vSet = new ViewSet();
+					vSet.Insert(i);
+				
+					doc.Export(newPath, i.SheetNumber + i.Name,vSet, options);
+                }
+				*/
+				doc.Export(newPath.Substring(0, newPath.Length - 1), namePrefix, b, options);
 				tr.Commit();
 			}
+			
 			//Form1 SheetControl = new Form1();
 			//SheetControl.ShowDialog();
-			TaskDialog msg = new TaskDialog("Info");
-			msg.MainContent = "Ok";
-			msg.Show();
+			//string[] amm=Directory.GetFiles(newPath+"\\");
+			
+			try
+            {
+                using (FileStream fs = File.Create(newPath+"printing.bpj"))
+                {
+					//byte[] info = new UTF8Encoding(true).GetBytes(batchPrint(viewName, formatA, kratn, knign));
+					byte[] info = new UTF8Encoding(true).GetBytes(batchPrint(fileName));
+					fs.Write(info,0,info.Length);
+                }
+            }
+            catch (Exception)
+            {
 
+                
+            }
+			Environment.SetEnvironmentVariable("MYAPP", newPath.Substring(0, newPath.Length-1),EnvironmentVariableTarget.User);
+			Process.Start("DesignReview.exe", newPath + "printing.bpj");
 			
 
 			return Result.Succeeded;
 		}
-		void batchPrint(List<string> name, List<int> fA, List<int> kr, List<int> kniga)
+		string batchPrint(List<string> name, List<int> fA, List<int> kr, List<int> kniga)
 		{
+			string batch = "<configuration_file>";
             for (int i = 0; i < name.Count(); i++)
             {
-
+				batch += string.Format("<DWF_File FileName=\"{0}\" PageSize=\"Прочее\" NoOfSections=\"2\" Print_to_scale=\"100\" Print_Style=\"1\" Print_What=\"0\" Fit_To_Paper=\"0\" Paper_Size=\"9\" Paper_Size_Width=\"2100\" Paper_Size_Height=\"2970\" Orientation=\"{2}\" Number_of_copies=\"1\" PrinterName=\"Bullzip PDF Printer\" Page_Range=\"0\" Print_Range_Str=\"\" Reverse_Order=\"0\" Collate=\"0\" printColor=\"0\" MarkupColor=\"0\" printAlignment=\"0\" Use_DWF_Paper_Size=\"-1\" PrintasImage=\"0\" PaperName=\"A{1}{3}\"/>", name[i], fA[i], kniga[i]==1?1:2, kr[i]!=1?"x"+kr[i].ToString():"");
             }
+			batch += "</configuration_file>";
+			return batch;
+		}
+		string batchPrint(string name)
+		{
+			string batch = "<configuration_file>";
+			batch += string.Format("<DWF_File FileName=\"{0}\" PageSize=\"Прочее\" NoOfSections=\"2\" Print_to_scale=\"100\" Print_Style=\"1\" Print_What=\"0\" Fit_To_Paper=\"0\" Paper_Size=\"9\" Paper_Size_Width=\"2100\" Paper_Size_Height=\"2970\" Orientation=\"1\" Number_of_copies=\"1\" PrinterName=\"Adobe PDF\" Page_Range=\"0\" Print_Range_Str=\"\" Reverse_Order=\"0\" Collate=\"0\" printColor=\"0\" MarkupColor=\"0\" printAlignment=\"0\" Use_DWF_Paper_Size=\"-1\" PrintasImage=\"0\" PaperName=\"A4\"/>", name);
+			batch += "</configuration_file>";
+			return batch;
 		}
 	}
 
