@@ -17,14 +17,17 @@ namespace WorkApp
         public string Other { get; set; }
         public string Group { get; set; }
 
-        public Cube(string group)
+        public Cube(string group, string name)
         {
             Group = group;
+            Name = name;
         }
 
         public void Create(Document doc)
         {
             FamilySymbol neocube = new FilteredElementCollector(doc).OfClass(typeof(FamilySymbol)).Where(q => q.Name == "cube").First() as FamilySymbol;
+            if (!neocube.IsActive)
+                neocube.Activate();
             FamilyInstance unit = doc.Create.NewFamilyInstance(new XYZ(), neocube, Autodesk.Revit.DB.Structure.StructuralType.NonStructural);
             unit.LookupParameter("g_pos").Set(Pos);
             unit.LookupParameter("g_gost").Set(Gost);
