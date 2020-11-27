@@ -1,12 +1,15 @@
 ﻿using Autodesk.Revit.DB;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace WorkApp
 {
+    
+    
     public class Cube
     {
         public string Pos { get; set; }
@@ -29,16 +32,27 @@ namespace WorkApp
             if (!neocube.IsActive)
                 neocube.Activate();
             FamilyInstance unit = doc.Create.NewFamilyInstance(new XYZ(), neocube, Autodesk.Revit.DB.Structure.StructuralType.NonStructural);
-            unit.LookupParameter("g_pos").Set(Pos);
-            unit.LookupParameter("g_gost").Set(Gost);
-            unit.LookupParameter("g_name").Set(Name);
-            unit.LookupParameter("g_num").Set(Num);
-            unit.LookupParameter("g_mass").Set(Mass);
-            unit.LookupParameter("g_other").Set(Other);
-            unit.LookupParameter("g_group").Set(Group);
-
-
-
+            
+            unit.setP("g_pos", Pos);
+            unit.setP("g_gost", Gost);
+            unit.setP("g_name", Name);
+            unit.setP("g_num", Num);
+            unit.setP("g_mass", Mass);
+            unit.setP("g_other", Other);
+            unit.setP("g_group", Group);
         }
+    }
+
+     public static class FinishWall
+    {
+        public static string getP(this Element e, string name)
+        {
+            return e.LookupParameter(name).AsString();
+        }
+        public static void setP(this Element e, string name, string value)
+        {
+            e.LookupParameter(name).Set(value);
+        }
+       
     }
 }

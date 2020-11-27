@@ -47,9 +47,9 @@ namespace WorkApp
 
             foreach (FamilyInstance e in myKar)
             {
-                if (e.LookupParameter("ADSK_Группирование").AsString().Length>2)
+                if (e.getP("ADSK_Группирование").Length>2)
                 {
-                    cubes.Add(new Cube(e.LookupParameter("ADSK_Группирование").AsString(), e.Name));
+                    cubes.Add(new Cube(e.getP("ADSK_Группирование"), e.Name));
                 }
                 
             }

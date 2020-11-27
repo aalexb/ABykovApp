@@ -397,81 +397,81 @@ namespace WorkApp
 		}
 
 		string shortLists(List<string> IN)
-        {
+		{
 			string Out = "";
-			int first=-1;
+			int first = -1;
 			int current;
-			int previous=-2;
-			bool inQueue=false;
+			int previous = -2;
+			bool inQueue = false;
 			int value;
 			string str = "";
 			string sym = " - ";
 			string sep = ", ";
-			
-            for (int i = 0; i < IN.Count(); i++)
-            {
-                if (int.TryParse(IN[i], out value))
-                {
-                    if (inQueue)
-                    {
-                        if (value==previous+1& previous==first)
-                        {
-							
+
+			for (int i = 0; i < IN.Count(); i++)
+			{
+				if (int.TryParse(IN[i], out value))
+				{
+					if (inQueue)
+					{
+						if (value == previous + 1 & previous == first)
+						{
+
 							previous = value;
 							str = first.ToString("D") + sep + IN[i] + sep;
-                        }
-                        else if (previous + 1 == value & previous != first)
-                        {
-							
+						}
+						else if (previous + 1 == value & previous != first)
+						{
+
 							previous = value;
 							str = first.ToString("D") + sym + IN[i] + sep;
-                        }
-                        else
-                        {
-                            if (previous!=first)
-                            {
+						}
+						else
+						{
+							if (previous != first)
+							{
 								Out += str;
 								str = "";
 							}
-                            else
-                            {
+							else
+							{
 								Out += first.ToString("D") + sep;
 								str = "";
 							}
-							
+
 							inQueue = false;
 							first = -1;
 							previous = -2;
 							i--;
-                        }
-                    }
-                    else
-                    {
+						}
+					}
+					else
+					{
 						first = value;
 						previous = value;
 						inQueue = true;
 						str = IN[i] + ", ";
-                    }
+					}
 
-                }
-                else
-                {
-					Out += str+IN[i] + sep;
+				}
+				else
+				{
+					Out += str + IN[i] + sep;
 					first = -1;
 					previous = -2;
 					str = "";
 				}
-            }
-            if (first>0)
-            {
+			}
+			if (first > 0)
+			{
 				Out += str;
 			}
-			
-			
-          
 
-			return Out.Remove(Out.Length-2);
-        }
+
+
+
+			return Out.Remove(Out.Length - 2);
+		}
 	}
 
 }
