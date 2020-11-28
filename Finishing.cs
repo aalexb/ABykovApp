@@ -39,24 +39,10 @@ namespace WorkApp
 			FilterableValueProvider providerRoom = new ParameterValueProvider(new ElementId((int)BuiltInParameter.ROOM_PHASE_ID));
 			FilterElementIdRule rRule = new FilterElementIdRule(providerRoom, evaluator, idPhase);
 			ElementParameterFilter room_filter = new ElementParameterFilter(rRule);		
-			
 			FilterableValueProvider provRoomSchool = new ParameterValueProvider(shParam.Id);
 			FilterStringRuleEvaluator StrEvaluator = new FilterStringEquals();
 			FilterRule rScRule = new FilterStringRule(provRoomSchool, StrEvaluator, "",false);
 			ElementParameterFilter roomSc_filter = new ElementParameterFilter(rScRule);
-
-			//walls
-			FilterableValueProvider provider = new ParameterValueProvider(new ElementId((int)BuiltInParameter.PHASE_CREATED));
-			FilterElementIdRule fRule = new FilterElementIdRule(provider, evaluator, idPhase);
-			ElementParameterFilter door_filter = new ElementParameterFilter(fRule);
-
-			//doors
-			List<FamilyInstance> doors = new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Doors)
-				.WhereElementIsNotElementType()
-				.Cast<FamilyInstance>()
-				.ToList();
-
-
 
 			IList<Element> rooms = new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Rooms)
 				.WhereElementIsNotElementType()
@@ -64,11 +50,25 @@ namespace WorkApp
 				.WherePasses(roomSc_filter)
 				.ToElements();
 
+			//walls
+			FilterableValueProvider provider = new ParameterValueProvider(new ElementId((int)BuiltInParameter.PHASE_CREATED));
+			FilterElementIdRule fRule = new FilterElementIdRule(provider, evaluator, idPhase);
+			ElementParameterFilter door_filter = new ElementParameterFilter(fRule);
+
 			IList<Element> allWalls = new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Walls)
 				.WhereElementIsNotElementType()
 				.WherePasses(door_filter)
 				.ToElements();
+
+			//doors
+			List<FamilyInstance> doors = new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Doors)
+				.WhereElementIsNotElementType()
+				.Cast<FamilyInstance>()
+				.ToList();
+			
+			
 			List<Element> walls = new List<Element>();
+
             foreach (Element item in allWalls)
             {
                 if (item.LookupParameter("Помещение").AsString()!=null & item.LookupParameter("Помещение").AsString() != "")
@@ -238,8 +238,10 @@ namespace WorkApp
                 }
             }
 			WT2 = WT2.OrderBy(x=>x).ToList();
-			int finishTypes = 0;
+
+
 			//Сортируем помещения по типу отделки потолка и стен
+			int finishTypes = 0;
 			foreach (string wt2 in WT2.Distinct())
 			{
 				foreach (String i in CeilText.Distinct())
@@ -332,7 +334,7 @@ namespace WorkApp
 						else
 						{
 							fillText += (lev + 1).ToString() + " этаж:\n";
-							fillText += shortLists(FinishTableNum[i][lev]);
+							fillText += Meta.shortLists(FinishTableNum[i][lev]);
 							fillText += "\n";
 						}
 					}
@@ -370,7 +372,7 @@ namespace WorkApp
                         else
                         {
 							fillText += (lev+1).ToString() + " этаж:\n";
-							fillText += shortLists(floorTableNum[i][lev]);							
+							fillText += Meta.shortLists(floorTableNum[i][lev]);							
 							fillText += "\n";
                         }
                     }
@@ -396,82 +398,7 @@ namespace WorkApp
 			return Result.Succeeded;
 		}
 
-		string shortLists(List<string> IN)
-		{
-			string Out = "";
-			int first = -1;
-			int current;
-			int previous = -2;
-			bool inQueue = false;
-			int value;
-			string str = "";
-			string sym = " - ";
-			string sep = ", ";
-
-			for (int i = 0; i < IN.Count(); i++)
-			{
-				if (int.TryParse(IN[i], out value))
-				{
-					if (inQueue)
-					{
-						if (value == previous + 1 & previous == first)
-						{
-
-							previous = value;
-							str = first.ToString("D") + sep + IN[i] + sep;
-						}
-						else if (previous + 1 == value & previous != first)
-						{
-
-							previous = value;
-							str = first.ToString("D") + sym + IN[i] + sep;
-						}
-						else
-						{
-							if (previous != first)
-							{
-								Out += str;
-								str = "";
-							}
-							else
-							{
-								Out += first.ToString("D") + sep;
-								str = "";
-							}
-
-							inQueue = false;
-							first = -1;
-							previous = -2;
-							i--;
-						}
-					}
-					else
-					{
-						first = value;
-						previous = value;
-						inQueue = true;
-						str = IN[i] + ", ";
-					}
-
-				}
-				else
-				{
-					Out += str + IN[i] + sep;
-					first = -1;
-					previous = -2;
-					str = "";
-				}
-			}
-			if (first > 0)
-			{
-				Out += str;
-			}
-
-
-
-
-			return Out.Remove(Out.Length - 2);
-		}
+		
 	}
 
 }
