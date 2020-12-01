@@ -62,6 +62,7 @@
     <Compile Include="annot.cs" />
     <Compile Include="CodeFile1.cs" />
     <Compile Include="Cube.cs" />
+    <Compile Include="GhostWall.cs" />
     <Compile Include="grouping.cs" />
     <Compile Include="metall.cs" />
     <Compile Include="Finishing.cs" />
@@ -71,6 +72,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="refFinishing.cs" />
     <Compile Include="SheetNum.cs" />
     <Compile Include="RoomElements.cs" />
     <Compile Include="ExportDWFX.cs" />

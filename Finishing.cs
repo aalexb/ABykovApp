@@ -68,12 +68,17 @@ namespace WorkApp
 			
 			
 			List<Element> walls = new List<Element>();
-
+			List<GhostWall> cWalls = new List<GhostWall>();
             foreach (Element item in allWalls)
             {
                 if (item.LookupParameter("Помещение").AsString()!=null & item.LookupParameter("Помещение").AsString() != "")
                 {
 					walls.Add(item);
+					cWalls.Add(new GhostWall(
+						item.getP("Помещение"),
+						item.LevelId,
+						item.get_Parameter(BuiltInParameter.HOST_AREA_COMPUTED).AsDouble()
+						));
                 }
             }
 			List<ElementId> Levels = new List<ElementId>();
@@ -97,6 +102,7 @@ namespace WorkApp
 				LevelsName=LevelsName.Append( doc.GetElement(i).Name);
 			}
 			String str = String.Join(",", LevelsName);
+
 			
 			IEnumerable<bool> isNewC = new List<bool>();
 			IEnumerable<bool> isNewW = new List<bool>();
@@ -390,7 +396,7 @@ namespace WorkApp
 				
 				
 			}
-			String output = String.Join(", ", roomNumByLevel[0]);
+			//String output = String.Join(", ", roomNumByLevel[0]);
 			TaskDialog msg = new TaskDialog("Info");
 			msg.MainInstruction = "Ok"; //output;// FinishTable.Count().ToString();
 			msg.Show(); 
