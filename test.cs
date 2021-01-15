@@ -23,6 +23,12 @@ namespace WorkApp
             Application app = uiapp.Application;
             Document doc = uidoc.Document;
 
+            List<Element> EveryThing = new FilteredElementCollector(doc)
+                .WhereElementIsNotElementType()
+                //.Cast<FamilyInstance>()
+                .ToList();
+
+
             List<FamilyInstance> karkas = new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_StructuralFraming)
               .WhereElementIsNotElementType()
               .Cast<FamilyInstance>()
@@ -44,16 +50,18 @@ namespace WorkApp
             }
 
             List<Cube> cubes = new List<Cube>();
-
+            int counter = EveryThing.Count();
+            
             foreach (FamilyInstance e in myKar)
             {
                 if (e.getP("ADSK_Группирование").Length>2)
                 {
+                    
                     cubes.Add(new Cube(e.getP("ADSK_Группирование"), e.Name));
                 }
                 
             }
-
+            
 
 
 
@@ -71,16 +79,16 @@ namespace WorkApp
                 {
                     doc.Delete(i.Id);
                 }
-
+                /*
                 foreach (Cube i in cubes)
                 {
                     i.Create(doc);
                 }
-                
+                */
                 tr.Commit();
             }
-
-
+            
+            
             return Result.Succeeded;
         }
     }

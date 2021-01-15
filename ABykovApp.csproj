@@ -65,6 +65,7 @@
     <Compile Include="grouping.cs" />
     <Compile Include="metall.cs" />
     <Compile Include="Finishing.cs" />
+    <Compile Include="PerimetralWall.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -93,6 +94,9 @@
     <Content Include="TextFile1.py" />
     <None Include="printing.bpj" />
     <None Include="Otdelka.py" />
+    <None Include="Properties\DataSources\Cube.datasource" />
+    <Content Include="TextFile1 - Копировать.py" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

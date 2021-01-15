@@ -72,9 +72,18 @@ namespace WorkApp
 			List<int> knign = new List<int>();
             for (int i = 0; i < titleOnSheet.Count(); i++)
             {
-				formatA.Add(titleOnSheet[i].LookupParameter("Формат А").AsInteger());
-				kratn.Add(titleOnSheet[i].LookupParameter("Кратность").AsInteger());
-				knign.Add(titleOnSheet[i].LookupParameter("Книжная ориентация").AsInteger());
+                try
+                {
+					formatA.Add(titleOnSheet[i].LookupParameter("Формат А").AsInteger());
+					kratn.Add(titleOnSheet[i].LookupParameter("Кратность").AsInteger());
+					knign.Add(titleOnSheet[i].LookupParameter("Книжная ориентация").AsInteger());
+				}
+                catch (Exception)
+                {
+                    
+                }
+             
+				
 
 			}
 			string namePrefix = "Export";

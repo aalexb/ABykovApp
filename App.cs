@@ -92,8 +92,17 @@ namespace WorkApp
 
             PushButton testButton = panel.AddItem(new PushButtonData("Test", "Test", thisAssemblyPath, "WorkApp.test")) as PushButton;
 
+            PushButton button8 = panel.AddItem(new PushButtonData("Периметр", "Периметр", thisAssemblyPath, "WorkApp.PerimetralWall")) as PushButton;
+            button8.ToolTip = "Стены по периметру";
+            var globePath8 = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "14463930391582863594-32.png");
+            //Uri uriImage6 = new Uri();
 
-            
+            //BitmapImage largeImage6 = WorkApp.Properties.Resources.gear as BitmapImage;
+            BitmapImage pic8 = ConvertBitmap(WorkApp.Properties.Resources.gear);
+
+            button8.LargeImage = pic8;
+
+
             a.ApplicationClosing += a_ApplicationClosing;
             a.Idling += A_Idling;
 
