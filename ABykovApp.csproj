@@ -60,7 +60,6 @@
   <ItemGroup>
     <Compile Include="App.cs" />
     <Compile Include="annot.cs" />
-    <Compile Include="CodeFile1.cs" />
     <Compile Include="Cube.cs" />
     <Compile Include="GhostWall.cs" />
     <Compile Include="grouping.cs" />
@@ -93,9 +92,7 @@
   <ItemGroup>
     <None Include="packages.config" />
     <EmbeddedResource Include="Resources\gear.png" />
-    <Content Include="TextFile1.py" />
     <None Include="printing.bpj" />
-    <None Include="Otdelka.py" />
     <None Include="Properties\DataSources\Cube.datasource" />
     <Content Include="TextFile1 - Копировать.py" />
   </ItemGroup>

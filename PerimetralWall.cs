@@ -26,21 +26,25 @@ namespace WorkApp
             PhaseArray xcom = doc.Phases;
             Phase lastPhase = xcom.get_Item(xcom.Size - 1);
             ElementId idPhase = lastPhase.Id;
-
+            
+            //Выбираем элементы в Ревите
             ICollection<ElementId> selectedElements = uidoc.Selection.GetElementIds();
             List<Room> selectedRooms = selectedElements.Select(x => doc.GetElement(x) as Room).ToList();
-            SpatialElementBoundaryOptions options = new SpatialElementBoundaryOptions();
-            List<IList<IList<BoundarySegment>>> roomBounds = new List<IList<IList<BoundarySegment>>>();
-            foreach (var r in selectedRooms)
-            {
-                //IList<IList<BoundarySegment>> i = r.GetBoundarySegments(options);
-                roomBounds.Add(r.GetBoundarySegments(options));
-                //roomBounds.Append<IList<IList<BoundarySegment>>>(i);
-            }
 
-            //Get room boundaries, elements and disjoined curves
+            //Находим граничные элементы помещения
+            //SpatialElementBoundaryOptions options = new SpatialElementBoundaryOptions();
+
+            List<IList<IList<BoundarySegment>>> roomBounds = selectedRooms.Select(x => x.GetBoundarySegments(new SpatialElementBoundaryOptions())).ToList();
+            
+            //foreach (var r in selectedRooms)
+            //{ 
+            //    roomBounds.Add(r.GetBoundarySegments(options));
+            //}
+
+            //Получаем элементы границ и несоединенные кривые
             List<Element> roomElems = new List<Element>();
             List<List<List<Curve>>> disjoinedCurves = new List<List<List<Curve>>>();
+
             foreach (IList<IList<BoundarySegment>> rb in roomBounds)
             {
                 List<List<Curve>> tempCrvList = new List<List<Curve>>();
@@ -49,18 +53,14 @@ namespace WorkApp
                     List<Curve> tempCCCrvList = new List<Curve>();
                     foreach (var elem in closedCrv)
                     {
-                        
-                        if (doc.GetElement(elem.ElementId)==null)
+                        tempCCCrvList.Add(elem.GetCurve());
+                        if (doc.GetElement(elem.ElementId)==null)//Если элемент косячный
                         {
-                            roomElems.Add(null);
-                            tempCCCrvList.Add(elem.GetCurve());
+                            roomElems.Add(null);                            
                         }
                         else
                         {
-                            
-                            roomElems.Add(doc.GetElement(elem.ElementId));
-
-                            tempCCCrvList.Add(elem.GetCurve());
+                            roomElems.Add(doc.GetElement(elem.ElementId));                        
                         }
                     }
                     tempCrvList.Add(tempCCCrvList);
@@ -68,15 +68,11 @@ namespace WorkApp
                 disjoinedCurves.Add(tempCrvList);
             }
 
-            //Join curves in polycurves
+            //Соединяем кривые в полилинии
             List<List<CurveLoop>> joinedCurvesUnfl = new List<List<CurveLoop>>();
             foreach (var d in disjoinedCurves)
             {
-                List<CurveLoop> tempList = new List<CurveLoop>();
-                foreach (var item in d)
-                {
-                    tempList.Add(CurveLoop.Create(item));
-                }
+                List<CurveLoop> tempList = d.Select(x => CurveLoop.Create(x)).ToList();
                 joinedCurvesUnfl.Add(tempList);
             }
 
@@ -85,7 +81,6 @@ namespace WorkApp
             {
                 foreach (CurveLoop crv in j)
                 {
-                    
                     if (crv.GetPlane().Normal.Z<0)
                     {
                         crv.Flip();
@@ -99,12 +94,10 @@ namespace WorkApp
             foreach (var j in joinedCurvesUnfl)
             {
                 List<Room> tempList = new List<Room>();
+
                 foreach (CurveLoop crv in j)
                 {
-
                     tempList.Add(selectedRooms.ElementAt(count));
-                    
-
                 }
                 repeatedRoomsUnfl.Add(tempList);
                 count+=1;
@@ -119,6 +112,7 @@ namespace WorkApp
             foreach (Room r in repeatedRoomsFl)
             {
                 wHeights.Add(r.getP("setFFF"));
+                //allWallTypes.Where(x => x.Name == r.getP("setFFF")).ToList();
                 foreach (Element wt in allWallTypes)
                 {
                     if (wt.Name==r.getP("setFFF"))
@@ -129,14 +123,7 @@ namespace WorkApp
             }
 
             //Level of each room
-            List<Level> levels = new List<Level>();
-            foreach (Room r in repeatedRoomsFl)
-            {
-                levels.Add(r.Level);
-               
-            }
-
-
+            List<Level> levels = repeatedRoomsFl.Select(x => x.Level).ToList();
 
             //Create offset curve
             List<CurveLoop> offsetedCurves = new List<CurveLoop>();

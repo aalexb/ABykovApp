@@ -139,9 +139,9 @@ namespace WorkApp
 	}
 }
 
-public class GenericList<T>
+public class GenericList<T> //Шаблон
 {
-	public static List<T> Flatten(List<List<T>> x)
+	public static List<T> Flatten(List<List<T>> x) //Разворачивает список
 	{
 		List<T> result = new List<T>();
 		foreach (List<T> el in x)

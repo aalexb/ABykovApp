@@ -35,7 +35,7 @@ namespace WorkApp
 				.ToList();
 			SharedParameterElement shParam = shParamElements.Where(x => x.Name == "ADSK_Номер здания").First();
 
-			//rooms
+			//Фильтр: Помещения на последней стадии
 			FilterableValueProvider providerRoom = new ParameterValueProvider(new ElementId((int)BuiltInParameter.ROOM_PHASE_ID));
 			FilterElementIdRule rRule = new FilterElementIdRule(providerRoom, evaluator, idPhase);
 			ElementParameterFilter room_filter = new ElementParameterFilter(rRule);		
@@ -50,7 +50,7 @@ namespace WorkApp
 				.WherePasses(roomSc_filter)
 				.ToElements();
 
-			//walls
+			//Фильтр: Стены созданные на последней стадии
 			FilterableValueProvider provider = new ParameterValueProvider(new ElementId((int)BuiltInParameter.PHASE_CREATED));
 			FilterElementIdRule fRule = new FilterElementIdRule(provider, evaluator, idPhase);
 			ElementParameterFilter door_filter = new ElementParameterFilter(fRule);
@@ -60,7 +60,7 @@ namespace WorkApp
 				.WherePasses(door_filter)
 				.ToElements();
 
-			//doors
+			//Фильтр: экземпляры дверей
 			List<FamilyInstance> doors = new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Doors)
 				.WhereElementIsNotElementType()
 				.Cast<FamilyInstance>()
