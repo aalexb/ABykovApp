@@ -49,7 +49,11 @@ namespace WorkApp
         {
             return e.LookupParameter(name).AsString();
         }
-        public static void setP(this Element e, string name, string value)
+		public static double getP(this Element e, BuiltInParameter name)
+		{
+			return e.get_Parameter(name).AsDouble();
+		}
+		public static void setP(this Element e, string name, string value)
         {
             e.LookupParameter(name).Set(value);
         }
@@ -131,5 +135,24 @@ namespace WorkApp
 			return Out.Remove(Out.Length - 2);
 		}
 
+		
+	}
+}
+
+public class GenericList<T>
+{
+	public static List<T> Flatten(List<List<T>> x)
+	{
+		List<T> result = new List<T>();
+		foreach (List<T> el in x)
+		{
+            foreach (T em in el)
+            {
+				result.Add(em);
+			}
+			
+			
+		}
+		return result;
 	}
 }
