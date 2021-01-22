@@ -1,10 +1,12 @@
 ﻿using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media.Imaging;
 
 namespace WorkApp
 {
@@ -19,11 +21,19 @@ namespace WorkApp
         public string Mass { get; set; }
         public string Other { get; set; }
         public string Group { get; set; }
+		public bool yesno { get; set; }
 
         public Cube(string group, string name)
         {
             Group = group;
             Name = name;
+			Pos = "pos";
+			Gost = "Gost";
+			Num = "Num";
+			Mass = "Mass";
+			Other = "Other";
+			yesno = false;
+
         }
 
         public void Create(Document doc)
@@ -57,6 +67,15 @@ namespace WorkApp
         {
             e.LookupParameter(name).Set(value);
         }
+
+		public static PushButton AddButton(this RibbonPanel rp,string name,string pic,string path,string className)
+		{
+			PushButton butt = rp.AddItem(new PushButtonData(name, name, path, "WorkApp."+className)) as PushButton;
+			var globePath = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), pic);
+			Uri uriImage = new Uri(globePath);
+			butt.LargeImage = new BitmapImage(uriImage);
+			return butt;
+		}
 
 		public static string shortLists(List<string> IN)
 		{

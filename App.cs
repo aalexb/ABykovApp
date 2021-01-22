@@ -102,6 +102,9 @@ namespace WorkApp
 
             button8.LargeImage = pic8;
 
+            PushButton button9 = panel.AddButton("СуперТест", "14463930391582863594-32.png", thisAssemblyPath, "SuperTest");
+            
+
 
             a.ApplicationClosing += a_ApplicationClosing;
             a.Idling += A_Idling;
