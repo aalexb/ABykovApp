@@ -315,95 +315,95 @@ namespace WorkApp
 
             using (Transaction tr = new Transaction(doc, "otdelka"))
             {
-				tr.Start();
+                tr.Start();
                 //Передаем номера помещений с одинаковым типом отделки стен и потолка
                 for (int lev = 0; lev < roomByLevel.Count(); lev++)
                 {
                     for (int r = 0; r < roomByLevel[lev].Count(); r++)
                     {
-						roomByLevel[lev][r].LookupParameter("SanT").Set(WallT3[lev][r]);
-						roomByLevel[lev][r].LookupParameter("ДлинаПроемов").Set(plintByLevel[lev][r]);
-					}
-				}
+                        roomByLevel[lev][r].LookupParameter("SanT").Set(WallT3[lev][r]);
+                        roomByLevel[lev][r].LookupParameter("ДлинаПроемов").Set(plintByLevel[lev][r]);
+                    }
+                }
 
-				for (int i = 0; i < FinishTable.Count(); i++)
-				{
-					String fillText = "";
-					//String fillText2 = "";
-					double sumW3S =0;
-					for (int lev = 0; lev < FinishTable[i].Count(); lev++)
-					{
-						sumW3S+= FinishTableW3S[i][lev].Sum()*(FT*FT);
-						if (FinishTable[i][lev].Count() == 0)
-						{
-							continue;
-						}
-						else
-						{
-							fillText += (lev + 1).ToString() + " этаж:\n";
-							fillText += Meta.shortLists(FinishTableNum[i][lev]);
-							fillText += "\n";
-						}
-					}
-					for (int lev = 0; lev < FinishTable[i].Count(); lev++)
-					{
-						for (int r = 0; r < FinishTable[i][lev].Count(); r++)
-						{
-							FinishTable[i][lev][r].LookupParameter("testW").Set(fillText);
-							//FinishTable[i][lev][r].LookupParameter("unitTest").Set(fillText2);
-							FinishTable[i][lev][r].LookupParameter("SanS").Set(sumW3S>0?sumW3S.ToString("F1"):"");
-							FinishTable[i][lev][r].LookupParameter("snS").Set(FinishTableW3S[i][lev][r]);
-						}
-					}					
-				}
-				
+                for (int i = 0; i < FinishTable.Count(); i++)
+                {
+                    String fillText = "";
+                    //String fillText2 = "";
+                    double sumW3S = 0;
+                    for (int lev = 0; lev < FinishTable[i].Count(); lev++)
+                    {
+                        sumW3S += FinishTableW3S[i][lev].Sum() * (FT * FT);
+                        if (FinishTable[i][lev].Count() == 0)
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            fillText += (lev + 1).ToString() + " этаж:\n";
+                            fillText += Meta.shortLists(FinishTableNum[i][lev]);
+                            fillText += "\n";
+                        }
+                    }
+                    for (int lev = 0; lev < FinishTable[i].Count(); lev++)
+                    {
+                        for (int r = 0; r < FinishTable[i][lev].Count(); r++)
+                        {
+                            FinishTable[i][lev][r].LookupParameter("testW").Set(fillText);
+                            //FinishTable[i][lev][r].LookupParameter("unitTest").Set(fillText2);
+                            FinishTable[i][lev][r].LookupParameter("SanS").Set(sumW3S > 0 ? sumW3S.ToString("F1") : "");
+                            FinishTable[i][lev][r].LookupParameter("snS").Set(FinishTableW3S[i][lev][r]);
+                        }
+                    }
+                }
+
                 for (int lev = 0; lev < Levels.Distinct().Count(); lev++)
                 {
                     for (int r = 0; r < roomByLevel[lev].Count(); r++)
                     {
-						roomByLevel[lev][r].LookupParameter("WallS1n").Set(WallS1[lev][r]);
+                        roomByLevel[lev][r].LookupParameter("WallS1n").Set(WallS1[lev][r]);
                     }
                 }
-				//Передаем номера помещений с одинаковым типом отделки пола
-				for (int i = 0; i < floorTable.Count(); i++)
-				{
-					double sumPlint=0;
-					String fillText = "";
+                //Передаем номера помещений с одинаковым типом отделки пола
+                for (int i = 0; i < floorTable.Count(); i++)
+                {
+                    double sumPlint = 0;
+                    String fillText = "";
                     for (int lev = 0; lev < floorTable[i].Count(); lev++)
                     {
-						sumPlint += plintTable[i][lev].Sum() * FT;
-                        if (floorTable[i][lev].Count()==0)
+                        sumPlint += plintTable[i][lev].Sum() * FT;
+                        if (floorTable[i][lev].Count() == 0)
                         {
-							continue;
+                            continue;
                         }
                         else
                         {
-							fillText += (lev+1).ToString() + " этаж:\n";
-							fillText += Meta.shortLists(floorTableNum[i][lev]);							
-							fillText += "\n";
+                            fillText += (lev + 1).ToString() + " этаж:\n";
+                            fillText += Meta.shortLists(floorTableNum[i][lev]);
+                            fillText += "\n";
                         }
                     }
                     for (int lev = 0; lev < floorTable[i].Count(); lev++)
                     {
                         for (int r = 0; r < floorTable[i][lev].Count(); r++)
                         {
-							floorTable[i][lev][r].LookupParameter("testF").Set(fillText);
-							floorTable[i][lev][r].LookupParameter("PlintusTotal").Set(sumPlint);
-                            if (floorTable[i][lev][r].LookupParameter("плинтус").AsInteger()==1)
+                            floorTable[i][lev][r].LookupParameter("testF").Set(fillText);
+                            floorTable[i][lev][r].LookupParameter("PlintusTotal").Set(sumPlint);
+                            if (floorTable[i][lev][r].LookupParameter("плинтус").AsInteger() == 1)
                             {
-								floorTable[i][lev][r].setP("PlintusTotalT", (sumPlint * FT).ToString("F1"));
-							}
-							
+                                floorTable[i][lev][r].setP("PlintusTotalT", (sumPlint * FT).ToString("F1"));
+                            }
 
-						}						
-                    }		
-				}
-				tr.Commit();
-				
-				
-			}
-			//String output = String.Join(", ", roomNumByLevel[0]);
-			TaskDialog msg = new TaskDialog("Info");
+
+                        }
+                    }
+                }
+                tr.Commit();
+
+
+            }
+            //String output = String.Join(", ", roomNumByLevel[0]);
+            TaskDialog msg = new TaskDialog("Info");
 			msg.MainInstruction = "Ok"; //output;// FinishTable.Count().ToString();
 			msg.Show(); 
 
