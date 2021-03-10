@@ -2,6 +2,7 @@
 using Autodesk.Revit.UI;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -55,7 +56,8 @@ namespace WorkApp
 
      public static class Meta
     {
-        public static string getP(this Element e, string name)
+		
+			public static string getP(this Element e, string name)
         {
             return e.LookupParameter(name).AsString();
         }
@@ -68,12 +70,11 @@ namespace WorkApp
             e.LookupParameter(name).Set(value);
         }
 
-		public static PushButton AddButton(this RibbonPanel rp,string name,string pic,string path,string className)
+		public static PushButton AddButton(this RibbonPanel rp,string name,Bitmap pic,string className)
 		{
-			PushButton butt = rp.AddItem(new PushButtonData(name, name, path, "WorkApp."+className)) as PushButton;
-			var globePath = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), pic);
-			Uri uriImage = new Uri(globePath);
-			butt.LargeImage = new BitmapImage(uriImage);
+			string thisAssemblyPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+			PushButton butt = rp.AddItem(new PushButtonData(name, name, thisAssemblyPath, "WorkApp."+className)) as PushButton;
+			butt.LargeImage = Tools.GetImage(pic.GetHbitmap());
 			return butt;
 		}
 

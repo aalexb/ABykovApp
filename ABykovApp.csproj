@@ -78,6 +78,7 @@
     <Compile Include="ExportDWFX.cs" />
     <Compile Include="SuperTest.cs" />
     <Compile Include="test.cs" />
+    <Compile Include="Tools.cs" />
     <Compile Include="Window.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -101,9 +102,25 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <EmbeddedResource Include="Resources\gear.png" />
+    <Resource Include="Resources\gear.png" />
     <None Include="printing.bpj" />
     <None Include="Properties\DataSources\Cube.datasource" />
+    <Resource Include="Resources\invalid.png" />
+    <Resource Include="Resources\sheetNum.png" />
+    <Resource Include="Resources\roomElem.png" />
+    <Resource Include="Resources\otdelka.png" />
+    <Resource Include="Resources\dwfx.png" />
+    <Resource Include="Resources\pic.png" />
+    <None Include="bin\Release\14463930391582863594-32.png" />
+    <None Include="bin\Release\18070417311582004489-32.png" />
+    <None Include="bin\Release\19695904531582800514-32.png" />
+    <None Include="bin\Release\6187224341600002476-32.png" />
+    <None Include="bin\Release\dwfx.png" />
+    <None Include="bin\Release\pic.png" />
+    <None Include="Resources\free-icon-pdf-179483.png" />
+    <None Include="Resources\block.png" />
+    <None Include="Resources\block %281%29.png" />
+    <None Include="Resources\free-icon-pdf-179483 %281%29.png" />
     <Content Include="TextFile1 - Копировать.py" />
   </ItemGroup>
   <ItemGroup />
