@@ -23,6 +23,17 @@ namespace WorkApp
 			Application app = uiapp.Application;
 			Document doc = uidoc.Document;
 
+
+			//GlobalParametersManager.GetAllGlobalParameters(doc).Contains
+			bool IsMoreThenOneLevel = false;
+			GlobalParameter two = doc.GetElement(GlobalParametersManager.FindByName(doc, "НесколькоЭтажей")) as ParameterElement as GlobalParameter;
+			IntegerParameterValue three = two.GetValue() as IntegerParameterValue;
+			if (three.Value ==1)
+            {
+				IsMoreThenOneLevel = true;
+            }
+			
+			
 			double FT = 0.3048;
 			PhaseArray xcom = doc.Phases;
 			Phase lastPhase = xcom.get_Item(xcom.Size - 1);
@@ -33,21 +44,21 @@ namespace WorkApp
 				.OfClass(typeof(SharedParameterElement))
 				.Cast<SharedParameterElement>()
 				.ToList();
-			SharedParameterElement shParam = shParamElements.Where(x => x.Name == "ADSK_Номер здания").First();
+			//SharedParameterElement shParam = shParamElements.Where(x => x.Name == "ADSK_Номер здания").First();
 
 			//Фильтр: Помещения на последней стадии
 			FilterableValueProvider providerRoom = new ParameterValueProvider(new ElementId((int)BuiltInParameter.ROOM_PHASE_ID));
 			FilterElementIdRule rRule = new FilterElementIdRule(providerRoom, evaluator, idPhase);
 			ElementParameterFilter room_filter = new ElementParameterFilter(rRule);		
-			FilterableValueProvider provRoomSchool = new ParameterValueProvider(shParam.Id);
+			//FilterableValueProvider provRoomSchool = new ParameterValueProvider(shParam.Id);
 			FilterStringRuleEvaluator StrEvaluator = new FilterStringEquals();
-			FilterRule rScRule = new FilterStringRule(provRoomSchool, StrEvaluator, "",false);
-			ElementParameterFilter roomSc_filter = new ElementParameterFilter(rScRule);
+			//FilterRule rScRule = new FilterStringRule(provRoomSchool, StrEvaluator, "",false);
+			//ElementParameterFilter roomSc_filter = new ElementParameterFilter(rScRule);
 
 			IList<Element> rooms = new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Rooms)
 				.WhereElementIsNotElementType()
 				.WherePasses(room_filter)
-				.WherePasses(roomSc_filter)
+				//.WherePasses(roomSc_filter)
 				.ToElements();
 
 			//Фильтр: Стены созданные на последней стадии
@@ -340,7 +351,11 @@ namespace WorkApp
                         }
                         else
                         {
-                            fillText += (lev + 1).ToString() + " этаж:\n";
+                            if (IsMoreThenOneLevel)
+                            {
+								fillText += (lev + 1).ToString() + " этаж:\n";
+							}
+                            
                             fillText += Meta.shortLists(FinishTableNum[i][lev]);
                             fillText += "\n";
                         }
@@ -378,7 +393,11 @@ namespace WorkApp
                         }
                         else
                         {
-                            fillText += (lev + 1).ToString() + " этаж:\n";
+                            if (IsMoreThenOneLevel)
+                            {
+								fillText += (lev + 1).ToString() + " этаж:\n";
+							}
+                            
                             fillText += Meta.shortLists(floorTableNum[i][lev]);
                             fillText += "\n";
                         }
