@@ -20,11 +20,18 @@ namespace WorkApp
         public string Name { get; set; }
         public string Num { get; set; }
         public string Mass { get; set; }
+		public double dMass { get; set; }
         public string Other { get; set; }
         public string Group { get; set; }
+		public double Length { get; set; }
 		public bool yesno { get; set; }
+		public string Units { get; set; }
+		const string GROUP = "ADSK_Группирование";
+		const string GOST = "ADSK_Обозначение";
+		const string NAME = "ADSK_Наименование";
+		const string MASS = "ADSK_Масса";
 
-        public Cube(string group, string name)
+		public Cube(string group, string name)
         {
             Group = group;
             Name = name;
@@ -36,6 +43,29 @@ namespace WorkApp
 			yesno = false;
 
         }
+		public Cube (FamilyInstance i)
+		{
+			Name = i.Symbol.getP(NAME);
+			Group = i.getP(GROUP);
+			Pos = "";
+			Gost = i.Symbol.getP(GOST);
+			Length = 0;
+			if (i.Category.Id== new ElementId(BuiltInCategory.OST_StructuralFraming))
+			{
+				Length = i.get_Parameter(BuiltInParameter.STRUCTURAL_FRAME_CUT_LENGTH).AsDouble();
+				Units = " кг";
+			}
+			if (i.Category.Id == new ElementId(BuiltInCategory.OST_StructuralColumns))
+			{
+				Length = i.get_Parameter(BuiltInParameter.STEEL_ELEM_CUT_LENGTH).AsDouble();
+				Units = " кг";
+			}
+			Num = Length.ToString();
+			dMass = i.Symbol.LookupParameter(MASS).AsDouble();
+			Mass = dMass.ToString();
+			Other = (Length*dMass).ToString()+Units;
+
+		}
 
         public void Create(Document doc)
         {
@@ -61,6 +91,7 @@ namespace WorkApp
         {
             return e.LookupParameter(name).AsString();
         }
+
 		public static double getP(this Element e, BuiltInParameter name)
 		{
 			return e.get_Parameter(name).AsDouble();
