@@ -275,10 +275,11 @@ namespace WorkApp
 			{
 				l += b.Length;
 			}
-			a.Other = l.ToString("F2");
+			a.Num = l.ToString("F2");
 			a.Gost = IN[0].Gost;
 			a.Pos = position.ToString();
-			a.Mass = IN[0].Mass;
+			a.Mass = "-";
+			a.Other = "";
 			return a;
 		}
 	}

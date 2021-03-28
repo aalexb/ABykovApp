@@ -94,6 +94,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Добавить.txt" />
     <None Include="packages.config" />
     <Resource Include="Resources\gear.png" />
     <None Include="printing.bpj" />

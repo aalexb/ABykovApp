@@ -71,8 +71,17 @@ namespace WorkApp
                 .WherePasses(stageFilter)
                 .Cast<Element>()
                 .ToList();
+            List<Element> walls = new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Walls)
+                .WhereElementIsNotElementType()
+                .WherePasses(stageFilter)
+                .Cast<Element>()
+                .ToList();
+            List<Element> fundament = new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_StructuralFoundation)
+                .WhereElementIsNotElementType()
+                .WherePasses(stageFilter)
+                .Cast<Element>()
+                .ToList();
 
-            
 
             genModel = genModel.Where(x => x.Name != "cube").ToList();
 
@@ -129,6 +138,31 @@ namespace WorkApp
 
             }
 
+            foreach (Element w in walls)
+            {
+                foreach (ElementId m in w.GetMaterialIds(false))
+                {
+                    Cube abc = new Cube(doc.GetElement(m), w);
+                    if (abc.Name != null)
+                    {
+                        allCube.Add(abc);
+                    }
+                }
+
+            }
+
+            foreach (Element f in fundament)
+            {
+                foreach (ElementId m in f.GetMaterialIds(false))
+                {
+                    Cube abc = new Cube(doc.GetElement(m), f);
+                    if (abc.Name != null)
+                    {
+                        allCube.Add(abc);
+                    }
+                }
+
+            }
             List<List<Cube>> groupingCube = new List<List<Cube>>();
 
             //List<string> groupNum=allCube.Select(x => x.Group).Distinct().ToList();
