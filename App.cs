@@ -15,7 +15,7 @@ using WorkApp.Properties;
 namespace WorkApp
 {
 
-
+    
 
     public class App : IExternalApplication
     {
@@ -33,12 +33,15 @@ namespace WorkApp
             PushButton button8 = panel.AddButton("Периметр", Resources.block,  "PerimetralWall");
             PushButton button9 = panel.AddButton("СуперТест", Resources.block, "SuperTest");
             PushButton buttonTest = panel.AddButton("Тест", Resources.block, "test");
+            PushButton buttonUniv = panel.AddButton("Всё", Resources.block, "Universe");
+
+
 
 
 
             a.ApplicationClosing += a_ApplicationClosing;
             a.Idling += A_Idling;
-
+            
             return Result.Succeeded;
         }
 

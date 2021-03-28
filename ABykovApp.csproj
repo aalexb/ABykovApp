@@ -60,6 +60,7 @@
   <ItemGroup>
     <Compile Include="App.cs" />
     <Compile Include="annot.cs" />
+    <Compile Include="Book.cs" />
     <Compile Include="Cube.cs" />
     <Compile Include="GhostWall.cs" />
     <Compile Include="grouping.cs" />
@@ -79,20 +80,12 @@
     <Compile Include="SuperTest.cs" />
     <Compile Include="test.cs" />
     <Compile Include="Tools.cs" />
-    <Compile Include="Window.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Window.Designer.cs">
-      <DependentUpon>Window.cs</DependentUpon>
-    </Compile>
+    <Compile Include="Universe.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Window.resx">
-      <DependentUpon>Window.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
@@ -117,6 +110,7 @@
     <None Include="bin\Release\6187224341600002476-32.png" />
     <None Include="bin\Release\dwfx.png" />
     <None Include="bin\Release\pic.png" />
+    <None Include="Properties\DataSources\FinishElements.datasource" />
     <None Include="Resources\free-icon-pdf-179483.png" />
     <None Include="Resources\block.png" />
     <None Include="Resources\block %281%29.png" />

@@ -23,16 +23,10 @@ namespace WorkApp
 			Application app = uiapp.Application;
 			Document doc = uidoc.Document;
 
-
-			//GlobalParametersManager.GetAllGlobalParameters(doc).Contains
-			bool IsMoreThenOneLevel = false;
-			GlobalParameter two = doc.GetElement(GlobalParametersManager.FindByName(doc, "НесколькоЭтажей")) as ParameterElement as GlobalParameter;
-			IntegerParameterValue three = two.GetValue() as IntegerParameterValue;
-			if (three.Value ==1)
-            {
-				IsMoreThenOneLevel = true;
-            }
+			//GlobalParameter.
+			//GlobalParameter one = ;
 			
+
 			
 			double FT = 0.3048;
 			PhaseArray xcom = doc.Phases;
@@ -327,8 +321,13 @@ namespace WorkApp
             using (Transaction tr = new Transaction(doc, "otdelka"))
             {
                 tr.Start();
-                //Передаем номера помещений с одинаковым типом отделки стен и потолка
-                for (int lev = 0; lev < roomByLevel.Count(); lev++)
+				GlobalParameter ohohoh = GlobalParametersManager.FindByName(doc, "НесколькоЭтажей") != ElementId.InvalidElementId ?
+				doc.GetElement(GlobalParametersManager.FindByName(doc, "НесколькоЭтажей")) as GlobalParameter :
+				GlobalParameter.Create(doc, "НесколькоЭтажей", ParameterType.YesNo);
+				int MoreThenOneLevel = ((IntegerParameterValue)ohohoh.GetValue()).Value;
+
+				//Передаем номера помещений с одинаковым типом отделки стен и потолка
+				for (int lev = 0; lev < roomByLevel.Count(); lev++)
                 {
                     for (int r = 0; r < roomByLevel[lev].Count(); r++)
                     {
@@ -351,11 +350,10 @@ namespace WorkApp
                         }
                         else
                         {
-                            if (IsMoreThenOneLevel)
-                            {
+							if (MoreThenOneLevel==1)
+							{
 								fillText += (lev + 1).ToString() + " этаж:\n";
-							}
-                            
+							}                            
                             fillText += Meta.shortLists(FinishTableNum[i][lev]);
                             fillText += "\n";
                         }
@@ -393,11 +391,10 @@ namespace WorkApp
                         }
                         else
                         {
-                            if (IsMoreThenOneLevel)
-                            {
+							if (MoreThenOneLevel==1)
+							{
 								fillText += (lev + 1).ToString() + " этаж:\n";
-							}
-                            
+							}                            
                             fillText += Meta.shortLists(floorTableNum[i][lev]);
                             fillText += "\n";
                         }
