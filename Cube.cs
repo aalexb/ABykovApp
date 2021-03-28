@@ -1,10 +1,13 @@
 ﻿using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Architecture;
+using Autodesk.Revit.DB.Structure;
 using Autodesk.Revit.UI;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Globalization;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
@@ -24,11 +27,14 @@ namespace WorkApp
         public string Other { get; set; }
         public string Group { get; set; }
 		public double Length { get; set; }
+		public double Area { get; set; }
 		public bool yesno { get; set; }
 		public string Units { get; set; }
+		double FT = 0.3048;
 		const string GROUP = "ADSK_Группирование";
 		const string GOST = "ADSK_Обозначение";
 		const string NAME = "ADSK_Наименование";
+		const string MAT_NAME = "ADSK_Материал наименование";
 		const string MASS = "ADSK_Масса";
 
 		public Cube(string group, string name)
@@ -43,6 +49,70 @@ namespace WorkApp
 			yesno = false;
 
         }
+
+		public Cube(Rebar a)
+		{
+			string[] stringSeparator =new string[] { " : " };
+			string[] subName = a.Name.Split(stringSeparator,StringSplitOptions.None);
+			Name = "ø"+ subName[0];
+			Group = a.getP("Метка основы");
+			Length = a.TotalLength*FT;
+			
+
+		}
+		public Cube(RebarInSystem a)
+		{
+			string[] stringSeparator = new string[] { " : " };
+			string[] subName = a.Name.Split(stringSeparator, StringSplitOptions.None);
+			Name = "ø" + subName[0];
+			Group = a.getP("Метка основы");
+			Length = a.TotalLength*FT;
+
+		}
+		public Cube(Railing a)
+		{
+			//a.Document.
+			Name=a.Document.GetElement(a.GetTypeId()).getP(NAME);
+			//Name = a.getP(NAME);
+			Group = a.getP(GROUP);
+			Length = a.get_Parameter(BuiltInParameter.CURVE_ELEM_LENGTH).AsDouble() * FT;
+
+		}
+		public Cube (Element material, Element source)
+		{
+			Group = source.getP(GROUP);
+			Name = material.getP(MAT_NAME);
+			Mass = material.Name;
+			if (material.LookupParameter("Объем_Площадь").AsInteger()==0)
+			{
+				Area = source.GetMaterialArea(material.Id,false);
+			}
+			else
+			{
+				Area = source.GetMaterialVolume(material.Id);
+			}
+
+		}
+		public Cube (Element e)
+		{
+			Name = e.Document.GetElement(e.GetTypeId()).getP(NAME);
+			Gost=e.Document.GetElement(e.GetTypeId()).getP(GOST);
+			switch (e.Category.Name)
+			{
+				case "Желоба":
+					Group = e.getP(GROUP);
+					Length = e.get_Parameter(BuiltInParameter.CURVE_ELEM_LENGTH).AsDouble() * FT;
+					break;
+				case "Крыши":
+					Group = e.getP(GROUP);
+					Area = e.get_Parameter(BuiltInParameter.HOST_AREA_COMPUTED).AsDouble() * FT;
+					break;
+				
+				default:
+					break;
+			}
+			
+		}
 		public Cube (FamilyInstance i)
 		{
 			Name = i.Symbol.getP(NAME);
@@ -50,19 +120,27 @@ namespace WorkApp
 			Pos = "";
 			Gost = i.Symbol.getP(GOST);
 			Length = 0;
-			if (i.Category.Id== new ElementId(BuiltInCategory.OST_StructuralFraming))
+			switch (i.Category.Name)
 			{
-				Length = i.get_Parameter(BuiltInParameter.STRUCTURAL_FRAME_CUT_LENGTH).AsDouble();
-				Units = " кг";
-			}
-			if (i.Category.Id == new ElementId(BuiltInCategory.OST_StructuralColumns))
-			{
-				Length = i.get_Parameter(BuiltInParameter.STEEL_ELEM_CUT_LENGTH).AsDouble();
-				Units = " кг";
+				case "Каркас несущий":
+					Length = i.get_Parameter(BuiltInParameter.STRUCTURAL_FRAME_CUT_LENGTH).AsDouble()*FT;
+					Units = " кг";
+					break;
+				case "Несущие колонны":
+					Length = i.get_Parameter(BuiltInParameter.STEEL_ELEM_CUT_LENGTH).AsDouble()*FT;
+					Units = " кг";
+					break;
+				default:
+					if (i.Symbol.LookupParameter("АММО_Длина_КМ")!=null)
+					{
+						Length = i.Symbol.LookupParameter("АММО_Длина_КМ").AsDouble();
+					}
+					break;
 			}
 			Num = Length.ToString();
 			dMass = i.Symbol.LookupParameter(MASS).AsDouble();
-			Mass = dMass.ToString();
+			Mass = i.Name;
+			//Mass = dMass.ToString();
 			Other = (Length*dMass).ToString()+Units;
 
 		}
@@ -72,7 +150,7 @@ namespace WorkApp
             FamilySymbol neocube = new FilteredElementCollector(doc).OfClass(typeof(FamilySymbol)).Where(q => q.Name == "cube").First() as FamilySymbol;
             if (!neocube.IsActive)
                 neocube.Activate();
-            FamilyInstance unit = doc.Create.NewFamilyInstance(new XYZ(), neocube, Autodesk.Revit.DB.Structure.StructuralType.NonStructural);
+            FamilyInstance unit = doc.Create.NewFamilyInstance(new XYZ(), neocube, StructuralType.NonStructural);
             
             unit.setP("g_pos", Pos);
             unit.setP("g_gost", Gost);
@@ -82,6 +160,8 @@ namespace WorkApp
             unit.setP("g_other", Other);
             unit.setP("g_group", Group);
         }
+
+
     }
 
      public static class Meta
@@ -186,7 +266,21 @@ namespace WorkApp
 			return Out.Remove(Out.Length - 2);
 		}
 
-		
+		public static Cube forgeCube(List<Cube> IN,int position)
+		{
+
+			Cube a = new Cube(IN[0].Group,IN[0].Name);
+			double l=0;
+			foreach (Cube b in IN)
+			{
+				l += b.Length;
+			}
+			a.Other = l.ToString("F2");
+			a.Gost = IN[0].Gost;
+			a.Pos = position.ToString();
+			a.Mass = IN[0].Mass;
+			return a;
+		}
 	}
 }
 
