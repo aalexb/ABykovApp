@@ -95,8 +95,42 @@ namespace WorkApp
 		}
 		public Cube (Element e)
 		{
-			Name = e.Document.GetElement(e.GetTypeId()).getP(NAME);
-			Gost=e.Document.GetElement(e.GetTypeId()).getP(GOST);
+            switch (e.Category.Name)
+            {
+				case "Пластины":
+					Name =
+						"Пластина "
+						+ (e.get_Parameter(BuiltInParameter.STEEL_ELEM_PLATE_LENGTH).AsDouble() * 1000 * FT).ToString("F0") 
+						+ "x"
+						+ (e.get_Parameter(BuiltInParameter.STEEL_ELEM_PLATE_WIDTH).AsDouble()*1000*FT).ToString("F0") 
+						+ "x" 
+						+ (e.get_Parameter(BuiltInParameter.STEEL_ELEM_PLATE_THICKNESS).AsDouble() * 1000 * FT).ToString("F0");
+					Group = e.get_Parameter(BuiltInParameter.ALL_MODEL_MARK).AsString();
+					break;
+
+				case "Анкеры":
+					string standardName = e.get_Parameter(BuiltInParameter.STEEL_ELEM_ANCHOR_STANDARD).AsString();
+					ElementId gPar = GlobalParametersManager.FindByName(e.Document, standardName);
+					string ankerName = gPar==ElementId.InvalidElementId?standardName:
+						((StringParameterValue)
+						((GlobalParameter)e.Document.GetElement(gPar))
+						.GetValue()).Value;
+					Name =
+						ankerName
+						+ " Ø"
+						+ (e.get_Parameter(BuiltInParameter.STEEL_ELEM_ANCHOR_DIAMETER).AsString())
+						+ "x"
+						+ (e.get_Parameter(BuiltInParameter.STEEL_ELEM_ANCHOR_LENGTH).AsString()).Split(',')[0];
+					Group = e.get_Parameter(BuiltInParameter.ALL_MODEL_MARK).AsString();
+					break;
+
+				default:
+					Name = e.Document.GetElement(e.GetTypeId()).getP(NAME);
+					Gost = e.Document.GetElement(e.GetTypeId()).getP(GOST);
+					break;
+            }
+            
+			
 			switch (e.Category.Name)
 			{
 				case "Желоба":
@@ -133,7 +167,7 @@ namespace WorkApp
 				default:
 					if (i.Symbol.LookupParameter("АММО_Длина_КМ")!=null)
 					{
-						Length = i.Symbol.LookupParameter("АММО_Длина_КМ").AsDouble();
+						Length = i.Symbol.LookupParameter("АММО_Длина_КМ").AsDouble()*FT;
 					}
 					break;
 			}

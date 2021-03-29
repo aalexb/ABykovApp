@@ -324,6 +324,8 @@ namespace WorkApp
 				GlobalParameter ohohoh = GlobalParametersManager.FindByName(doc, "НесколькоЭтажей") != ElementId.InvalidElementId ?
 				doc.GetElement(GlobalParametersManager.FindByName(doc, "НесколькоЭтажей")) as GlobalParameter :
 				GlobalParameter.Create(doc, "НесколькоЭтажей", ParameterType.YesNo);
+
+
 				int MoreThenOneLevel = ((IntegerParameterValue)ohohoh.GetValue()).Value;
 
 				//Передаем номера помещений с одинаковым типом отделки стен и потолка

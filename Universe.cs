@@ -81,8 +81,21 @@ namespace WorkApp
                 .WherePasses(stageFilter)
                 .Cast<Element>()
                 .ToList();
-
-
+            List<Element> lestnici = new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Stairs)
+                .WhereElementIsNotElementType()
+                .WherePasses(stageFilter)
+                .Cast<Element>()
+                .ToList();
+            List<Element> plastini = new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_StructConnectionPlates)
+                .WhereElementIsNotElementType()
+                .WherePasses(stageFilter)
+                .Cast<Element>()
+                .ToList();
+            List<Element> ankera = new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_StructConnectionAnchors)
+                .WhereElementIsNotElementType()
+                .WherePasses(stageFilter)
+                .Cast<Element>()
+                .ToList();
             genModel = genModel.Where(x => x.Name != "cube").ToList();
 
 
@@ -124,7 +137,14 @@ namespace WorkApp
             {
                 allCube.Add(new Cube(e));
             }
-
+            foreach (Element e in plastini)
+            {
+                allCube.Add(new Cube(e));
+            }
+            foreach (Element e in ankera)
+            {
+                allCube.Add(new Cube(e));
+            }
             foreach (Element f in floors)
             {
                 foreach (ElementId m in f.GetMaterialIds(false))
@@ -152,6 +172,18 @@ namespace WorkApp
             }
 
             foreach (Element f in fundament)
+            {
+                foreach (ElementId m in f.GetMaterialIds(false))
+                {
+                    Cube abc = new Cube(doc.GetElement(m), f);
+                    if (abc.Name != null)
+                    {
+                        allCube.Add(abc);
+                    }
+                }
+
+            }
+            foreach (Element f in lestnici)
             {
                 foreach (ElementId m in f.GetMaterialIds(false))
                 {
