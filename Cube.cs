@@ -50,34 +50,29 @@ namespace WorkApp
 
         }
 
-		public Cube(Rebar a)
-		{
-			string[] stringSeparator =new string[] { " : " };
-			string[] subName = a.Name.Split(stringSeparator,StringSplitOptions.None);
-			Name = "ø"+ subName[0];
-			Group = a.getP("Метка основы");
-			Length = a.TotalLength*FT;
-			
+        //public Cube(Rebar e)
+        //{
+        //	string[] stringSeparator = new string[] { " : " };
+        //	string[] subName = e.Name.Split(stringSeparator, StringSplitOptions.None);
+        //	Name = "ø" + subName[0];
+        //	Group = e.getP("Метка основы");
+        //	Length = ((Rebar)e).TotalLength * FT;
+        //}
+        //public Cube(RebarInSystem a)
+        //{
+        //    string[] stringSeparator = new string[] { " : " };
+        //    string[] subName = a.Name.Split(stringSeparator, StringSplitOptions.None);
+        //    Name = "ø" + subName[0];
+        //    Group = a.getP("Метка основы");
+        //    Length = a.TotalLength * FT;
 
-		}
-		public Cube(RebarInSystem a)
-		{
-			string[] stringSeparator = new string[] { " : " };
-			string[] subName = a.Name.Split(stringSeparator, StringSplitOptions.None);
-			Name = "ø" + subName[0];
-			Group = a.getP("Метка основы");
-			Length = a.TotalLength*FT;
-
-		}
-		public Cube(Railing a)
-		{
-			//a.Document.
-			Name=a.Document.GetElement(a.GetTypeId()).getP(NAME);
-			//Name = a.getP(NAME);
-			Group = a.getP(GROUP);
-			Length = a.get_Parameter(BuiltInParameter.CURVE_ELEM_LENGTH).AsDouble() * FT;
-
-		}
+        //}
+  //      public Cube(Railing e)
+		//{
+		//	Name=e.Document.GetElement(e.GetTypeId()).getP(NAME);
+		//	Group = e.getP(GROUP);
+		//	Length = e.get_Parameter(BuiltInParameter.CURVE_ELEM_LENGTH).AsDouble() * FT;
+		//}
 		public Cube (Element material, Element source)
 		{
 			Group = source.getP(GROUP);
@@ -93,6 +88,7 @@ namespace WorkApp
 			}
 
 		}
+		
 		public Cube (Element e)
 		{
             switch (e.Category.Name)
@@ -107,7 +103,11 @@ namespace WorkApp
 						+ (e.get_Parameter(BuiltInParameter.STEEL_ELEM_PLATE_THICKNESS).AsDouble() * 1000 * FT).ToString("F0");
 					Group = e.get_Parameter(BuiltInParameter.ALL_MODEL_MARK).AsString();
 					break;
-
+				case "Ограждение":
+					Name = e.Document.GetElement(e.GetTypeId()).getP(NAME);
+					Group = e.getP(GROUP);
+					Length = e.get_Parameter(BuiltInParameter.CURVE_ELEM_LENGTH).AsDouble() * FT;
+					break;
 				case "Анкеры":
 					string standardName = e.get_Parameter(BuiltInParameter.STEEL_ELEM_ANCHOR_STANDARD).AsString();
 					ElementId gPar = GlobalParametersManager.FindByName(e.Document, standardName);
@@ -123,61 +123,100 @@ namespace WorkApp
 						+ (e.get_Parameter(BuiltInParameter.STEEL_ELEM_ANCHOR_LENGTH).AsString()).Split(',')[0];
 					Group = e.get_Parameter(BuiltInParameter.ALL_MODEL_MARK).AsString();
 					break;
+				case "Несущая арматура":
+					string[] stringSeparator = new string[] { " : " };
+					string[] subName = e.Name.Split(stringSeparator, StringSplitOptions.None);
+					Name = "ø" + subName[0];
+					Group = e.getP("Метка основы");
+                    try
+                    {
+						Length = ((Rebar)e).TotalLength * FT;
+					}
+                    catch (Exception)
+                    {
 
-				default:
-					Name = e.Document.GetElement(e.GetTypeId()).getP(NAME);
-					Gost = e.Document.GetElement(e.GetTypeId()).getP(GOST);
+						Length = ((RebarInSystem)e).TotalLength * FT;
+					}
+					
 					break;
-            }
-            
-			
-			switch (e.Category.Name)
-			{
 				case "Желоба":
 					Group = e.getP(GROUP);
 					Length = e.get_Parameter(BuiltInParameter.CURVE_ELEM_LENGTH).AsDouble() * FT;
+					Name = e.Document.GetElement(e.GetTypeId()).getP(NAME);
+					Gost = e.Document.GetElement(e.GetTypeId()).getP(GOST);
 					break;
 				case "Крыши":
 					Group = e.getP(GROUP);
 					Area = e.get_Parameter(BuiltInParameter.HOST_AREA_COMPUTED).AsDouble() * FT;
+					Name = e.Document.GetElement(e.GetTypeId()).getP(NAME);
+					Gost = e.Document.GetElement(e.GetTypeId()).getP(GOST);
 					break;
-				
 				default:
+					Name = e.Document.GetElement(e.GetTypeId()).getP(NAME);
+					Group = e.getP(GROUP);
+					Pos = "";
+					Gost = e.Document.GetElement(e.GetTypeId()).getP(GOST);
+					Length = 0;
+					switch (e.Category.Name)
+					{
+						case "Каркас несущий":
+							Length = e.get_Parameter(BuiltInParameter.STRUCTURAL_FRAME_CUT_LENGTH).AsDouble() * FT;
+							Units = " кг";
+							break;
+						case "Несущие колонны":
+							Length = e.get_Parameter(BuiltInParameter.STEEL_ELEM_CUT_LENGTH).AsDouble() * FT;
+							Units = " кг";
+							break;
+						default:
+							if (e.Document.GetElement(e.GetTypeId()).LookupParameter("АММО_Длина_КМ") != null)
+							{
+								Length = e.Document.GetElement(e.GetTypeId()).LookupParameter("АММО_Длина_КМ").AsDouble() * FT;
+							}
+							break;
+					}
+					Num = Length.ToString();
+					dMass = e.Document.GetElement(e.GetTypeId()).LookupParameter(MASS).AsDouble();
+					Mass = e.Name;
+					//Mass = dMass.ToString();
+					Other = (Length * dMass).ToString() + Units;
+					//Name = e.Document.GetElement(e.GetTypeId()).getP(NAME);
+					//Gost = e.Document.GetElement(e.GetTypeId()).getP(GOST);
 					break;
-			}
+            }
+
 			
 		}
-		public Cube (FamilyInstance i)
-		{
-			Name = i.Symbol.getP(NAME);
-			Group = i.getP(GROUP);
-			Pos = "";
-			Gost = i.Symbol.getP(GOST);
-			Length = 0;
-			switch (i.Category.Name)
-			{
-				case "Каркас несущий":
-					Length = i.get_Parameter(BuiltInParameter.STRUCTURAL_FRAME_CUT_LENGTH).AsDouble()*FT;
-					Units = " кг";
-					break;
-				case "Несущие колонны":
-					Length = i.get_Parameter(BuiltInParameter.STEEL_ELEM_CUT_LENGTH).AsDouble()*FT;
-					Units = " кг";
-					break;
-				default:
-					if (i.Symbol.LookupParameter("АММО_Длина_КМ")!=null)
-					{
-						Length = i.Symbol.LookupParameter("АММО_Длина_КМ").AsDouble()*FT;
-					}
-					break;
-			}
-			Num = Length.ToString();
-			dMass = i.Symbol.LookupParameter(MASS).AsDouble();
-			Mass = i.Name;
-			//Mass = dMass.ToString();
-			Other = (Length*dMass).ToString()+Units;
+		//public Cube (FamilyInstance e)
+		//{
+		//	Name = e.Symbol.getP(NAME);
+		//	Group = e.getP(GROUP);
+		//	Pos = "";
+		//	Gost = e.Symbol.getP(GOST);
+		//	Length = 0;
+		//	switch (e.Category.Name)
+		//	{
+		//		case "Каркас несущий":
+		//			Length = e.get_Parameter(BuiltInParameter.STRUCTURAL_FRAME_CUT_LENGTH).AsDouble()*FT;
+		//			Units = " кг";
+		//			break;
+		//		case "Несущие колонны":
+		//			Length = e.get_Parameter(BuiltInParameter.STEEL_ELEM_CUT_LENGTH).AsDouble()*FT;
+		//			Units = " кг";
+		//			break;
+		//		default:
+		//			if (e.Symbol.LookupParameter("АММО_Длина_КМ")!=null)
+		//			{
+		//				Length = e.Symbol.LookupParameter("АММО_Длина_КМ").AsDouble()*FT;
+		//			}
+		//			break;
+		//	}
+		//	Num = Length.ToString();
+		//	dMass = e.Symbol.LookupParameter(MASS).AsDouble();
+		//	Mass = e.Name;
+		//	//Mass = dMass.ToString();
+		//	Other = (Length*dMass).ToString()+Units;
 
-		}
+		//}
 
         public void Create(Document doc)
         {

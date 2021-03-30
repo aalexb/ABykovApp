@@ -27,45 +27,61 @@ namespace WorkApp
             ElementId ruleValue = idPhase;
             ElementParameterFilter stageFilter = new ElementParameterFilter(new FilterElementIdRule(valueProvider, evaluator, ruleValue));
 
-          
-            List<FamilyInstance> karkas = new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_StructuralFraming)
+            List<List<Element>> collectFromModel = new List<List<Element>>();
+
+            collectFromModel.Add(new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_StructuralFraming)
                 .WhereElementIsNotElementType()
                 .WherePasses(stageFilter)
                 .Where(x=>((FamilyInstance)x).StructuralType.ToString()!="NonStructural")
-                .Cast<FamilyInstance>()
-                .ToList();
+                .Cast<Element>()
+                .ToList());
+            //collectFromModel.Add(karkas);
 
-            List<FamilyInstance> kolon = new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_StructuralColumns)
-                .WhereElementIsNotElementType()
-                .WherePasses(stageFilter)
-                .Cast<FamilyInstance>()
-                .ToList();
-            List<Element> armaFree = new FilteredElementCollector(doc).OfClass(typeof(Rebar))
-                .WherePasses(stageFilter)
-                .ToElements().ToList();
-            List<Element> armaZ = new FilteredElementCollector(doc).OfClass(typeof(RebarInSystem))
-                .WherePasses(stageFilter)
-                .ToElements().ToList();
-            List<Element> perila = new FilteredElementCollector(doc).OfClass(typeof(Railing))
-                .WhereElementIsNotElementType()
-                .WherePasses(stageFilter)
-                .ToElements()
-                .ToList();
-            List<Element> jelob = new FilteredElementCollector(doc).OfClass(typeof(HostedSweep))
-                .WhereElementIsNotElementType()
-                .WherePasses(stageFilter)
-                .ToElements()
-                .ToList();
-            List<Element> roof = new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Roofs)
+            collectFromModel.Add(new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_StructuralColumns)
                 .WhereElementIsNotElementType()
                 .WherePasses(stageFilter)
                 .Cast<Element>()
-                .ToList();
-            List<FamilyInstance> genModel = new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_GenericModel)
+                .ToList());
+
+            collectFromModel.Add(new FilteredElementCollector(doc).OfClass(typeof(Rebar))
+                .WherePasses(stageFilter)
+                .ToElements().ToList());
+            collectFromModel.Add(new FilteredElementCollector(doc).OfClass(typeof(RebarInSystem))
+                .WherePasses(stageFilter)
+                .ToElements().ToList());
+            collectFromModel.Add(new FilteredElementCollector(doc).OfClass(typeof(Railing))
                 .WhereElementIsNotElementType()
                 .WherePasses(stageFilter)
-                .Cast<FamilyInstance>()
-                .ToList();
+                .ToElements()
+                .ToList());
+            collectFromModel.Add(new FilteredElementCollector(doc).OfClass(typeof(HostedSweep))
+                .WhereElementIsNotElementType()
+                .WherePasses(stageFilter)
+                .ToElements()
+                .ToList());
+            collectFromModel.Add(new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Roofs)
+                .WhereElementIsNotElementType()
+                .WherePasses(stageFilter)
+                .Cast<Element>()
+                .ToList());
+            collectFromModel.Add(new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_StructConnectionPlates)
+                .WhereElementIsNotElementType()
+                .WherePasses(stageFilter)
+                .Cast<Element>()
+                .ToList());
+            collectFromModel.Add(new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_StructConnectionAnchors)
+                .WhereElementIsNotElementType()
+                .WherePasses(stageFilter)
+                .Cast<Element>()
+                .ToList());
+            collectFromModel.Add( new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_GenericModel)
+                .WhereElementIsNotElementType()
+                .WherePasses(stageFilter)
+                .Cast<Element>()
+                .Where(x => x.Name != "cube")
+                .ToList());
+
+
             List<Element> floors = new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Floors)
                 .WhereElementIsNotElementType()
                 .WherePasses(stageFilter)
@@ -86,65 +102,22 @@ namespace WorkApp
                 .WherePasses(stageFilter)
                 .Cast<Element>()
                 .ToList();
-            List<Element> plastini = new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_StructConnectionPlates)
-                .WhereElementIsNotElementType()
-                .WherePasses(stageFilter)
-                .Cast<Element>()
-                .ToList();
-            List<Element> ankera = new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_StructConnectionAnchors)
-                .WhereElementIsNotElementType()
-                .WherePasses(stageFilter)
-                .Cast<Element>()
-                .ToList();
-            genModel = genModel.Where(x => x.Name != "cube").ToList();
 
-
+            //genModel = genModel.Where(x => x.Name != "cube").ToList();
             List<Cube> allCube = new List<Cube>();
-            foreach (FamilyInstance i in karkas)
+            foreach (List<Element> a in collectFromModel)
             {
-                allCube.Add(new Cube(i));
-            }
-            foreach (FamilyInstance i in kolon)
-            {
-                allCube.Add(new Cube(i));
-            }
-            foreach (Rebar a in armaFree)
-            {
-                allCube.Add(new Cube(a));
-            }
-            foreach (RebarInSystem a in armaZ)
-            {
-                allCube.Add(new Cube(a));
-            }
-            foreach (Railing a in perila)
-            {
-                allCube.Add(new Cube(a));
-            }
-            foreach (FamilyInstance i in genModel)
-            {
-                Cube abc = new Cube(i);
-                if (abc.Name!=null)
+                foreach (Element e in a)
                 {
+                    Cube abc = new Cube(e);
+                    if (abc.Name == null)
+                    {
+                        abc.Name="Unknown name";
+                    }
                     allCube.Add(abc);
                 }
-                
             }
-            foreach (Element e in jelob)
-            {
-                allCube.Add(new Cube(e));
-            }
-            foreach (Element e in roof)
-            {
-                allCube.Add(new Cube(e));
-            }
-            foreach (Element e in plastini)
-            {
-                allCube.Add(new Cube(e));
-            }
-            foreach (Element e in ankera)
-            {
-                allCube.Add(new Cube(e));
-            }
+            
             foreach (Element f in floors)
             {
                 foreach (ElementId m in f.GetMaterialIds(false))
