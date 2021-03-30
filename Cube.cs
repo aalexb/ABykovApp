@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Globalization;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,28 +15,51 @@ using System.Windows.Media.Imaging;
 
 namespace WorkApp
 {
-    
-    
-    public class Cube
+	public enum myTypes
+	{
+		matVol,
+		matArea,
+		kmLen,//Общая длина
+		kmNum,//Длина штуки
+		armLen,//Общая длина
+		armNum,//Длина штуки
+		allNum,//количество
+	}
+	public enum myUnits
+	{
+		num,
+		len,
+		are,
+		vol,
+		mas
+	}
+
+	public class Cube
     {
-        public string Pos { get; set; }
-        public string Gost { get; set; }
-        public string Name { get; set; }
-        public string Num { get; set; }
-        public string Mass { get; set; }
-		public double dMass { get; set; }
-        public string Other { get; set; }
-        public string Group { get; set; }
-		public double Length { get; set; }
-		public double Area { get; set; }
-		public bool yesno { get; set; }
-		public string Units { get; set; }
+		public int Prior { get; set; } //Приоритет в спецификации
+		public myTypes mType { get; set; }
+		public myUnits Units { get; set; } //Единицы измерения
+		public string Pos { get; set; } //Позиция
+        public string Gost { get; set; } //ГОСТ
+        public string Name { get; set; } //Имя в спецификации
+        public string Num { get; set; } //Количество в штуках
+		public double Length { get; set; } //Длина
+		public double Area { get; set; } //Площадь
+		public double Volume { get; set; } //Объем
+		public string Mass { get; set; } //Масса
+		public double dMass { get; set; } //Масса единицы
+        public string Other { get; set; } //Примечание
+        public string Group { get; set; } //Группирование
+		
+		
+		//public bool yesno { get; set; }
+		public string oldUnits { get; set; }
 		double FT = 0.3048;
-		const string GROUP = "ADSK_Группирование";
-		const string GOST = "ADSK_Обозначение";
-		const string NAME = "ADSK_Наименование";
-		const string MAT_NAME = "ADSK_Материал наименование";
-		const string MASS = "ADSK_Масса";
+		private const string GROUP = "ADSK_Группирование";
+		private const string GOST = "ADSK_Обозначение";
+		private const string NAME = "ADSK_Наименование";
+		private const string MAT_NAME = "ADSK_Материал наименование";
+		private const string MASS = "ADSK_Масса";
 
 		public Cube(string group, string name)
         {
@@ -46,7 +70,7 @@ namespace WorkApp
 			Num = "Num";
 			Mass = "Mass";
 			Other = "Other";
-			yesno = false;
+			//yesno = false;
 
         }
 
@@ -81,11 +105,18 @@ namespace WorkApp
 			if (material.LookupParameter("Объем_Площадь").AsInteger()==0)
 			{
 				Area = source.GetMaterialArea(material.Id,false);
+				mType = myTypes.matArea;
+				//Units=myUnits.are;
+				
 			}
 			else
 			{
 				Area = source.GetMaterialVolume(material.Id);
+				mType = myTypes.matVol;
+				//Units = myUnits.vol;
+				
 			}
+			//Other = Meta.setEdizm(Units);
 
 		}
 		
@@ -94,6 +125,7 @@ namespace WorkApp
             switch (e.Category.Name)
             {
 				case "Пластины":
+					//Units=myUnits
 					Name =
 						"Пластина "
 						+ (e.get_Parameter(BuiltInParameter.STEEL_ELEM_PLATE_LENGTH).AsDouble() * 1000 * FT).ToString("F0") 
@@ -161,11 +193,12 @@ namespace WorkApp
 					{
 						case "Каркас несущий":
 							Length = e.get_Parameter(BuiltInParameter.STRUCTURAL_FRAME_CUT_LENGTH).AsDouble() * FT;
-							Units = " кг";
+							Units = myUnits.mas;
+							oldUnits = " кг";
 							break;
 						case "Несущие колонны":
 							Length = e.get_Parameter(BuiltInParameter.STEEL_ELEM_CUT_LENGTH).AsDouble() * FT;
-							Units = " кг";
+							oldUnits = " кг";
 							break;
 						default:
 							if (e.Document.GetElement(e.GetTypeId()).LookupParameter("АММО_Длина_КМ") != null)
@@ -178,7 +211,7 @@ namespace WorkApp
 					dMass = e.Document.GetElement(e.GetTypeId()).LookupParameter(MASS).AsDouble();
 					Mass = e.Name;
 					//Mass = dMass.ToString();
-					Other = (Length * dMass).ToString() + Units;
+					Other = (Length * dMass).ToString() + oldUnits;
 					//Name = e.Document.GetElement(e.GetTypeId()).getP(NAME);
 					//Gost = e.Document.GetElement(e.GetTypeId()).getP(GOST);
 					break;
@@ -248,6 +281,58 @@ namespace WorkApp
 		public static double getP(this Element e, BuiltInParameter name)
 		{
 			return e.get_Parameter(name).AsDouble();
+		}
+		public static string setEdizm(myTypes wow) //Устанавливает единицы измерения
+		{
+
+			//switch (wow)
+			//{
+			//	case myUnits.num:
+			//		s = "шт";
+			//		break;
+			//	case myUnits.len:
+			//		s = "м.п.";
+			//		break;
+			//	case myUnits.are:
+			//		s = "м²";
+			//		break;
+			//	case myUnits.vol:
+			//		s = "м³";
+			//		break;
+			//	case myUnits.mas:
+			//		s = "кг";
+			//		break;
+			//	default:
+			//		s = "";
+			//		break;
+			//}
+			string s = "";
+			switch (wow)
+			{
+				case myTypes.matVol:
+					s = "м³";
+					break;
+				case myTypes.matArea:
+					s = "м²";
+					break;
+				case myTypes.kmLen:
+					s = "кг";
+					break;
+				case myTypes.kmNum:
+					s = "кг";
+					break;
+				case myTypes.armLen:
+					s = "кг";
+					break;
+				case myTypes.armNum:
+					s = "кг";
+					break;
+				case myTypes.allNum:
+					break;
+				default:
+					break;
+			}
+			return s;
 		}
 		public static void setP(this Element e, string name, string value)
         {
@@ -341,7 +426,26 @@ namespace WorkApp
 
 		public static Cube forgeCube(List<Cube> IN,int position)
 		{
-
+			
+			switch (IN[0].mType)
+			{
+				case myTypes.matVol:
+					break;
+				case myTypes.matArea:
+					break;
+				case myTypes.kmLen:
+					break;
+				case myTypes.kmNum:
+					break;
+				case myTypes.armLen:
+					break;
+				case myTypes.armNum:
+					break;
+				case myTypes.allNum:
+					break;
+				default:
+					break;
+			}
 			Cube a = new Cube(IN[0].Group,IN[0].Name);
 			double l=0;
 			foreach (Cube b in IN)
@@ -353,7 +457,12 @@ namespace WorkApp
 			a.Pos = position.ToString();
 			a.Mass = "-";
 			a.Other = "";
+			(a.Pos, a.Mass, a.Other) = Meta.chtoto(a);
 			return a;
+		}
+		public static (string,string,string) chtoto(Cube uno)
+		{
+			return ("", "", "");
 		}
 	}
 }

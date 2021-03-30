@@ -102,7 +102,8 @@ namespace WorkApp
                 .WherePasses(stageFilter)
                 .Cast<Element>()
                 .ToList();
-
+            
+            
             //genModel = genModel.Where(x => x.Name != "cube").ToList();
             List<Cube> allCube = new List<Cube>();
             foreach (List<Element> a in collectFromModel)
