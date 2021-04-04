@@ -111,9 +111,9 @@ namespace WorkApp
                 foreach (Element e in a)
                 {
                     Cube abc = new Cube(e);
-                    if (abc.Name == null)
+                    if (abc.out_Name == null)
                     {
-                        abc.Name="Unknown name";
+                        abc.out_Name="Исключение: "+abc.typeName;
                     }
                     allCube.Add(abc);
                 }
@@ -124,7 +124,7 @@ namespace WorkApp
                 foreach (ElementId m in f.GetMaterialIds(false))
                 {
                     Cube abc=new Cube(doc.GetElement(m), f);
-                    if (abc.Name != null)
+                    if (abc.out_Name != null)
                     {
                         allCube.Add(abc);
                     }
@@ -137,7 +137,7 @@ namespace WorkApp
                 foreach (ElementId m in w.GetMaterialIds(false))
                 {
                     Cube abc = new Cube(doc.GetElement(m), w);
-                    if (abc.Name != null)
+                    if (abc.out_Name != null)
                     {
                         allCube.Add(abc);
                     }
@@ -150,7 +150,7 @@ namespace WorkApp
                 foreach (ElementId m in f.GetMaterialIds(false))
                 {
                     Cube abc = new Cube(doc.GetElement(m), f);
-                    if (abc.Name != null)
+                    if (abc.out_Name != null)
                     {
                         allCube.Add(abc);
                     }
@@ -162,7 +162,7 @@ namespace WorkApp
                 foreach (ElementId m in f.GetMaterialIds(false))
                 {
                     Cube abc = new Cube(doc.GetElement(m), f);
-                    if (abc.Name != null)
+                    if (abc.out_Name != null)
                     {
                         allCube.Add(abc);
                     }
@@ -173,12 +173,12 @@ namespace WorkApp
 
             //List<string> groupNum=allCube.Select(x => x.Group).Distinct().ToList();
 
-            foreach (string eqGroup in allCube.Select(x => x.Group).Distinct())
+            foreach (string eqGroup in allCube.Select(x => x.out_Group).Distinct())
             {
                 List<Cube> similarGroup = new List<Cube>();
                 foreach (Cube c in allCube)
                 {
-                    if (c.Group==eqGroup)
+                    if (c.out_Group==eqGroup)
                     {
                         similarGroup.Add(c);
                     }
@@ -190,13 +190,13 @@ namespace WorkApp
             foreach (List<Cube> item in groupingCube)
             {
                 int a = 0;
-                foreach (string eqName in item.Select(x=>x.Name).Distinct())
+                foreach (string eqName in item.Select(x=>x.out_Name).Distinct())
                 {
                     List<Cube> b = new List<Cube>();
 
                     foreach (Cube i in item)
                     {
-                        if (i.Name ==eqName)
+                        if (i.out_Name ==eqName)
                         {
                             b.Add(i);
                         }
@@ -204,6 +204,30 @@ namespace WorkApp
                     outCube.Add(Meta.forgeCube(b,++a));
                 }
             }
+            List<Cube> secondOutCube = new List<Cube>();
+            foreach (string eqGroup in outCube.Select(x => x.out_Group).Distinct())
+            {
+                List<Cube> similarGroup = new List<Cube>();
+                foreach (Cube c in allCube)
+                {
+                    if (c.out_Group == eqGroup)
+                    {
+                        similarGroup.Add(c);
+                    }
+                }
+                int i = 1;
+                similarGroup.OrderBy(x => x.Prior);
+                foreach (var item in similarGroup)
+                {
+                    item.out_Pos = i.ToString();
+                    i++;
+                    secondOutCube.Add(item);
+                }
+
+                //similarGroup.short
+                //secondOutCube.Add(similarGroup.Select());
+            }
+            outCube = secondOutCube;
 
 
 
