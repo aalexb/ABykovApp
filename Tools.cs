@@ -332,7 +332,7 @@ namespace WorkApp
 			{
 				case myTypes.matVol:
 					a = "-";
-					c = cube.TotalVolume.ToString("F3") + " м³";
+					c = cube.TotalVolume.ToString("F2") + " м³";
 					break;
 				case myTypes.matArea:
 					a = "-";

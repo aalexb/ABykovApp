@@ -204,30 +204,30 @@ namespace WorkApp
                     outCube.Add(Meta.forgeCube(b,++a));
                 }
             }
-            List<Cube> secondOutCube = new List<Cube>();
-            foreach (string eqGroup in outCube.Select(x => x.out_Group).Distinct())
-            {
-                List<Cube> similarGroup = new List<Cube>();
-                foreach (Cube c in allCube)
-                {
-                    if (c.out_Group == eqGroup)
-                    {
-                        similarGroup.Add(c);
-                    }
-                }
-                int i = 1;
-                similarGroup.OrderBy(x => x.Prior);
-                foreach (var item in similarGroup)
-                {
-                    item.out_Pos = i.ToString();
-                    i++;
-                    secondOutCube.Add(item);
-                }
+            //List<Cube> secondOutCube = new List<Cube>();
+            //foreach (string eqGroup in outCube.Select(x => x.out_Group).Distinct())
+            //{
+            //    List<Cube> similarGroup = new List<Cube>();
+            //    foreach (Cube c in allCube)
+            //    {
+            //        if (c.out_Group == eqGroup)
+            //        {
+            //            similarGroup.Add(c);
+            //        }
+            //    }
+            //    int i = 1;
+            //    similarGroup.OrderBy(x => x.Prior);
+            //    foreach (var item in similarGroup)
+            //    {
+            //        item.out_Pos = i.ToString();
+            //        i++;
+            //        secondOutCube.Add(item);
+            //    }
 
-                //similarGroup.short
-                //secondOutCube.Add(similarGroup.Select());
-            }
-            outCube = secondOutCube;
+            //    //similarGroup.short
+            //    //secondOutCube.Add(similarGroup.Select());
+            //}
+            //outCube = secondOutCube;
 
 
 
