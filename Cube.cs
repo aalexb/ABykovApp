@@ -159,7 +159,7 @@ namespace WorkApp
 						+ (e.get_Parameter(BuiltInParameter.STEEL_ELEM_ANCHOR_DIAMETER).AsString())
 						+ "x"
 						+ (e.get_Parameter(BuiltInParameter.STEEL_ELEM_ANCHOR_LENGTH).AsString()).Split(',')[0];
-					
+					Quantity = e.get_Parameter(BuiltInParameter.STEEL_ELEM_PATTERN_NUMBER_X).AsInteger() * e.get_Parameter(BuiltInParameter.STEEL_ELEM_PATTERN_NUMBER_Y).AsInteger();
 					break;
 				case "Несущая арматура":
 					mType = myTypes.armLen;

@@ -78,6 +78,7 @@
     <Compile Include="RoomElements.cs" />
     <Compile Include="ExportDWFX.cs" />
     <Compile Include="SuperTest.cs" />
+    <Compile Include="WallLastStage.cs" />
     <Compile Include="test.cs" />
     <Compile Include="Tools.cs" />
     <Compile Include="Universe.cs" />
@@ -94,6 +95,10 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\21412874381565982018-32.png" />
+    <None Include="Resources\11893007501600701712-32.png" />
+    <None Include="Resources\15903809461600702091-32.png" />
+    <None Include="Resources\18531432621599996549-32.png" />
     <Content Include="Добавить.txt" />
     <None Include="packages.config" />
     <Resource Include="Resources\gear.png" />

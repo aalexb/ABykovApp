@@ -30,10 +30,11 @@ namespace WorkApp
             PushButton button5 = panel.AddButton("Аннотации", Resources.inval, "annot");
             PushButton button6 = panel.AddButton("Металл", Resources.gear,  "metall");
             PushButton button7 = panel.AddButton("Спецификация", Resources.block,  "grouping");
-            PushButton button8 = panel.AddButton("Периметр", Resources.block,  "PerimetralWall");
+            PushButton button8 = panel.AddButton("Периметр", Resources.emptyHouse,  "PerimetralWall");
             PushButton button9 = panel.AddButton("СуперТест", Resources.block, "SuperTest");
-            PushButton buttonTest = panel.AddButton("Тест", Resources.block, "test");
-            PushButton buttonUniv = panel.AddButton("Всё", Resources.block, "Universe");
+            PushButton buttonTest = panel.AddButton("Тест", Resources.fullHouse, "test");
+            PushButton buttonUniv = panel.AddButton("Всё", Resources.atom, "Universe");
+            PushButton buttonWLS= panel.AddButton("Стены 2021", Resources.plane, "WallLastStage");
 
 
 

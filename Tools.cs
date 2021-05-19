@@ -13,6 +13,12 @@ using Autodesk.Revit.UI;
 
 namespace WorkApp
 {
+	public enum FinishClasses
+    {
+		wall,
+		floor,
+		ceiling,
+    }
 	public enum myTypes
 	{
 		matVol,
@@ -303,7 +309,19 @@ namespace WorkApp
 			string grName = IN[0].out_Group == null ?"Без группы": IN[0].out_Group;
 			Cube nova = new Cube(grName, IN[0].out_Name);
 			nova.mType = IN[0].mType;
-			nova.Quantity = IN.Count;
+			//nova
+            foreach (Cube i in IN)
+            {
+                if (i.Quantity<=1)
+                {
+					nova.Quantity += 1;
+                }
+                else
+                {
+					nova.Quantity += i.Quantity;
+                }
+            }
+			//nova.Quantity = IN.Count;
 			nova.Massa = IN[0].Massa;
 			nova.out_Pos = IN[0].out_Pos;
 			

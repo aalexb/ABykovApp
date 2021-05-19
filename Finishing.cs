@@ -70,9 +70,35 @@ namespace WorkApp
 				.WhereElementIsNotElementType()
 				.Cast<FamilyInstance>()
 				.ToList();
-			
-			
-			List<Element> walls = new List<Element>();
+
+            List<FamilySymbol> ento = new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Entourage)
+              .WhereElementIsElementType()
+              .Cast<FamilySymbol>()
+              .ToList();
+
+            List<String> entoName = new List<string>();
+            foreach (FamilySymbol i in ento)
+            {
+                entoName.Add(i.Name);
+            }
+
+            List<String> entoFamily = new List<string>();
+			//List<otdelka> otd = new List<otdelka>();
+            foreach (FamilySymbol f in ento)
+            {
+				//otd.Add(new otdelka(f.FamilyName+':'+f.Name,f.getP("АР_Состав отделки")));
+                entoFamily.Add(f.FamilyName);
+            }
+            List<String> one = new List<string>();
+            
+            foreach (FamilySymbol f in ento)
+            {
+
+                one.Add(f.getP("АР_Состав отделки"));
+            }
+			//string two = doc.GetElement(rooms[0].LookupParameter("ОТД_Пол").AsElementId()).Name;
+
+            List<Element> walls = new List<Element>();
 			List<GhostWall> cWalls = new List<GhostWall>();
             foreach (Element item in allWalls)
             {
@@ -115,7 +141,7 @@ namespace WorkApp
 			List<String> CeilText = new List<String>();
 			List<String> MainText = new List<String>();
 			List<String> FloorText = new List<String>();
-			List<string> WT3 = new List<string>();
+			List<string> WallsLocal = new List<string>();
 			List<List<Element>> roomByLevel = new List<List<Element>>();
 			List<List<String>> roomNumByLevel = new List<List<String>>();
 			List<List<String>> CeilTextByLevel = new List<List<string>>();
@@ -129,14 +155,14 @@ namespace WorkApp
 			List<List<double>> wallAreaByLevel = new List<List<double>>();
 			List<List<double>> WallS1 = new List<List<double>>();
 			List<List<double>> WallS2 = new List<List<double>>();
-			List<List<string>> WallT3 = new List<List<string>>();
+			List<List<string>> WallsLocalText = new List<List<string>>();
 			List< List < List < Element >>> floorTable = new List<List<List<Element>>>();
 			List<List<List<string>>> floorTableNum = new List<List<List<string>>>();
 			List<List<List<double>>> plintTable = new List<List<List<double>>>();
 			List<List<double>> plintByLevel = new List<List<double>>();
 			List<List<double>> perimByLevel = new List<List<double>>();
 			
-
+			
 			foreach (ElementId lev in Levels.Distinct().OrderBy(x => doc.GetElement(x).Name))
             {
 				List<Element> s = new List<Element>();
@@ -156,22 +182,19 @@ namespace WorkApp
                     {
 						s.Add(rooms.ElementAt(i));
 						n.Add(rooms.ElementAt(i).get_Parameter(BuiltInParameter.ROOM_NUMBER).AsString());
-						ct.Add(rooms.ElementAt(i).LookupParameter("Отделка потолка").AsString());
-						mt.Add(rooms.ElementAt(i).LookupParameter("Отделка стен").AsString());
-						ft.Add(rooms.ElementAt(i).LookupParameter("Отделка пола").AsString());
+						ct.Add(rooms.ElementAt(i).LookupParameter("ОТД_Потолок").AsValueString());
+						mt.Add(rooms.ElementAt(i).LookupParameter("ОТД_Стены").AsValueString());
+						ft.Add(rooms.ElementAt(i).LookupParameter("ОТД_Пол").AsValueString());
 						pr.Add(rooms.ElementAt(i).get_Parameter(BuiltInParameter.ROOM_PERIMETER).AsDouble());
 						ws.Add(0);
 						ws2.Add(0);
 						pl.Add(0);
 						wt.Add("");
 
-						CeilText.Add(rooms.ElementAt(i).LookupParameter("Отделка потолка").AsString());
-						MainText.Add(rooms.ElementAt(i).LookupParameter("Отделка стен").AsString());
-						FloorText.Add(rooms.ElementAt(i).LookupParameter("Отделка пола").AsString());
+						CeilText.Add(rooms.ElementAt(i).LookupParameter("ОТД_Потолок").AsValueString());
+						MainText.Add(rooms.ElementAt(i).LookupParameter("ОТД_Стены").AsValueString());
+						FloorText.Add(rooms.ElementAt(i).LookupParameter("ОТД_Пол").AsValueString());
 						
-
-
-
 					}
 				}
 				roomByLevel.Add(s);
@@ -181,7 +204,7 @@ namespace WorkApp
 				FloorTextByLevel.Add(ft);
 				WallS1.Add(ws);
 				WallS2.Add(ws2);
-				WallT3.Add(wt);
+				WallsLocalText.Add(wt);
 				plintByLevel.Add(pl);
 				perimByLevel.Add(pr);
 
@@ -203,7 +226,7 @@ namespace WorkApp
 				wallByLevel.Add(w);
 				wallNumByLevel.Add(wn);
 			}
-
+			
             //Задаём площади отделки помещений и указываем неизменные помещения
 
             for (int lev = 0; lev < Levels.Distinct().Count(); lev++)
@@ -238,23 +261,24 @@ namespace WorkApp
                             if (checkWall.WallType.LookupParameter("rykomoika").AsInteger()==1)
                             {
 								WallS2[lev][r]+= wallAreaByLevel[lev][w];
-								WallT3[lev][r] = checkWall.WallType.LookupParameter("СоставОтделкиСтен").AsString();
-								WT3.Add(checkWall.WallType.LookupParameter("СоставОтделкиСтен").AsString());
+								WallsLocalText[lev][r] = checkWall.WallType.LookupParameter("СоставОтделкиСтен").AsString();
+								WallsLocal.Add(checkWall.WallType.LookupParameter("СоставОтделкиСтен").AsString());
 								continue;
 							}
 							WallS1[lev][r] += wallAreaByLevel[lev][w];
-							WT3.Add("");
+							WallsLocal.Add("");
                         }
                     }
                 }
             }
-			WT3 = WT3.OrderBy(x=>x).ToList();
-
+			WallsLocal = WallsLocal.OrderBy(x=>x).ToList();
+            
 
 			//Сортируем помещения по типу отделки потолка и стен
 			int finishTypes = 0;
-			foreach (string wt3 in WT3.Distinct())
-			{
+
+            if (WallsLocal.Count==0)
+            {
 				foreach (String i in CeilText.Distinct())
 				{
 					foreach (String j in MainText.Distinct())
@@ -271,7 +295,7 @@ namespace WorkApp
 							for (int r = 0; r < roomByLevel[lev].Count(); r++)
 							{
 
-								if (CeilTextByLevel[lev][r] == i & MainTextByLevel[lev][r] == j & WallT3[lev][r]==wt3)
+								if (CeilTextByLevel[lev][r] == i & MainTextByLevel[lev][r] == j)
 								{
 									SimilarFinish.Add(roomByLevel[lev][r]);
 									SimilarFinishNum.Add(roomNumByLevel[lev][r]);
@@ -286,7 +310,46 @@ namespace WorkApp
 						finishTypes++;
 					}
 				}
+
+		}
+            else
+            {
+				foreach (string wt3 in WallsLocal.Distinct())
+				{
+					foreach (String i in CeilText.Distinct())
+					{
+						foreach (String j in MainText.Distinct())
+						{
+							FinishTable.Add(new List<List<Element>>());
+							FinishTableNum.Add(new List<List<string>>());
+							FinishTableW3S.Add(new List<List<double>>());
+
+							for (int lev = 0; lev < Levels.Distinct().Count(); lev++)
+							{
+								List<Element> SimilarFinish = new List<Element>();
+								List<String> SimilarFinishNum = new List<String>();
+								List<double> SimW3S = new List<double>();
+								for (int r = 0; r < roomByLevel[lev].Count(); r++)
+								{
+
+									if (CeilTextByLevel[lev][r] == i & MainTextByLevel[lev][r] == j & WallsLocalText[lev][r] == wt3)
+									{
+										SimilarFinish.Add(roomByLevel[lev][r]);
+										SimilarFinishNum.Add(roomNumByLevel[lev][r]);
+										SimW3S.Add(WallS2[lev][r]);
+
+									}
+								}
+								FinishTable[finishTypes].Add(SimilarFinish);
+								FinishTableNum[finishTypes].Add(SimilarFinishNum);
+								FinishTableW3S[finishTypes].Add(SimW3S);
+							}
+							finishTypes++;
+						}
+					}
+				}
 			}
+			
 			//Сортируем помещения по типу пола  
 			int floorTypes = 0;
             foreach (string i in FloorText.Distinct())
@@ -324,6 +387,7 @@ namespace WorkApp
 				GlobalParameter ohohoh = GlobalParametersManager.FindByName(doc, "НесколькоЭтажей") != ElementId.InvalidElementId ?
 				doc.GetElement(GlobalParametersManager.FindByName(doc, "НесколькоЭтажей")) as GlobalParameter :
 				GlobalParameter.Create(doc, "НесколькоЭтажей", ParameterType.YesNo);
+				
 
 
 				int MoreThenOneLevel = ((IntegerParameterValue)ohohoh.GetValue()).Value;
@@ -333,7 +397,7 @@ namespace WorkApp
                 {
                     for (int r = 0; r < roomByLevel[lev].Count(); r++)
                     {
-                        roomByLevel[lev][r].LookupParameter("SanT").Set(WallT3[lev][r]);
+                        roomByLevel[lev][r].LookupParameter("SanT").Set(WallsLocalText[lev][r]);
                         roomByLevel[lev][r].LookupParameter("ДлинаПроемов").Set(plintByLevel[lev][r]);
                     }
                 }
@@ -364,7 +428,27 @@ namespace WorkApp
                     {
                         for (int r = 0; r < FinishTable[i][lev].Count(); r++)
                         {
-                            FinishTable[i][lev][r].LookupParameter("testW").Set(fillText);
+							try
+							{
+								FinishTable[i][lev][r].LookupParameter("ОТД_Состав.Стены").Set(doc.GetElement(FinishTable[i][lev][r].LookupParameter("ОТД_Стены").AsElementId()).LookupParameter("АР_Состав отделки").AsString());
+								//FinishTable[i][lev][r].LookupParameter("ОТД_Состав.Потолок").Set(doc.GetElement(FinishTable[i][lev][r].LookupParameter("ОТД_Потолок").AsElementId()).LookupParameter("АР_Состав отделки").AsString());
+							}
+							catch (Exception)
+							{
+								FinishTable[i][lev][r].LookupParameter("ОТД_Состав.Стены").Set("НЕТ ОТДЕЛКИ");
+								//FinishTable[i][lev][r].LookupParameter("ОТД_Состав.Потолок").Set("НЕТ ОТДЕЛКИ");
+							}
+							try
+							{
+								//FinishTable[i][lev][r].LookupParameter("ОТД_Состав.Стены").Set(doc.GetElement(FinishTable[i][lev][r].LookupParameter("ОТД_Стены").AsElementId()).LookupParameter("АР_Состав отделки").AsString());
+								FinishTable[i][lev][r].LookupParameter("ОТД_Состав.Потолок").Set(doc.GetElement(FinishTable[i][lev][r].LookupParameter("ОТД_Потолок").AsElementId()).LookupParameter("АР_Состав отделки").AsString());
+							}
+							catch (Exception)
+							{
+								//FinishTable[i][lev][r].LookupParameter("ОТД_Состав.Стены").Set("НЕТ ОТДЕЛКИ");
+								FinishTable[i][lev][r].LookupParameter("ОТД_Состав.Потолок").Set("НЕТ ОТДЕЛКИ");
+							}
+							FinishTable[i][lev][r].LookupParameter("testW").Set(fillText);
                             //FinishTable[i][lev][r].LookupParameter("unitTest").Set(fillText2);
                             FinishTable[i][lev][r].LookupParameter("SanS").Set(sumW3S > 0 ? sumW3S.ToString("F1") : "");
                             FinishTable[i][lev][r].LookupParameter("snS").Set(FinishTableW3S[i][lev][r]);
@@ -401,10 +485,21 @@ namespace WorkApp
                             fillText += "\n";
                         }
                     }
+					
                     for (int lev = 0; lev < floorTable[i].Count(); lev++)
                     {
-                        for (int r = 0; r < floorTable[i][lev].Count(); r++)
-                        {
+						for (int r = 0; r < floorTable[i][lev].Count(); r++)
+						{
+                            try
+                            {
+								floorTable[i][lev][r].LookupParameter("ОТД_Состав.Пол").Set(doc.GetElement(floorTable[i][lev][r].LookupParameter("ОТД_Пол").AsElementId()).LookupParameter("АР_Состав отделки").AsString());
+								
+							}
+                            catch (Exception)
+                            {
+								floorTable[i][lev][r].LookupParameter("ОТД_Состав.Пол").Set("НЕТ ОТДЕЛКИ");
+
+							}							
                             floorTable[i][lev][r].LookupParameter("testF").Set(fillText);
                             floorTable[i][lev][r].LookupParameter("PlintusTotal").Set(sumPlint);
                             if (floorTable[i][lev][r].LookupParameter("плинтус").AsInteger() == 1)

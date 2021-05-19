@@ -87,6 +87,7 @@ namespace WorkApp
                     }
                 }
             }
+            List<string> getRoomNumbers = new List<string>();
 
             List<List<Room>> repeatedRoomsUnfl = new List<List<Room>>();
             int count = 0;
@@ -109,13 +110,34 @@ namespace WorkApp
             List<string> wHeights = new List<string>();
             List<Element> wTypes = new List<Element>();
             List<Element> allWallTypes = new FilteredElementCollector(doc).OfClass(typeof(WallType)).ToList();
+
+            GlobalParameter OTD_Main;
+            using (Transaction tryGlobal = new Transaction(doc, "defineGlobal"))
+            {
+                tryGlobal.Start();
+
+                if (GlobalParametersManager.FindByName(doc, "ОТД_Основная") != ElementId.InvalidElementId)
+                {
+                    OTD_Main = doc.GetElement(GlobalParametersManager.FindByName(doc, "ОТД_Основная")) as GlobalParameter;
+                }
+                else
+                {
+                    OTD_Main = GlobalParameter.Create(doc, "ОТД_Основная", ParameterType.Text);
+                    
+                }
+
+                tryGlobal.Commit();
+            }
+
+            string s_OTD_Main = ((StringParameterValue)OTD_Main.GetValue()).Value;
+            
             foreach (Room r in repeatedRoomsFl)
             {
-                wHeights.Add(r.getP("setFFF"));
+                wHeights.Add(r.getP(s_OTD_Main));
                 //allWallTypes.Where(x => x.Name == r.getP("setFFF")).ToList();
                 foreach (Element wt in allWallTypes)
                 {
-                    if (wt.Name==r.getP("setFFF"))
+                    if (wt.Name==r.getP(s_OTD_Main))
                     {
                         wTypes.Add(wt);
                     }
@@ -145,7 +167,16 @@ namespace WorkApp
                 else
                 {
                     //offsetedCurves.Add(gg);
-                    offsetedCurves.Add(CurveLoop.CreateViaOffset(j, (valueWith * (-0.5)), j.GetPlane().Normal));
+                    try
+                    {
+                        offsetedCurves.Add(CurveLoop.CreateViaOffset(j, (valueWith * (-0.5)), j.GetPlane().Normal));
+                    }
+                    catch (Exception)
+                    {
+
+                        
+                    }
+                    
                 }
                 count += 1;
             }
@@ -162,6 +193,7 @@ namespace WorkApp
                 explodedCurves.Add(tempList);
                 
             }
+            
             List<Wall> walls = new List<Wall>();
             using (Transaction tr = new Transaction(doc, "PerimetralWall"))
             {

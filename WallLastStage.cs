@@ -2,7 +2,6 @@
 //using Autodesk.Revit.Creation;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
-using Autodesk.Revit.DB.Structure;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Events;
 using System;
@@ -15,7 +14,7 @@ using System.Threading.Tasks;
 namespace WorkApp
 {
     [Autodesk.Revit.Attributes.Transaction(Autodesk.Revit.Attributes.TransactionMode.Manual)]
-    class test : IExternalCommand
+    class WallLastStage : IExternalCommand
     {
         Result IExternalCommand.Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
@@ -38,50 +37,28 @@ namespace WorkApp
                 .WherePasses(door_filter)
                 .ToElements();
 
-            List<Element> otdWalls=allWalls.Where(x => x.Name == "!!отделка!!").ToList();
-            List<Room> roomofWall = new List<Room>();
-            using (Transaction tr = new Transaction(doc, "creating"))
+
+            using (Transaction tr = new Transaction(doc, "otdelka"))
             {
                 tr.Start();
-                foreach (Element i in otdWalls)
+                foreach (Element w in allWalls)
                 {
-
-                    BoundingBoxXYZ bBox = i.get_BoundingBox(null);
-                    
-
-                    XYZ origin = new XYZ((bBox.Max.X+bBox.Min.X)/2, (bBox.Max.Y + bBox.Min.Y) / 2, (bBox.Max.Z + bBox.Min.Z) /2 );
-
-
-                    try
-                    {
-                        i.setP("Помещение", doc.GetRoomAtPoint(origin).Number);
-                    }
-                    catch (Exception)
-                    { 
-                    }
-                       
-            }
-
-
-
-
-
-
+                    w.LookupParameter("стадияСтены").Set("2021");
+                }
                 tr.Commit();
             }
 
-                return Result.Succeeded;
-        }
-    }
 
-    public class FinishType
-    {
-        string Info { get; set; }
-        string Name { get; set; }
-        public FinishClasses finType { get; set; }
-        public FinishType(FamilySymbol sym)
-        {
-            
+                
+
+
+                //TaskDialog msg = new TaskDialog("Info");
+                //msg.MainInstruction = one[3];
+                //msg.Show();
+
+
+
+                return Result.Succeeded;
         }
     }
 }

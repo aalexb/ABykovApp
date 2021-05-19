@@ -204,7 +204,15 @@ namespace WorkApp
                     outCube.Add(Meta.forgeCube(b,++a));
                 }
             }
-            //List<Cube> secondOutCube = new List<Cube>();
+
+            List<List<Cube>> secondOutCube = new List<List<Cube>>();
+            foreach (string eqGr in outCube.Select(x=>x.out_Name).Distinct())
+            {
+                foreach (Cube cube in outCube)
+                {
+
+                }
+            }
             //foreach (string eqGroup in outCube.Select(x => x.out_Group).Distinct())
             //{
             //    List<Cube> similarGroup = new List<Cube>();
