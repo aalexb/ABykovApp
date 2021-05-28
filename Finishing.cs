@@ -114,6 +114,14 @@ namespace WorkApp
             }
 			List<ElementId> Levels = new List<ElementId>();
 			rooms = rooms.OrderBy(x => x.get_Parameter(BuiltInParameter.ROOM_NUMBER).AsString()).ToList();
+			List<RoomFinishing> novaRooms = new List<RoomFinishing>();
+            foreach (Element e in rooms)
+            {
+				novaRooms.Add(new RoomFinishing(e));
+            }
+
+			novaRooms = novaRooms.OrderBy(x => x.Num).ToList();
+
 			List<ElementId> wallLevels = new List<ElementId>();
 
             foreach (Element i in rooms)
@@ -226,34 +234,85 @@ namespace WorkApp
 				wallByLevel.Add(w);
 				wallNumByLevel.Add(wn);
 			}
-			
-            //Задаём площади отделки помещений и указываем неизменные помещения
+
+			//Плинтус
+			foreach (FamilyInstance d in doors)
+			{
+                foreach (RoomFinishing r in novaRooms)
+                {
+                    try
+                    {
+                        if (d.get_FromRoom(lastPhase).Id==r.Id | d.get_ToRoom(lastPhase).Id == r.Id)
+                        {
+							r.Perimeter -= d.LookupParameter("сп_Ширина проёма").AsDouble();
+                        }
+                    }
+                    catch (Exception)
+                    { 
+                    }
+                }
+			}
+
+			//Задаём площади отделки помещений и указываем неизменные помещения
+			foreach (ElementId lev in novaRooms.Select(x=>x.Level).Distinct())
+            {
+                foreach (RoomFinishing r in novaRooms.Where(x=>x.Level==lev))
+                {
+                    //Стены
+                    for (int i = 0; i < novaRooms.Select(x => x.Level).Distinct().Count(); i++)
+                    {
+                        for (int w = 0; w < wallNumByLevel[i].Count(); w++)
+                        {
+                            if (wallByLevel[i][w].LevelId != lev)
+                            {
+                                continue;
+                            }
+                            Wall checkWall = (Wall)wallByLevel[i][w];
+                            if (r.Num == wallNumByLevel[i][w])
+                            {
+
+                                if (checkWall.WallType.LookupParameter("rykomoika").AsInteger() == 1)
+                                {
+                                    r.LocalWallVal += wallAreaByLevel[i][w];
+                                    r.LocalWallText = checkWall.WallType.LookupParameter("СоставОтделкиСтен").AsString();
+                                    WallsLocal.Add(checkWall.WallType.LookupParameter("СоставОтделкиСтен").AsString());
+                                    continue;
+                                }
+                                r.MainWallVal += wallAreaByLevel[i][w];
+                                WallsLocal.Add("");
+                            }
+                        }
+                    }
+                }
+            }
+
 
             for (int lev = 0; lev < Levels.Distinct().Count(); lev++)
             {
                 for (int r = 0; r < roomNumByLevel[lev].Count(); r++)
                 {
-					
+
                     //Плинтус
                     for (int i = 0; i < doors.Count(); i++)
                     {
                         try
                         {
-							if (doors[i].get_FromRoom(lastPhase).Id == roomByLevel[lev][r].Id | doors[i].get_ToRoom(lastPhase).Id == roomByLevel[lev][r].Id)
-							{
-								plintByLevel[lev][r] += doors[i].LookupParameter("Ширина").AsDouble();
-							}
-						}
+                            if (doors[i].get_FromRoom(lastPhase).Id == roomByLevel[lev][r].Id | doors[i].get_ToRoom(lastPhase).Id == roomByLevel[lev][r].Id)
+                            {
+                                plintByLevel[lev][r] += doors[i].LookupParameter("Ширина").AsDouble();
+                            }
+                        }
                         catch (Exception)
                         {
 
                         }
-                        
+
                     }
-					
-					//Стены
+
+                    //Стены
                     for (int w = 0; w < wallNumByLevel[lev].Count(); w++)
                     {
+						
 						Wall checkWall = (Wall)wallByLevel[lev][w];
 						if (roomNumByLevel[lev][r]==wallNumByLevel[lev][w])
                         {
@@ -276,8 +335,26 @@ namespace WorkApp
 
 			//Сортируем помещения по типу отделки потолка и стен
 			int finishTypes = 0;
+			List<List<RoomFinishing>> novaFinishTable = new List<List<RoomFinishing>>();
+			foreach (string c in novaRooms.Select(x => x.CeilType).Distinct())
+			{
+				foreach (string w in novaRooms.Select(x => x.WallType).Distinct())
+				{
+					List<RoomFinishing> cw = novaRooms
+						.Where(x => x.CeilType == c)
+						.Where(y => y.WallType == w)
+						.ToList();
+					novaFinishTable.Add(cw);
+					foreach (RoomFinishing r in cw)
+					{
+						r.SimilarWallVal = cw.Sum(x => x.MainWallVal);
 
-            if (WallsLocal.Count==0)
+					}
+
+				}
+			}
+
+					if (WallsLocal.Count==0)
             {
 				foreach (String i in CeilText.Distinct())
 				{
@@ -349,7 +426,25 @@ namespace WorkApp
 					}
 				}
 			}
-			
+
+			List<List<RoomFinishing>> novaFloorTable = new List<List<RoomFinishing>>();
+            foreach (string i in novaRooms.Select(x=>x.FloorType).Distinct())
+            {
+                foreach (string pl in novaRooms.Select(x=>x.PlintusType).Distinct())
+                {
+					List < RoomFinishing > flpl= novaRooms
+						.Where(x => x.FloorType == i)
+						.Where(y => y.PlintusType == pl)
+						.ToList();
+					novaFloorTable.Add(flpl);
+                    foreach (RoomFinishing r in flpl)
+                    {
+						r.SimilarPlintusVal = flpl.Sum(x => x.Perimeter);
+
+                    }
+                }   
+            }
+
 			//Сортируем помещения по типу пола  
 			int floorTypes = 0;
             foreach (string i in FloorText.Distinct())
@@ -463,54 +558,181 @@ namespace WorkApp
                         roomByLevel[lev][r].LookupParameter("WallS1n").Set(WallS1[lev][r]);
                     }
                 }
-                //Передаем номера помещений с одинаковым типом отделки пола
-                for (int i = 0; i < floorTable.Count(); i++)
-                {
-                    double sumPlint = 0;
-                    String fillText = "";
-                    for (int lev = 0; lev < floorTable[i].Count(); lev++)
-                    {
-                        sumPlint += plintTable[i][lev].Sum() * FT;
-                        if (floorTable[i][lev].Count() == 0)
-                        {
-                            continue;
-                        }
-                        else
-                        {
-							if (MoreThenOneLevel==1)
-							{
-								fillText += (lev + 1).ToString() + " этаж:\n";
-							}                            
-                            fillText += Meta.shortLists(floorTableNum[i][lev]);
-                            fillText += "\n";
-                        }
-                    }
-					
-                    for (int lev = 0; lev < floorTable[i].Count(); lev++)
-                    {
-						for (int r = 0; r < floorTable[i][lev].Count(); r++)
+
+				int withNames = 1;//Если нужны имена помещений
+								  //Передаем номера помещений с одинаковым типом стен потолка
+				foreach (List<RoomFinishing> item in novaFinishTable)
+				{
+					if (item == null)
+					{
+						continue;
+					}
+					String fillText = "";
+					foreach (ElementId lev in item.Select(x => x.Level).Distinct())
+					{
+						if (MoreThenOneLevel == 1)
 						{
-                            try
-                            {
-								floorTable[i][lev][r].LookupParameter("ОТД_Состав.Пол").Set(doc.GetElement(floorTable[i][lev][r].LookupParameter("ОТД_Пол").AsElementId()).LookupParameter("АР_Состав отделки").AsString());
-								
+							fillText += doc.GetElement(lev).LookupParameter("Название уровня").AsString() + ":\n";
+						}
+						if (withNames == 1)
+						{
+							foreach (RoomFinishing gg in item.Where(x => x.Level == lev))
+							{
+								fillText += gg.Name + "(" + gg.Num + "), ";
 							}
-                            catch (Exception)
-                            {
-								floorTable[i][lev][r].LookupParameter("ОТД_Состав.Пол").Set("НЕТ ОТДЕЛКИ");
+							fillText = fillText.Remove(fillText.Length - 2, 2) + "\n";
+							continue;
+						}
+						fillText += Meta.shortLists(item.Where(x => x.Level == lev).Select(y => y.Num).ToList()) + "\n";
+					}
+					foreach (ElementId lev in item.Select(x => x.Level).Distinct())
+					{
+						foreach (RoomFinishing r in item.Where(x => x.Level == lev))
+						{
+							try
+							{
+								r.refElement.LookupParameter("ОТД_Состав.Потолок").Set(doc.GetElement(r.refElement.LookupParameter("ОТД_Потолок").AsElementId()).LookupParameter("АР_Состав отделки").AsString());
+							}
+							catch (Exception)
+							{
 
-							}							
-                            floorTable[i][lev][r].LookupParameter("testF").Set(fillText);
-                            floorTable[i][lev][r].LookupParameter("PlintusTotal").Set(sumPlint);
-                            if (floorTable[i][lev][r].LookupParameter("плинтус").AsInteger() == 1)
-                            {
-                                floorTable[i][lev][r].setP("PlintusTotalT", (sumPlint * FT).ToString("F1"));
-                            }
+								r.refElement.LookupParameter("ОТД_Состав.Потолок").Set("НЕТ ОТДЕЛКИ");
+							}
+							try
+							{
+								r.refElement.LookupParameter("ОТД_Состав.Стены").Set(doc.GetElement(r.refElement.LookupParameter("ОТД_Стены").AsElementId()).LookupParameter("АР_Состав отделки").AsString());
+							}
+							catch (Exception)
+							{
 
+								r.refElement.LookupParameter("ОТД_Состав.Стены").Set("НЕТ ОТДЕЛКИ");
+							}
+							r.refElement.LookupParameter("testW").Set(fillText);
+							//r.refElement.LookupParameter("ОТД_Кол.Стены").Set(0);
+							r.refElement.LookupParameter("ОТД_Кол.Стены").Set(r.SimilarWallVal);
+							
 
-                        }
+							//r.refElement.LookupParameter("PlintusTotal").Set(r.Perimeter);
+							//item.Select(x => x.refElement.LookupParameter("testF").Set(fillText));
+							//item.Select(x => x.refElement.LookupParameter("PlintusTotal").Set(x.SimilarPlintusVal));
+
+						}
+					}
+				}
+
+				//Передаем номера помещений с одинаковым типом отделки пола
+				foreach (List<RoomFinishing> item in novaFloorTable)
+                {
+                    if (item==null)
+                    {
+						continue;
                     }
-                }
+					String fillText = "";
+                    foreach (ElementId lev in item.Select(x=>x.Level).Distinct())
+                    {
+                        if (MoreThenOneLevel==1)
+                        {
+							fillText += doc.GetElement(lev).LookupParameter("Название уровня").AsString() + ":\n";
+                        }
+                        if (withNames==1)
+                        {
+                            foreach (RoomFinishing gg in item.Where(x => x.Level == lev))
+                            {
+								fillText += gg.Name + "-" + gg.Num + ", ";
+							}
+							fillText = fillText.Remove(fillText.Length-2,2)+"\n";
+							continue;
+                        }
+						fillText += Meta.shortLists(item.Where(x => x.Level == lev).Select(y => y.Num).ToList())+"\n";
+                    }
+					foreach (ElementId lev in item.Select(x => x.Level).Distinct())
+					{
+						foreach (RoomFinishing r in item.Where(x => x.Level == lev))
+						{
+							r.refElement.LookupParameter("ОТД_Состав.Пол").Set("");
+							try
+							{
+								r.refElement.LookupParameter("ОТД_Состав.Пол").Set(doc.GetElement(r.refElement.LookupParameter("ОТД_Пол").AsElementId()).LookupParameter("АР_Состав отделки").AsString());
+							}
+							catch (Exception)
+							{
+
+								r.refElement.LookupParameter("ОТД_Состав.Пол").Set("НЕТ ОТДЕЛКИ");
+							}
+							try
+							{
+								r.refElement.LookupParameter("ОТД_Состав.Плинтус").Set(doc.GetElement(r.refElement.LookupParameter("ОТД_Плинтус").AsElementId()).LookupParameter("АР_Состав отделки").AsString());
+							}
+							catch (Exception)
+							{
+
+								r.refElement.LookupParameter("ОТД_Состав.Плинтус").Set("НЕТ ОТДЕЛКИ");
+							}
+							r.refElement.LookupParameter("testF").Set(fillText);
+							r.refElement.LookupParameter("ОТД_Кол.Плинтус").Set("");
+
+							if (r.PlintusType!="__Отделка : ---")
+                            {
+								r.refElement.LookupParameter("ОТД_Кол.Плинтус").Set((r.SimilarPlintusVal * FT).ToString("F1"));
+							}
+							
+							r.refElement.LookupParameter("PlintusTotal").Set(r.Perimeter);
+							//item.Select(x => x.refElement.LookupParameter("testF").Set(fillText));
+							//item.Select(x => x.refElement.LookupParameter("PlintusTotal").Set(x.SimilarPlintusVal));
+
+						}
+					}
+
+				}
+      //          for (int i = 0; i < floorTable.Count(); i++)
+      //          {
+      //              double sumPlint = 0;
+      //              String fillText = "";
+      //              for (int lev = 0; lev < floorTable[i].Count(); lev++)
+      //              {
+      //                  sumPlint += plintTable[i][lev].Sum() * FT;
+      //                  if (floorTable[i][lev].Count() == 0)
+      //                  {
+      //                      continue;
+      //                  }
+      //                  else
+      //                  {
+						//	if (MoreThenOneLevel==1)
+						//	{
+						//		fillText += (lev + 1).ToString() + " этаж:\n";
+						//	}                            
+      //                      fillText += Meta.shortLists(floorTableNum[i][lev]);
+      //                      fillText += "\n";
+      //                  }
+      //              }
+
+                    
+
+      //              for (int lev = 0; lev < floorTable[i].Count(); lev++)
+      //              {
+						//for (int r = 0; r < floorTable[i][lev].Count(); r++)
+						//{
+      //                      try
+      //                      {
+						//		floorTable[i][lev][r].LookupParameter("ОТД_Состав.Пол").Set(doc.GetElement(floorTable[i][lev][r].LookupParameter("ОТД_Пол").AsElementId()).LookupParameter("АР_Состав отделки").AsString());
+								
+						//	}
+      //                      catch (Exception)
+      //                      {
+						//		floorTable[i][lev][r].LookupParameter("ОТД_Состав.Пол").Set("НЕТ ОТДЕЛКИ");
+
+						//	}							
+      //                      floorTable[i][lev][r].LookupParameter("testF").Set(fillText);
+      //                      floorTable[i][lev][r].LookupParameter("PlintusTotal").Set(sumPlint);
+      //                      if (floorTable[i][lev][r].LookupParameter("плинтус").AsInteger() == 1)
+      //                      {
+      //                          floorTable[i][lev][r].setP("PlintusTotalT", (sumPlint * FT).ToString("F1"));
+      //                      }
+
+
+      //                  }
+      //              }
+      //          }
                 tr.Commit();
 
 
@@ -527,3 +749,4 @@ namespace WorkApp
 	}
 
 }
+
