@@ -83,6 +83,16 @@ namespace WorkApp.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap Brush {
+            get {
+                object obj = ResourceManager.GetObject("Brush", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap dwfx {
             get {
                 object obj = ResourceManager.GetObject("dwfx", resourceCulture);
@@ -123,9 +133,9 @@ namespace WorkApp.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap inval {
+        internal static System.Drawing.Bitmap MGN {
             get {
-                object obj = ResourceManager.GetObject("inval", resourceCulture);
+                object obj = ResourceManager.GetObject("MGN", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -133,9 +143,9 @@ namespace WorkApp.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap kista {
+        internal static System.Drawing.Bitmap PDF {
             get {
-                object obj = ResourceManager.GetObject("kista", resourceCulture);
+                object obj = ResourceManager.GetObject("PDF", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -143,9 +153,9 @@ namespace WorkApp.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap pdf {
+        internal static System.Drawing.Bitmap Peace {
             get {
-                object obj = ResourceManager.GetObject("pdf", resourceCulture);
+                object obj = ResourceManager.GetObject("Peace", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -156,16 +166,6 @@ namespace WorkApp.Properties {
         internal static System.Drawing.Bitmap pic {
             get {
                 object obj = ResourceManager.GetObject("pic", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap pirog {
-            get {
-                object obj = ResourceManager.GetObject("pirog", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

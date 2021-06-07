@@ -26,6 +26,7 @@ namespace WorkApp
             PhaseArray xcom = doc.Phases;
             Phase lastPhase = xcom.get_Item(xcom.Size - 1);
             ElementId idPhase = lastPhase.Id;
+            string LastPhaseName = lastPhase.Name;
 
             FilterNumericRuleEvaluator evaluator = new FilterNumericEquals();
             FilterableValueProvider provider = new ParameterValueProvider(new ElementId((int)BuiltInParameter.PHASE_CREATED));
@@ -38,26 +39,12 @@ namespace WorkApp
                 .ToElements();
 
 
-            using (Transaction tr = new Transaction(doc, "otdelka"))
+            using (Transaction tr = new Transaction(doc, "WallLastStage"))
             {
                 tr.Start();
-                foreach (Element w in allWalls)
-                {
-                    w.LookupParameter("стадияСтены").Set("2021");
-                }
+                foreach (Element w in allWalls){w.LookupParameter("стадияСтены").Set(LastPhaseName);}
                 tr.Commit();
             }
-
-
-                
-
-
-                //TaskDialog msg = new TaskDialog("Info");
-                //msg.MainInstruction = one[3];
-                //msg.Show();
-
-
-
                 return Result.Succeeded;
         }
     }

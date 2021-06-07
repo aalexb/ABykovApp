@@ -62,12 +62,6 @@
     <Compile Include="annot.cs" />
     <Compile Include="Book.cs" />
     <Compile Include="Cube.cs" />
-    <Compile Include="Form1.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Form1.Designer.cs">
-      <DependentUpon>Form1.cs</DependentUpon>
-    </Compile>
     <Compile Include="GhostWall.cs" />
     <Compile Include="grouping.cs" />
     <Compile Include="metall.cs" />
@@ -86,14 +80,12 @@
     <Compile Include="ExportDWFX.cs" />
     <Compile Include="SuperTest.cs" />
     <Compile Include="WallLastStage.cs" />
-    <Compile Include="test.cs" />
+    <Compile Include="RNumInFWall.cs" />
     <Compile Include="Tools.cs" />
     <Compile Include="Universe.cs" />
+    <Compile Include="zWall.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Form1.resx">
-      <DependentUpon>Form1.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -131,7 +123,6 @@
     <None Include="Resources\block.png" />
     <None Include="Resources\block %281%29.png" />
     <None Include="Resources\free-icon-pdf-179483 %281%29.png" />
-    <Content Include="TextFile1 - Копировать.py" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

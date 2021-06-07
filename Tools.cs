@@ -226,6 +226,13 @@ namespace WorkApp
 			butt.LargeImage = Tools.GetImage(pic.GetHbitmap());
 			return butt;
 		}
+		public static PushButton AddButton(this RibbonPanel rp, string name,string Comment, Bitmap pic, string className)
+		{
+			string thisAssemblyPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+			PushButton butt = rp.AddItem(new PushButtonData(name, Comment, thisAssemblyPath, "WorkApp." + className)) as PushButton;
+			butt.LargeImage = Tools.GetImage(pic.GetHbitmap());
+			return butt;
+		}
 		//public static string 
 		public static string shortLists(List<string> IN)
 		{

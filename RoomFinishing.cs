@@ -17,6 +17,10 @@ namespace WorkApp
 {
     public class RoomFinishing
     {
+        public static List<RoomFinishing> AllRooms = new List<RoomFinishing>();
+        public static List<List<RoomFinishing>> FloorTable = new List<List<RoomFinishing>>();
+        public static List<List<RoomFinishing>> FinishTable = new List<List<RoomFinishing>>();
+
         public Element refElement { get; }
         public ElementId Id { get; }
         public string Name { get; }
@@ -38,7 +42,7 @@ namespace WorkApp
         public string SimilarFloorVal { get; set; }
         public RoomFinishing(Element e)
         {
-            refElement = e;
+            this.refElement = e;
             Id = e.Id;
             Name=e.get_Parameter(BuiltInParameter.ROOM_NAME).AsString();
             Num = e.get_Parameter(BuiltInParameter.ROOM_NUMBER).AsString();
@@ -51,6 +55,44 @@ namespace WorkApp
             MainWallVal = 0;
             LocalWallVal = 0;
             PlintusVal = 0;
+        }
+
+        public static void organizeFloor()
+        {
+            foreach (string i in AllRooms.Select(x=>x.FloorType).Distinct())
+            {
+                foreach (string pl in AllRooms.Select(x=>x.PlintusType).Distinct())
+                {
+                    List<RoomFinishing> flpl = AllRooms
+                        .Where(x => x.FloorType == i)
+                        .Where(y => y.PlintusType == pl)
+                        .ToList();
+                    FloorTable.Add(flpl);
+                    foreach (RoomFinishing room in flpl)
+                    {
+                        room.SimilarPlintusVal = flpl.Sum(x => x.Perimeter);
+                    }
+                } 
+            }
+        }
+
+        public static void organizeFinish()
+        {
+            foreach (string c in AllRooms.Select(x=>x.CeilType).Distinct())
+            {
+                foreach (string w in AllRooms.Select(x => x.WallType).Distinct())
+                {
+                    List<RoomFinishing> cw = AllRooms
+                        .Where(x => x.CeilType == c)
+                        .Where(y => y.WallType == w)
+                        .ToList();
+                    FinishTable.Add(cw);
+                    foreach (RoomFinishing room in cw)
+                    {
+                        room.SimilarWallVal = cw.Sum(x => x.MainWallVal);
+                    }
+                }
+            }
         }
     }
 }
