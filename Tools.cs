@@ -200,6 +200,7 @@ namespace WorkApp
 
 	public static class Meta
 	{
+		public static double FT = 0.3048;
 		public static void ororor(this List<Cube> a)
 		{
 
@@ -304,10 +305,23 @@ namespace WorkApp
 			return Out.Remove(Out.Length - 2);
 		}
 
-		public static Cube forgeCube(List<Cube> IN, int position)
+		public static (Cube,int) forgeCube(List<Cube> IN, int position)
 		{
+			int addpos = 1;
+            
 			string grName = IN[0].out_Group == null ?"Без группы": IN[0].out_Group;
 			Cube nova = new Cube(grName, IN[0].out_Name);
+			foreach (Cube c in IN)
+			{
+                try
+                {
+					nova.posElements.Add(c.refElement);
+				}
+                catch 
+                {
+                }
+				
+			}
 			nova.mType = IN[0].mType;
 			//nova
             foreach (Cube i in IN)
@@ -321,9 +335,20 @@ namespace WorkApp
 					nova.Quantity += i.Quantity;
                 }
             }
+			if (IN[0].mType == myTypes.matArea | IN[0].mType == myTypes.matVol)
+			{
+				addpos = 0;
+				nova.out_Pos = "";
+				nova.Prior = 1000;
+			}
+            else
+            {
+				nova.out_Pos = position.ToString();
+				nova.Prior = 10;
+			}
 			//nova.Quantity = IN.Count;
 			nova.Massa = IN[0].Massa;
-			nova.out_Pos = IN[0].out_Pos;
+			
 			
 			foreach (Cube b in IN)
 			{
@@ -337,9 +362,9 @@ namespace WorkApp
 				nova.out_Name = nova.out_Name + " l=" + nova.TotalLength.ToString("F1") + " м.п.";
 			}
 			nova.out_Gost = IN[0].out_Gost;
-			nova.Prior = IN[0].Prior;
+			//nova.Prior = IN[0].Prior;
 			(nova.out_Kol_vo, nova.out_Mass, nova.out_Other) = Meta.chtoto(nova);
-			return nova;
+			return (nova,addpos);
 		}
 		public static (string, string, string) chtoto(Cube cube)
 		{

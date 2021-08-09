@@ -19,8 +19,11 @@ namespace WorkApp
 
 	public class Cube
     {
-		
+		public Element refElement { get; set; }
+		public static List<Cube> allCubes = new List<Cube>();
+		public List<Element> posElements = new List<Element>();
 		public string out_Pos { get; set; } //Позиция
+		public string out_Snos { get; set; } //Стадия сноса
         public string out_Gost { get; set; } //ГОСТ
         public string out_Name { get; set; } //Имя в спецификации
         public string out_Kol_vo { get; set; } //Количество в штуках
@@ -65,9 +68,28 @@ namespace WorkApp
 		public Cube (Element material, Element source)
 		{
 			out_Group = source.getP(GROUP);
-			out_Name = material.getP(MAT_NAME);
-			out_Gost = material.getP(MAT_GOST);
+            if (material.getP(MAT_NAME)=="")
+            {
+				out_Name = "Назв: " + material.Name;
+
+			}
+            else
+            {
+				out_Name = material.getP(MAT_NAME);
+			}
+			if (material.getP(MAT_GOST) == "")
+			{
+				out_Gost = "Обозн: " + material.Name;
+
+			}
+			else
+			{
+				out_Gost = material.getP(MAT_GOST);
+			}
+
+			
 			out_Mass = material.Name;
+			out_Snos = source.get_Parameter(BuiltInParameter.PHASE_DEMOLISHED).AsValueString();
 			if (material.LookupParameter("Объем_Площадь").AsInteger()==0)
 			{
 				Area = source.GetMaterialArea(material.Id,false)*FT*FT;
@@ -82,6 +104,8 @@ namespace WorkApp
 		
 		public Cube (Element e)
 		{
+			refElement = e;
+			out_Snos = e.get_Parameter(BuiltInParameter.PHASE_DEMOLISHED).AsValueString();
 			typeName = e.Name;
 			//GOST
 			switch (e.Category.Name)
@@ -105,17 +129,12 @@ namespace WorkApp
 			switch (e.Category.Name)
 			{
 				case "Несущая арматура":
-					out_Group = e.getP("Метка основы");
+					//ebar r = e as Rebar;
+					Element osn = e.Document.GetElement( (e as Rebar).GetHostId());
+					out_Group = osn.getP(GROUP);
 					break;
 				default:
-					if (e.get_Parameter(BuiltInParameter.ALL_MODEL_MARK).AsString() != null)
-					{
-						out_Group = e.get_Parameter(BuiltInParameter.ALL_MODEL_MARK).AsString();
-					}
-					else
-					{
-						out_Group = e.getP(GROUP);
-					}
+					out_Group = e.getP(GROUP);
 					break;
 			}
 
@@ -199,7 +218,9 @@ namespace WorkApp
 							break;
 						case "Несущие колонны":
 							mType = myTypes.armLen;
-							Length = e.get_Parameter(BuiltInParameter.STEEL_ELEM_CUT_LENGTH).AsDouble() * FT;
+							Length = e.get_Parameter(BuiltInParameter.INSTANCE_LENGTH_PARAM).AsDouble() * FT;
+                            
+							
 							break;
 						default:
 
@@ -230,6 +251,9 @@ namespace WorkApp
             unit.setP("g_mass", out_Mass);
             unit.setP("g_other", out_Other);
             unit.setP("g_group", out_Group);
+			unit.setP("g_snos", out_Snos);
+			//unit.LookupParameter("g_sort").Set(this.Prior).ToString();
+			unit.setP("g_sort", Prior.ToString());
         }
 
 

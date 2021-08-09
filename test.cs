@@ -47,18 +47,21 @@ namespace WorkApp
                 {
 
                     BoundingBoxXYZ bBox = i.get_BoundingBox(null);
-                    
 
-                    XYZ origin = new XYZ((bBox.Max.X+bBox.Min.X)/2, (bBox.Max.Y + bBox.Min.Y) / 2, (bBox.Max.Z + bBox.Min.Z) /2 );
-
-
-                    try
+                    if (bBox!=null)
                     {
-                        i.setP("Помещение", doc.GetRoomAtPoint(origin).Number);
+                        XYZ origin = new XYZ((bBox.Max.X + bBox.Min.X) / 2, (bBox.Max.Y + bBox.Min.Y) / 2, (bBox.Max.Z + bBox.Min.Z) / 2);
+                        try
+                        {
+                            i.setP("Помещение", doc.GetRoomAtPoint(origin).Number);
+                        }
+                        catch (Exception)
+                        {
+                        }
                     }
-                    catch (Exception)
-                    { 
-                    }
+
+
+                   
                        
             }
 

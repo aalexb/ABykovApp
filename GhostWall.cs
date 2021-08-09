@@ -9,23 +9,34 @@ namespace WorkApp
 {
     public class GhostWall
     {
-
+        public Element refEl { get; set; }
         public ElementId Level { get; set; }
         public string Room { get; set; }
         public double Area { get; set; }
         public int Secondary { get; set; }
+        public bool isLocal = false;
+        public string sostav { get; set; }
         
 
-        public GhostWall (string room, ElementId level, double area)
+        public GhostWall (string room, ElementId level, double area, bool isLocal)
         {
             Room = room;
             Level = level;
             Area = area;
-
+            this.isLocal = isLocal;
         }
-        public GhostWall(Element wall) { 
+        public GhostWall(Element wall) {
+            refEl = wall;
+            Room = wall.getP("Помещение");
+            Level = wall.LevelId;
+            Area = wall.get_Parameter(BuiltInParameter.HOST_AREA_COMPUTED).AsDouble();
+            isLocal= (wall as Wall).WallType.LookupParameter("rykomoika").AsInteger() == 1 ? true : false;
+            sostav = (wall as Wall).WallType.LookupParameter("СоставОтделкиСтен").AsString();
         }
     }
+
+
+
 
     public class GhostRoom
     {

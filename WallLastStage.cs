@@ -27,14 +27,13 @@ namespace WorkApp
             Phase lastPhase = xcom.get_Item(xcom.Size - 1);
             ElementId idPhase = lastPhase.Id;
 
-            FilterNumericRuleEvaluator evaluator = new FilterNumericEquals();
-            FilterableValueProvider provider = new ParameterValueProvider(new ElementId((int)BuiltInParameter.PHASE_CREATED));
-            FilterElementIdRule fRule = new FilterElementIdRule(provider, evaluator, idPhase);
-            ElementParameterFilter door_filter = new ElementParameterFilter(fRule);
 
             IList<Element> allWalls = new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Walls)
                 .WhereElementIsNotElementType()
-                .WherePasses(door_filter)
+                .ToElements();
+
+            IList<Element> allDoors = new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Doors)
+                .WhereElementIsNotElementType()
                 .ToElements();
 
 
@@ -43,7 +42,24 @@ namespace WorkApp
                 tr.Start();
                 foreach (Element w in allWalls)
                 {
-                    w.LookupParameter("стадияСтены").Set("2021");
+                    if (w.get_Parameter(BuiltInParameter.PHASE_CREATED).AsValueString()=="обозначения")
+                    {
+                        continue;
+                    }
+                    LocationCurve loc = w.Location as LocationCurve;
+                    
+                    w.LookupParameter("СП_Стадия возведения").Set(w.get_Parameter(BuiltInParameter.PHASE_CREATED).AsValueString());
+                    //BoundingBoxXYZ bbox=w.get_Geometry(new Options).
+                    w.LookupParameter("СП_Стадия сноса").Set(w.get_Parameter(BuiltInParameter.PHASE_DEMOLISHED).AsValueString());
+                    w.LookupParameter("СП_Высота").Set(w.get_Parameter(BuiltInParameter.WALL_USER_HEIGHT_PARAM).AsDouble());
+                    
+                    
+                    //w.LookupParameter("СП_Длина").Set(w.getP(BuiltInParameter.));
+
+                }
+                foreach (Element  w in allDoors)
+                {
+                    w.LookupParameter("СП_Стадия возведения").Set(w.get_Parameter(BuiltInParameter.PHASE_CREATED).AsValueString());
                 }
                 tr.Commit();
             }

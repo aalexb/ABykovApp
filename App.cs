@@ -24,9 +24,10 @@ namespace WorkApp
             RibbonPanel panel = ribbonPanel(a);
 
             PushButton button1 = panel.AddButton("Получить ПДФ", Resources.pdf, "ExportDWFX");
+            PushButton buttonDWG = panel.AddButton("Получить DWG", Resources.dwgpic, "ExportDWG");
             PushButton button2 = panel.AddButton("Смена номера", Resources.tudaSyda, "SheetNum");
             PushButton button3 = panel.AddButton("Эл-ты помещ.", Resources.pirog, "RoomElements");
-            PushButton button4 = panel.AddButton("Отделка", Resources.kista, "Finishing");
+            PushButton button4 = panel.AddButton("Отделка", Resources.kista, "NovaFinishing");
             PushButton button5 = panel.AddButton("Аннотации", Resources.inval, "annot");
             PushButton button6 = panel.AddButton("Металл", Resources.gear,  "metall");
             PushButton button7 = panel.AddButton("Спецификация", Resources.block,  "grouping");
@@ -35,6 +36,7 @@ namespace WorkApp
             PushButton buttonTest = panel.AddButton("Тест", Resources.fullHouse, "test");
             PushButton buttonUniv = panel.AddButton("Всё", Resources.atom, "Universe");
             PushButton buttonWLS= panel.AddButton("Стены 2021", Resources.plane, "WallLastStage");
+           
 
 
 

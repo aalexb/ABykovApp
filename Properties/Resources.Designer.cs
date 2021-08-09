@@ -93,6 +93,16 @@ namespace WorkApp.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap dwgpic {
+            get {
+                object obj = ResourceManager.GetObject("dwgpic", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap emptyHouse {
             get {
                 object obj = ResourceManager.GetObject("emptyHouse", resourceCulture);

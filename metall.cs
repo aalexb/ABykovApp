@@ -63,7 +63,7 @@ namespace WorkApp
                 }
                 foreach (FamilyInstance i in kolon)
                 {
-                    i.LookupParameter("АММО_Длина_КМ").Set(i.get_Parameter(BuiltInParameter.STEEL_ELEM_CUT_LENGTH).AsDouble());
+                    i.LookupParameter("АММО_Длина_КМ").Set(i.get_Parameter(BuiltInParameter.INSTANCE_LENGTH_PARAM).AsDouble());
                 }
                 tr.Commit();
             }

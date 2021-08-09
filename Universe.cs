@@ -102,8 +102,10 @@ namespace WorkApp
                 .WherePasses(stageFilter)
                 .Cast<Element>()
                 .ToList();
+
             
-            
+
+
             //genModel = genModel.Where(x => x.Name != "cube").ToList();
             List<Cube> allCube = new List<Cube>();
             foreach (List<Element> a in collectFromModel)
@@ -187,9 +189,12 @@ namespace WorkApp
             }
 
             List<Cube> outCube = new List<Cube>();
+
             foreach (List<Cube> item in groupingCube)
             {
-                int a = 0;
+                int a = 1;
+                //int addpos = 1;
+
                 foreach (string eqName in item.Select(x=>x.out_Name).Distinct())
                 {
                     List<Cube> b = new List<Cube>();
@@ -201,7 +206,9 @@ namespace WorkApp
                             b.Add(i);
                         }
                     }
-                    outCube.Add(Meta.forgeCube(b,++a));
+                    (Cube addCube, int addpos) = Meta.forgeCube(b, a);
+                    a += addpos;
+                    outCube.Add(addCube);
                 }
             }
 
@@ -252,6 +259,22 @@ namespace WorkApp
                 }
                 foreach (Cube i in outCube)
                 {
+                    if (i.posElements.Count!=0)
+                    {
+                        foreach (Element e in i.posElements)
+                        {
+                            try
+                            {
+                                e.LookupParameter("СП_Позиция").Set(i.out_Pos);
+                            }
+                            catch
+                            {
+
+                            }
+                            
+                        }
+                    }
+                    
                     i.Create(doc);
                 }
 

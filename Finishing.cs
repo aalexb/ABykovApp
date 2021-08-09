@@ -25,9 +25,11 @@ namespace WorkApp
 
 			//GlobalParameter.
 			//GlobalParameter one = ;
+			FinishForm questions = new FinishForm(doc);
+			questions.Show();
+			questions.Activate();
 			
 
-			
 			double FT = 0.3048;
 			PhaseArray xcom = doc.Phases;
 			Phase lastPhase = xcom.get_Item(xcom.Size - 1);
@@ -89,13 +91,13 @@ namespace WorkApp
 				//otd.Add(new otdelka(f.FamilyName+':'+f.Name,f.getP("АР_Состав отделки")));
                 entoFamily.Add(f.FamilyName);
             }
-            List<String> one = new List<string>();
+            //List<String> one = new List<string>();
             
-            foreach (FamilySymbol f in ento)
-            {
+            //foreach (FamilySymbol f in ento)
+            //{
 
-                one.Add(f.getP("АР_Состав отделки"));
-            }
+            //    one.Add(f.getP("АР_Состав отделки"));
+            //}
 			//string two = doc.GetElement(rooms[0].LookupParameter("ОТД_Пол").AsElementId()).Name;
 
             List<Element> walls = new List<Element>();
@@ -104,11 +106,14 @@ namespace WorkApp
             {
                 if (item.LookupParameter("Помещение").AsString()!=null & item.LookupParameter("Помещение").AsString() != "")
                 {
+					bool isLocal = (item as Wall).WallType.LookupParameter("rykomoika").AsInteger() == 1 ? true : false;
 					walls.Add(item);
+
 					cWalls.Add(new GhostWall(
 						item.getP("Помещение"),
 						item.LevelId,
-						item.get_Parameter(BuiltInParameter.HOST_AREA_COMPUTED).AsDouble()
+						item.get_Parameter(BuiltInParameter.HOST_AREA_COMPUTED).AsDouble(),
+                        isLocal
 						));
                 }
             }
@@ -336,25 +341,54 @@ namespace WorkApp
 			//Сортируем помещения по типу отделки потолка и стен
 			int finishTypes = 0;
 			List<List<RoomFinishing>> novaFinishTable = new List<List<RoomFinishing>>();
-			foreach (string c in novaRooms.Select(x => x.CeilType).Distinct())
+
+
+			if (WallsLocal.Count == 0)
 			{
-				foreach (string w in novaRooms.Select(x => x.WallType).Distinct())
+				foreach (string c in novaRooms.Select(x => x.CeilType).Distinct())
 				{
-					List<RoomFinishing> cw = novaRooms
-						.Where(x => x.CeilType == c)
-						.Where(y => y.WallType == w)
-						.ToList();
-					novaFinishTable.Add(cw);
-					foreach (RoomFinishing r in cw)
+					foreach (string w in novaRooms.Select(x => x.WallType).Distinct())
 					{
-						r.SimilarWallVal = cw.Sum(x => x.MainWallVal);
+						List<RoomFinishing> cw = novaRooms
+							.Where(x => x.CeilType == c)
+							.Where(y => y.WallType == w)
+							.ToList();
+						novaFinishTable.Add(cw);
+						foreach (RoomFinishing r in cw)
+						{
+							r.SimilarWallVal = cw.Sum(x => x.MainWallVal);
+
+						}
 
 					}
+				}
+			}
+			else
+			{
+				foreach (string wt3 in WallsLocal.Distinct())
+				{
+					foreach (string c in novaRooms.Select(x => x.CeilType).Distinct())
+					{
+						foreach (string w in novaRooms.Select(x => x.WallType).Distinct())
+						{
+							List<RoomFinishing> cw = novaRooms
+								.Where(x => x.CeilType == c)
+								.Where(y => y.WallType == w)
+								.ToList();
+							novaFinishTable.Add(cw);
+							foreach (RoomFinishing r in cw)
+							{
+								r.SimilarWallVal = cw.Sum(x => x.MainWallVal);
 
+							}
+
+						}
+					}
 				}
 			}
 
-					if (WallsLocal.Count==0)
+
+				if (WallsLocal.Count==0)
             {
 				foreach (String i in CeilText.Distinct())
 				{
@@ -476,6 +510,14 @@ namespace WorkApp
             }
 
 
+
+
+
+
+
+
+
+
             using (Transaction tr = new Transaction(doc, "otdelka"))
             {
                 tr.Start();
@@ -558,8 +600,10 @@ namespace WorkApp
                         roomByLevel[lev][r].LookupParameter("WallS1n").Set(WallS1[lev][r]);
                     }
                 }
+				
 
-				int withNames = 1;//Если нужны имена помещений
+
+				int withNames = questions.withnames;//Если нужны имена помещений
 								  //Передаем номера помещений с одинаковым типом стен потолка
 				foreach (List<RoomFinishing> item in novaFinishTable)
 				{
@@ -578,7 +622,7 @@ namespace WorkApp
 						{
 							foreach (RoomFinishing gg in item.Where(x => x.Level == lev))
 							{
-								fillText += gg.Name + "(" + gg.Num + "), ";
+								fillText += gg.Name + "-" + gg.Num + ", ";
 							}
 							fillText = fillText.Remove(fillText.Length - 2, 2) + "\n";
 							continue;
