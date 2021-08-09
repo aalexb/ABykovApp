@@ -37,8 +37,10 @@ namespace WorkApp
         public double SimilarWallVal { get; set; }
         public double LocalWallVal { get; set; }//Значение местной отделки стен
         public string LocalWallText { get; set; }//Текст местной отделки стен
+        public string KolonWallText { get; set; }//Текст отделки колонн
         public double unitMainWallVal { get; set; }
         public double unitLocalWallVal { get; set; }
+        public double unitKolonWallVal { get; set; }
 
 
         public string SimilarFloorVal { get; set; }
@@ -59,6 +61,7 @@ namespace WorkApp
             PlintusVal = 0;
             unitLocalWallVal = 0;
             unitMainWallVal = 0;
+            unitKolonWallVal = 0;
         }
         public static void makeFinish()
         {

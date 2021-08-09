@@ -86,6 +86,11 @@ namespace WorkApp
                             r.unitLocalWallVal += w.Area;
                             r.LocalWallText = w.sostav;
                         }
+                        else if (w.typeName== "!!отделка_колонн!!")
+                        {
+                            r.unitKolonWallVal += w.Area;
+                            r.KolonWallText = w.sostav;
+                        }
                         else
                         {
                             r.unitMainWallVal += w.Area;
