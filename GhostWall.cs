@@ -10,6 +10,7 @@ namespace WorkApp
     public class GhostWall
     {
         public Element refEl { get; set; }
+        public string typeName { get; set; }
         public ElementId Level { get; set; }
         public string Room { get; set; }
         public double Area { get; set; }
@@ -27,11 +28,13 @@ namespace WorkApp
         }
         public GhostWall(Element wall) {
             refEl = wall;
+            typeName = (wall as Wall).WallType.Name;
             Room = wall.getP("Помещение");
             Level = wall.LevelId;
             Area = wall.get_Parameter(BuiltInParameter.HOST_AREA_COMPUTED).AsDouble();
             isLocal= (wall as Wall).WallType.LookupParameter("rykomoika").AsInteger() == 1 ? true : false;
             sostav = (wall as Wall).WallType.LookupParameter("СоставОтделкиСтен").AsString();
+
         }
     }
 

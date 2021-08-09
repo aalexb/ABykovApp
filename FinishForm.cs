@@ -21,7 +21,7 @@ namespace WorkApp
     {
         public int levels = 0;
         public int withnames=0;
-        public FinishForm(UIApplication uiapp)
+        public FinishForm(Document doc)
         {
             InitializeComponent();
         }
