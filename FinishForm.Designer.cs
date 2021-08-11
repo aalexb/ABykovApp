@@ -31,6 +31,7 @@
             this.RoomNames = new System.Windows.Forms.CheckBox();
             this.button1 = new System.Windows.Forms.Button();
             this.SomeLevels = new System.Windows.Forms.CheckBox();
+            this.PhaseSelector = new System.Windows.Forms.ComboBox();
             this.SuspendLayout();
             // 
             // RoomNames
@@ -64,11 +65,21 @@
             this.SomeLevels.Text = "Добавлять названия помещений";
             this.SomeLevels.UseVisualStyleBackColor = true;
             // 
+            // PhaseSelector
+            // 
+            this.PhaseSelector.FormattingEnabled = true;
+            this.PhaseSelector.Location = new System.Drawing.Point(12, 99);
+            this.PhaseSelector.Name = "PhaseSelector";
+            this.PhaseSelector.Size = new System.Drawing.Size(194, 21);
+            this.PhaseSelector.TabIndex = 2;
+            this.PhaseSelector.SelectedIndexChanged += new System.EventHandler(this.PhaseSelector_SelectedIndexChanged);
+            // 
             // FinishForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(261, 255);
+            this.Controls.Add(this.PhaseSelector);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.SomeLevels);
             this.Controls.Add(this.RoomNames);
@@ -84,5 +95,6 @@
         private System.Windows.Forms.CheckBox RoomNames;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.CheckBox SomeLevels;
+        private System.Windows.Forms.ComboBox PhaseSelector;
     }
 }

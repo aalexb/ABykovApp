@@ -21,9 +21,25 @@ namespace WorkApp
     {
         public int levels = 0;
         public int withnames=0;
+        public Phase retPhase;
         public FinishForm(Document doc)
         {
+            PhaseArray xcom = doc.Phases;
+            //xcom.
+            
+            
+            //PhaseSelector.SelectedItem = xcom;
+
             InitializeComponent();
+
+            PhaseSelector.DataSource = xcom as IList<Phase>;
+            PhaseSelector.DisplayMember = "Name";
+            PhaseSelector.ValueMember = "Id";
+            foreach (Phase item in xcom)
+            {
+                PhaseSelector.Items.Add(item);
+            }
+            PhaseSelector.SelectedIndex = xcom.Size-1;
         }
 
 
@@ -33,10 +49,13 @@ namespace WorkApp
             {
                 withnames = 1;
             }
-            TaskDialog msg = new TaskDialog("wow");
-            msg.MainInstruction = "Hi";
-            msg.Show();
+            retPhase = (Phase)PhaseSelector.SelectedItem;
             this.Close();
+        }
+
+        private void PhaseSelector_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }

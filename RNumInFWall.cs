@@ -38,7 +38,7 @@ namespace WorkApp
                 .WherePasses(door_filter)
                 .ToElements();
 
-            List<Element> otdWalls=allWalls.Where(x => x.Name == "!!отделка!!").ToList();
+            List<Element> otdWalls=allWalls.Where(x => x.Name.StartsWith("!!отделка")).ToList();
             List<Room> roomofWall = new List<Room>();
             using (Transaction tr = new Transaction(doc, "creating"))
             {

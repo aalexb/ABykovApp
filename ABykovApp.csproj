@@ -69,6 +69,7 @@
     <Compile Include="FinishForm.Designer.cs">
       <DependentUpon>FinishForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="FormLoader.cs" />
     <Compile Include="GhostWall.cs" />
     <Compile Include="grouping.cs" />
     <Compile Include="metall.cs" />
@@ -82,6 +83,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="refFinishing.cs" />
+    <Compile Include="RNumInFWall.cs" />
     <Compile Include="RoomFinishing.cs" />
     <Compile Include="SheetNum.cs" />
     <Compile Include="RoomElements.cs" />
@@ -90,6 +92,7 @@
     <Compile Include="WallLastStage.cs" />
     <Compile Include="Tools.cs" />
     <Compile Include="Universe.cs" />
+    <Compile Include="zWall.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="FinishForm.resx">

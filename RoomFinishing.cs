@@ -36,6 +36,7 @@ namespace WorkApp
         public double MainWallVal { get; set; }//Значение основной отделки стен
         public double SimilarWallVal { get; set; }
         public double LocalWallVal { get; set; }//Значение местной отделки стен
+        public double KolonWallVal { get; set; }//Значение отделки колонн
         public string LocalWallText { get; set; }//Текст местной отделки стен
         public string KolonWallText { get; set; }//Текст отделки колонн
         public double unitMainWallVal { get; set; }
@@ -65,27 +66,34 @@ namespace WorkApp
         }
         public static void makeFinish()
         {
-            foreach (string l in Rooms.Select(x=>x.LocalWallText).Distinct())
+            foreach (string k in Rooms.Select(x=>x.KolonWallText).Distinct())
             {
-                foreach (string c in Rooms.Select(x => x.CeilType).Distinct())
+                foreach (string l in Rooms.Select(x => x.LocalWallText).Distinct())
                 {
-                    foreach (string w in Rooms.Select(x => x.WallType).Distinct())
+                    foreach (string c in Rooms.Select(x => x.CeilType).Distinct())
                     {
-                        List<RoomFinishing> cw = Rooms
-                            .Where(x => x.CeilType == c)
-                            .Where(y => y.WallType == w)
-                            .Where(z => z.LocalWallText ==l)
-                            .ToList();
-                        FinishTable.Add(cw);
-                        foreach (RoomFinishing r in cw)
+                        foreach (string w in Rooms.Select(x => x.WallType).Distinct())
                         {
-                            r.SimilarWallVal = cw.Sum(x => x.unitMainWallVal);
-                            r.LocalWallVal = cw.Sum(x => x.unitLocalWallVal);
-                        }
+                            List<RoomFinishing> cw = Rooms
+                                .Where(x => x.CeilType == c)
+                                .Where(y => y.WallType == w)
+                                .Where(z => z.LocalWallText == l)
+                                .Where(j=>j.KolonWallText==k)
+                                .ToList();
+                            FinishTable.Add(cw);
+                            foreach (RoomFinishing r in cw)
+                            {
+                                r.SimilarWallVal = cw.Sum(x => x.unitMainWallVal);
+                                r.LocalWallVal = cw.Sum(x => x.unitLocalWallVal);
+                                r.KolonWallVal = cw.Sum(x => x.unitKolonWallVal);
+                            }
 
+                        }
                     }
                 }
             }
+
+            
         }
 
         public static void makeFloor()
@@ -140,15 +148,18 @@ namespace WorkApp
                 {
                     foreach (RoomFinishing r in item.Where(x => x.Level == lev))
                     {
-                        try
-                        {
-                            r.refElement.LookupParameter("ОТД_Состав.Потолок").Set(doc.GetElement(r.refElement.LookupParameter("ОТД_Потолок").AsElementId()).LookupParameter("АР_Состав отделки").AsString());
-                        }
-                        catch (Exception)
-                        {
 
-                            r.refElement.LookupParameter("ОТД_Состав.Потолок").Set("НЕТ ОТДЕЛКИ");
-                        }
+                        //try
+                        //{
+                        //    r.refElement.LookupParameter("ОТД_Состав.Потолок").Set(doc.GetElement(r.refElement.LookupParameter("ОТД_Потолок").AsElementId()).LookupParameter("АР_Состав отделки").AsString());
+                        //}
+                        //catch (Exception)
+                        //{
+
+                        //    r.refElement.LookupParameter("ОТД_Состав.Потолок").Set("Без отделки");
+                        //}
+                        r.refElement.LookupParameter("ОТД_Состав.Потолок").Set(r.CeilType == "__Отделка : ---" ? "Без отделки" : doc.GetElement(r.refElement.LookupParameter("ОТД_Потолок").AsElementId()).LookupParameter("АР_Состав отделки").AsString());
+
                         try
                         {
                             r.refElement.LookupParameter("ОТД_Состав.Стены").Set(doc.GetElement(r.refElement.LookupParameter("ОТД_Стены").AsElementId()).LookupParameter("АР_Состав отделки").AsString());
@@ -156,8 +167,14 @@ namespace WorkApp
                         catch (Exception)
                         {
 
-                            r.refElement.LookupParameter("ОТД_Состав.Стены").Set("НЕТ ОТДЕЛКИ");
+                            r.refElement.LookupParameter("ОТД_Состав.Стены").Set("");
                         }
+
+                        r.refElement.LookupParameter("ОТД_Кол.Колонны").Set(r.KolonWallVal>0?r.KolonWallVal.ToString("F1"):"");
+                        r.refElement.LookupParameter("ОТД_Состав.Колонны").Set(r.KolonWallText);
+                        r.refElement.LookupParameter("ОТД_Кол.Доп").Set(r.LocalWallVal>0? r.LocalWallVal.ToString("F1"):"");
+                        r.refElement.LookupParameter("ОТД_Состав.Доп").Set(r.LocalWallText);
+
                         r.refElement.LookupParameter("testW").Set(fillText);
                         //r.refElement.LookupParameter("ОТД_Кол.Стены").Set(0);
                         r.refElement.LookupParameter("ОТД_Кол.Стены").Set(r.SimilarWallVal);
@@ -210,7 +227,7 @@ namespace WorkApp
                         catch (Exception)
                         {
 
-                            r.refElement.LookupParameter("ОТД_Состав.Пол").Set("НЕТ ОТДЕЛКИ");
+                            r.refElement.LookupParameter("ОТД_Состав.Пол").Set("");
                         }
                         try
                         {
@@ -219,15 +236,12 @@ namespace WorkApp
                         catch (Exception)
                         {
 
-                            r.refElement.LookupParameter("ОТД_Состав.Плинтус").Set("НЕТ ОТДЕЛКИ");
+                            r.refElement.LookupParameter("ОТД_Состав.Плинтус").Set("");
                         }
                         r.refElement.LookupParameter("testF").Set(fillText);
-                        r.refElement.LookupParameter("ОТД_Кол.Плинтус").Set("");
-
-                        if (r.PlintusType != "__Отделка : ---")
-                        {
-                            r.refElement.LookupParameter("ОТД_Кол.Плинтус").Set((r.SimilarPlintusVal * Meta.FT).ToString("F1"));
-                        }
+                        //r.refElement.LookupParameter("ОТД_Кол.Плинтус").Set("");
+                        r.refElement.LookupParameter("ОТД_Кол.Плинтус").Set(r.PlintusType == "__Отделка : ---" ? "" : (r.SimilarPlintusVal * Meta.FT).ToString("F1"));
+                        
 
                         r.refElement.LookupParameter("PlintusTotal").Set(r.Perimeter);
                         //item.Select(x => x.refElement.LookupParameter("testF").Set(fillText));

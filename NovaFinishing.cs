@@ -26,6 +26,11 @@ namespace WorkApp
             Phase lastPhase = xcom.get_Item(xcom.Size - 1);
             ElementId idPhase = lastPhase.Id;
             FilterNumericRuleEvaluator evaluator = new FilterNumericEquals();
+            
+            FinishForm MainForm = new FinishForm(doc);
+            MainForm.ShowDialog();
+            lastPhase = MainForm.retPhase;
+            idPhase = lastPhase.Id;
 
             List<SharedParameterElement> shParamElements = new FilteredElementCollector(doc)
                 .OfClass(typeof(SharedParameterElement))
@@ -128,7 +133,7 @@ namespace WorkApp
                 GlobalParameter.Create(doc, "НесколькоЭтажей", ParameterType.YesNo);
                 int MoreThenOneLevel = ((IntegerParameterValue)GlobePar.GetValue()).Value;
 
-                int withNames = 0;
+                int withNames = MainForm.withnames;
 
                 RoomFinishing.FinishTableCommit(MoreThenOneLevel, withNames, doc);
                 RoomFinishing.FloorTableCommit(MoreThenOneLevel, withNames, doc);
@@ -136,7 +141,7 @@ namespace WorkApp
                 tr.Commit();
             }
             TaskDialog msg = new TaskDialog("Info");
-            msg.MainInstruction = "Ok";
+            msg.MainInstruction = MainForm.retPhase.Name;
             msg.Show();
             return Result.Succeeded;
         }
