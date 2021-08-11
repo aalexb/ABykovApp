@@ -23,12 +23,12 @@ namespace WorkApp
         {
             RibbonPanel panel = ribbonPanel(a);
 
-            PushButton button1 = panel.AddButton("Получить ПДФ", Resources.pdf, "ExportDWFX");
+            PushButton button1 = panel.AddButton("Получить ПДФ", Resources.PDF, "ExportDWFX");
             PushButton buttonDWG = panel.AddButton("Получить DWG", Resources.dwgpic, "ExportDWG");
             PushButton button2 = panel.AddButton("Смена номера", Resources.tudaSyda, "SheetNum");
-            PushButton button3 = panel.AddButton("Эл-ты помещ.", Resources.pirog, "RoomElements");
-            PushButton button4 = panel.AddButton("Отделка", Resources.kista, "NovaFinishing");
-            PushButton button5 = panel.AddButton("Аннотации", Resources.inval, "annot");
+            PushButton button3 = panel.AddButton("Эл-ты помещ.", Resources.Peace, "RoomElements");
+            PushButton button4 = panel.AddButton("Отделка", Resources.Brush, "NovaFinishing");
+            PushButton button5 = panel.AddButton("Аннотации", Resources.MGN, "annot");
             PushButton button6 = panel.AddButton("Металл", Resources.gear,  "metall");
             PushButton button7 = panel.AddButton("Спецификация", Resources.block,  "grouping");
             PushButton button8 = panel.AddButton("Периметр", Resources.emptyHouse,  "PerimetralWall");
