@@ -24,6 +24,7 @@ namespace WorkApp
             RibbonPanel panel = ribbonPanel(a);
 
             PushButton button1 = panel.AddButton("Получить ПДФ", Resources.PDF, "ExportDWFX");
+            PushButton buttonPDFspec = panel.AddButton("ПДФ спец.", Resources.PDF, "ExportPDFspec");
             PushButton buttonDWG = panel.AddButton("Получить DWG", Resources.dwgpic, "ExportDWG");
             PushButton button2 = panel.AddButton("Смена номера", Resources.tudaSyda, "SheetNum");
             PushButton button3 = panel.AddButton("Эл-ты помещ.", Resources.Peace, "RoomElements");
@@ -33,10 +34,13 @@ namespace WorkApp
             PushButton button7 = panel.AddButton("Спецификация", Resources.block,  "grouping");
             PushButton button8 = panel.AddButton("Периметр", Resources.emptyHouse,  "PerimetralWall");
             PushButton button9 = panel.AddButton("СуперТест", Resources.block, "SuperTest");
-            PushButton buttonTest = panel.AddButton("Тест", Resources.fullHouse, "test");
+            PushButton buttonTest = panel.AddButton("Номер в отделку", Resources.fullHouse, "RNum2FWall");
             PushButton buttonUniv = panel.AddButton("Всё", Resources.atom, "Universe");
             PushButton buttonWLS= panel.AddButton("Стены 2021", Resources.plane, "WallLastStage");
-           
+            PushButton buttonSPEC = panel.AddButton("Общая спецификация", Resources.block, "SPECA");
+            PushButton SetCurrentSpec = panel.AddButton("Спецификация - расчет", Resources.block, "SetCurrentSpec");
+
+
 
 
 

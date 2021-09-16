@@ -123,8 +123,8 @@ namespace WorkApp
                 }
             }
 
-            RoomFinishing.makeFinish();
-            RoomFinishing.makeFloor();
+            RoomFinishing.makeFinish(MainForm.splitLevel);
+            RoomFinishing.makeFloor(MainForm.splitLevel);
             using (Transaction tr = new Transaction(doc, "otdelka"))
             {
                 tr.Start();
@@ -134,6 +134,7 @@ namespace WorkApp
                 int MoreThenOneLevel = ((IntegerParameterValue)GlobePar.GetValue()).Value;
 
                 int withNames = MainForm.withnames;
+                MoreThenOneLevel = MainForm.levels;
 
                 RoomFinishing.FinishTableCommit(MoreThenOneLevel, withNames, doc);
                 RoomFinishing.FloorTableCommit(MoreThenOneLevel, withNames, doc);
@@ -141,7 +142,7 @@ namespace WorkApp
                 tr.Commit();
             }
             TaskDialog msg = new TaskDialog("Info");
-            msg.MainInstruction = MainForm.retPhase.Name;
+            msg.MainInstruction =  $"Выполнен расчет отделки для стадии \"{MainForm.retPhase.Name}\"";
             msg.Show();
             return Result.Succeeded;
         }

@@ -219,6 +219,10 @@ namespace WorkApp
 		{
 			e.LookupParameter(name).Set(value);
 		}
+		public static void setP(this Element e, string name, int value)
+		{
+			e.LookupParameter(name).Set(value);
+		}
 
 		public static PushButton AddButton(this RibbonPanel rp, string name, Bitmap pic, string className)
 		{

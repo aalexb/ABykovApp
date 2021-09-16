@@ -29,6 +29,7 @@ namespace WorkApp
 				.ToList();
 
 			List<ElementId> elt = uidoc.Selection.GetElementIds().ToList();
+
 			List<Element> beta = new List<Element>();
             foreach (ElementId i in elt)
             {

@@ -58,16 +58,29 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="addParamForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="addParamForm.Designer.cs">
+      <DependentUpon>addParamForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="App.cs" />
     <Compile Include="annot.cs" />
     <Compile Include="Book.cs" />
     <Compile Include="Cube.cs" />
     <Compile Include="ExportDWG.cs" />
+    <Compile Include="ExportPDFspec.cs" />
     <Compile Include="FinishForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="FinishForm.Designer.cs">
       <DependentUpon>FinishForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Form1.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form1.Designer.cs">
+      <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
     <Compile Include="FormLoader.cs" />
     <Compile Include="GhostWall.cs" />
@@ -85,9 +98,11 @@
     <Compile Include="refFinishing.cs" />
     <Compile Include="RNumInFWall.cs" />
     <Compile Include="RoomFinishing.cs" />
+    <Compile Include="SetCurrentSpec.cs" />
     <Compile Include="SheetNum.cs" />
     <Compile Include="RoomElements.cs" />
     <Compile Include="ExportDWFX.cs" />
+    <Compile Include="SPECA.cs" />
     <Compile Include="SuperTest.cs" />
     <Compile Include="WallLastStage.cs" />
     <Compile Include="Tools.cs" />
@@ -95,8 +110,14 @@
     <Compile Include="zWall.cs" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="addParamForm.resx">
+      <DependentUpon>addParamForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="FinishForm.resx">
       <DependentUpon>FinishForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form1.resx">
+      <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

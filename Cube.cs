@@ -129,8 +129,8 @@ namespace WorkApp
 			switch (e.Category.Name)
 			{
 				case "Несущая арматура":
-					//ebar r = e as Rebar;
-					Element osn = e.Document.GetElement( (e as Rebar).GetHostId());
+                    //ebar r = e as Rebar;
+					Element osn = (e as Rebar) != null? e.Document.GetElement( (e as Rebar).GetHostId()): e.Document.GetElement((e as RebarInSystem).GetHostId());
 					out_Group = osn.getP(GROUP);
 					break;
 				default:

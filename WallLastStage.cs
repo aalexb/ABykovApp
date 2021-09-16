@@ -36,6 +36,10 @@ namespace WorkApp
                 .WhereElementIsNotElementType()
                 .ToElements();
 
+            IList<Element> allKolons = new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Columns)
+                .WhereElementIsNotElementType()
+                .ToElements();
+
 
             using (Transaction tr = new Transaction(doc, "otdelka"))
             {
@@ -60,6 +64,11 @@ namespace WorkApp
                 foreach (Element  w in allDoors)
                 {
                     w.LookupParameter("СП_Стадия возведения").Set(w.get_Parameter(BuiltInParameter.PHASE_CREATED).AsValueString());
+                }
+                foreach (Element k in allKolons)
+                {
+                    k.LookupParameter("СП_Стадия возведения").Set(k.get_Parameter(BuiltInParameter.PHASE_CREATED).AsValueString());
+                    k.LookupParameter("СП_Стадия сноса").Set(k.get_Parameter(BuiltInParameter.PHASE_DEMOLISHED).AsValueString());
                 }
                 tr.Commit();
             }

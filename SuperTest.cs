@@ -24,10 +24,22 @@ namespace WorkApp
             UIDocument uidoc = uiapp.ActiveUIDocument;
             Autodesk.Revit.ApplicationServices.Application app = uiapp.Application;
             Document doc = uidoc.Document;
+
+            addParamForm MainForm = new addParamForm(doc);
+            MainForm.ShowDialog();
+
+            FamilyManager fm = doc.FamilyManager;
+
+
             string messa;
             using (Transaction tr = new Transaction(doc, "pampam"))
             {
                 tr.Start();
+                for (int i = 1; i <= MainForm.num; i++)
+                {
+                    fm.AddParameter(MainForm.name + $"__{i}", MainForm.pGroup, MainForm.pType, MainForm.exempl);
+                }
+
                 Book t = new Book();
                 messa =t.ReadXML();
                 tr.Commit();

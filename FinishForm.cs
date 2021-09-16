@@ -21,7 +21,10 @@ namespace WorkApp
     {
         public int levels = 0;
         public int withnames=0;
+        public int poetagno = 0;
+        public bool splitLevel;
         public Phase retPhase;
+
         public FinishForm(Document doc)
         {
             PhaseArray xcom = doc.Phases;
@@ -41,14 +44,18 @@ namespace WorkApp
             }
             PhaseSelector.SelectedIndex = xcom.Size-1;
         }
-
+        public void disFElements()
+        {
+            SomeLevels.Enabled = false;
+            RoomNames.Enabled = false;
+            chkSplitLevel.Enabled = false;
+        }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            if (RoomNames.Checked)
-            {
-                withnames = 1;
-            }
+            levels = SomeLevels.Checked ? 1 : 0;
+            withnames = RoomNames.Checked ? 1 : 0;
+            splitLevel = chkSplitLevel.Checked;
             retPhase = (Phase)PhaseSelector.SelectedItem;
             this.Close();
         }

@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 namespace WorkApp
 {
     [Autodesk.Revit.Attributes.Transaction(Autodesk.Revit.Attributes.TransactionMode.Manual)]
-    class test : IExternalCommand
+    class RNum2FWall : IExternalCommand
     {
         Result IExternalCommand.Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
@@ -27,6 +27,13 @@ namespace WorkApp
             PhaseArray xcom = doc.Phases;
             Phase lastPhase = xcom.get_Item(xcom.Size - 1);
             ElementId idPhase = lastPhase.Id;
+            FinishForm MainForm = new FinishForm(doc);
+            MainForm.disFElements();
+            MainForm.ShowDialog();
+            lastPhase = MainForm.retPhase;
+            idPhase = lastPhase.Id;
+
+
 
             FilterNumericRuleEvaluator evaluator = new FilterNumericEquals();
             FilterableValueProvider provider = new ParameterValueProvider(new ElementId((int)BuiltInParameter.PHASE_CREATED));
@@ -38,8 +45,14 @@ namespace WorkApp
                 .WherePasses(door_filter)
                 .ToElements();
 
-            List<Element> otdWalls=allWalls.Where(x => x.Name.StartsWith("!!отделка")).ToList();
+            List<Element> otdWalls=allWalls.Where(x => x.Name.StartsWith("I__Отделка")).ToList();
             List<Room> roomofWall = new List<Room>();
+
+
+
+
+
+
             using (Transaction tr = new Transaction(doc, "creating"))
             {
                 tr.Start();
@@ -53,7 +66,7 @@ namespace WorkApp
                         XYZ origin = new XYZ((bBox.Max.X + bBox.Min.X) / 2, (bBox.Max.Y + bBox.Min.Y) / 2, (bBox.Max.Z + bBox.Min.Z) / 2);
                         try
                         {
-                            i.setP("Помещение", doc.GetRoomAtPoint(origin).Number);
+                            i.setP("Помещение", doc.GetRoomAtPoint(origin,lastPhase).Number);
                         }
                         catch (Exception)
                         {
