@@ -24,11 +24,19 @@ namespace WorkApp
 
             IList<Element> ReadPipes = filterOfCat(doc, BuiltInCategory.OST_PipeCurves);
             List<Element> GetFromModel = new List<Element>();
+            foreach (var item in ReadPipes)
+            {
+                GetFromModel.Add(item);
+            }
 
+            int a = 0;
             foreach (Element e in GetFromModel)
             {
-
+                SpecObj.AllObj.Add(new SpecObj(e.Name,a++,e));
             }
+
+            FullSpec main = new FullSpec();
+            main.Show();
 
             return Result.Succeeded;
         }
@@ -40,6 +48,7 @@ namespace WorkApp
                 .ToList();
 
         }
+
     }
     class MainSorter
     {

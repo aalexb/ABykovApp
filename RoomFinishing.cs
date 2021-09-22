@@ -42,6 +42,8 @@ namespace WorkApp
         public double unitMainWallVal { get; set; }
         public double unitLocalWallVal { get; set; }
         public double unitKolonWallVal { get; set; }
+        public double newWallVal { get; set; }
+        public double unitNewWallVal { get; set; }
 
 
         public string SimilarFloorVal { get; set; }
@@ -63,8 +65,10 @@ namespace WorkApp
             unitLocalWallVal = 0;
             unitMainWallVal = 0;
             unitKolonWallVal = 0;
+            newWallVal = 0;
+            unitNewWallVal = 0;
         }
-        public static void makeFinish(bool splitLvl)
+        public static void makeFinish(bool splitLvl, bool countNewW)
         {
             if (splitLvl)
             {
@@ -91,6 +95,10 @@ namespace WorkApp
                                         r.SimilarWallVal = cw.Sum(x => x.unitMainWallVal);
                                         r.LocalWallVal = cw.Sum(x => x.unitLocalWallVal);
                                         r.KolonWallVal = cw.Sum(x => x.unitKolonWallVal);
+                                        if (countNewW)
+                                        {
+                                            r.newWallVal = cw.Sum(x => x.unitNewWallVal);
+                                        }
                                     }
 
                                 }
@@ -122,6 +130,10 @@ namespace WorkApp
                                     r.SimilarWallVal = cw.Sum(x => x.unitMainWallVal);
                                     r.LocalWallVal = cw.Sum(x => x.unitLocalWallVal);
                                     r.KolonWallVal = cw.Sum(x => x.unitKolonWallVal);
+                                    if (countNewW)
+                                    {
+                                        r.newWallVal = cw.Sum(x => x.unitNewWallVal);
+                                    }
                                 }
 
                             }
@@ -186,7 +198,7 @@ namespace WorkApp
 
 
 
-        public static void FinishTableCommit(int MoreThenOneLevel, int withNames,Document doc) 
+        public static void FinishTableCommit(int MoreThenOneLevel, int withNames,Document doc, bool countNewW) 
         {
             foreach (List<RoomFinishing> item in FinishTable)
             {
@@ -226,6 +238,18 @@ namespace WorkApp
 
                         //    r.refElement.LookupParameter("ОТД_Состав.Потолок").Set("Без отделки");
                         //}
+                        if (countNewW)
+                        {
+                            
+                            if (r.newWallVal>0)
+                            {
+                                r.refElement.setP("countNewW", $"В т.ч. по вновь устраиваемым перегородкам - {r.newWallVal * Meta.FT * Meta.FT:F1} м²");
+                            }
+                            else
+                            {
+                                r.refElement.setP("countNewW", "");
+                            }
+                        }
                         r.refElement.LookupParameter("ОТД_Состав.Потолок").Set(r.CeilType == "__Отделка : ---" ? "Без отделки" : doc.GetElement(r.refElement.LookupParameter("ОТД_Потолок").AsElementId()).LookupParameter("АР_Состав отделки").AsString());
 
                         try

@@ -83,8 +83,15 @@
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
     <Compile Include="FormLoader.cs" />
+    <Compile Include="FullSpec.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FullSpec.Designer.cs">
+      <DependentUpon>FullSpec.cs</DependentUpon>
+    </Compile>
     <Compile Include="GhostWall.cs" />
     <Compile Include="grouping.cs" />
+    <Compile Include="Hydra.cs" />
     <Compile Include="metall.cs" />
     <Compile Include="Finishing.cs" />
     <Compile Include="NovaFinishing.cs" />
@@ -118,6 +125,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FullSpec.resx">
+      <DependentUpon>FullSpec.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

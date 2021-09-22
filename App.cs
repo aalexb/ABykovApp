@@ -39,6 +39,7 @@ namespace WorkApp
             PushButton buttonWLS= panel.AddButton("Стены 2021", Resources.plane, "WallLastStage");
             PushButton buttonSPEC = panel.AddButton("Общая спецификация", Resources.block, "SPECA");
             PushButton SetCurrentSpec = panel.AddButton("Спецификация - расчет", Resources.block, "SetCurrentSpec");
+            PushButton Hydpra = panel.AddButton("Гидравлический расчет", Resources.block, "Hydra");
 
 
 

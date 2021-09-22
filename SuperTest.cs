@@ -47,7 +47,7 @@ namespace WorkApp
             TaskDialog msg = new TaskDialog("Info");
             msg.MainInstruction = messa; //output;// FinishTable.Count().ToString();
             msg.Show();
-
+            
 
             //List<FinishElements> elt = new List<FinishElements>();
             //FinishingLib FLib = new FinishingLib(elt);

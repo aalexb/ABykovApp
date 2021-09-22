@@ -16,12 +16,23 @@ using System.Windows.Media.Imaging;
 namespace WorkApp
 {
 
+	public class ElementExt
+    {
+		public Element refElement { get; set; }
+		public string textDOWN { get; set; }
+		public ElementExt(Element e)
+        {
+			refElement = e;
+        }
+    }
+
 
 	public class Cube
     {
-		public Element refElement { get; set; }
+		public ElementExt refElement { get; set; }
 		public static List<Cube> allCubes = new List<Cube>();
-		public List<Element> posElements = new List<Element>();
+		public List<ElementExt> posElements = new List<ElementExt>();
+
 		public string out_Pos { get; set; } //Позиция
 		public string out_Snos { get; set; } //Стадия сноса
         public string out_Gost { get; set; } //ГОСТ
@@ -45,6 +56,8 @@ namespace WorkApp
 		public int Quantity { get; set; }//Количество
 		public string oldUnits { get; set; }
 		public string typeName { get; set; }
+		public string textUP { get; set; }
+		public string textDOWN { get; set; }
 		//==================================
 		double FT = 0.3048;
 		private const string GROUP = "ADSK_Группирование";
@@ -104,7 +117,7 @@ namespace WorkApp
 		
 		public Cube (Element e)
 		{
-			refElement = e;
+			refElement = new ElementExt(e);
 			out_Snos = e.get_Parameter(BuiltInParameter.PHASE_DEMOLISHED).AsValueString();
 			typeName = e.Name;
 			//GOST
@@ -181,19 +194,47 @@ namespace WorkApp
 					Quantity = e.get_Parameter(BuiltInParameter.STEEL_ELEM_PATTERN_NUMBER_X).AsInteger() * e.get_Parameter(BuiltInParameter.STEEL_ELEM_PATTERN_NUMBER_Y).AsInteger();
 					break;
 				case "Несущая арматура":
-					mType = myTypes.armLen;
-					Massa=e.Document.GetElement(e.GetTypeId()).LookupParameter(MASS).AsDouble();
+                    
+					
 					string[] stringSeparator = new string[] { " : " };
 					string[] subName = e.Name.Split(stringSeparator, StringSplitOptions.None);
 					out_Name = "ø" + subName[0];
-                    try
+					if (e.LookupParameter("шт/м/м2/м3 экз").AsInteger()==1)
                     {
-						Length = ((Rebar)e).TotalLength * FT;
+						mType = myTypes.armNum;
+						Length = ((Rebar)e).get_Parameter(BuiltInParameter.REBAR_ELEM_LENGTH).AsDouble()*1000 * FT;
+						refElement.textDOWN = (Math.Round(Length / 10)*10).ToString()+"мм";
+						Quantity = ((Rebar)e).Quantity;
+						Massa = e.Document.GetElement(e.GetTypeId()).LookupParameter(MASS).AsDouble()*Length/1000;
 					}
-                    catch (Exception)
+                    else
                     {
+						mType = myTypes.armLen;
+						Massa = e.Document.GetElement(e.GetTypeId()).LookupParameter(MASS).AsDouble();
+						try
+						{
+							Length = ((Rebar)e).TotalLength * FT;
+						}
+						catch (Exception)
+						{
 
-						Length = ((RebarInSystem)e).TotalLength * FT;
+							Length = ((RebarInSystem)e).TotalLength * FT;
+						}
+					}
+                    if (refElement.textDOWN!=null)
+                    {
+						refElement.textDOWN += ", ";
+					}
+					
+					try
+					{
+                        
+						refElement.textDOWN += "шаг " + ((e as Rebar).MaxSpacing * FT * 1000).ToString("F0");
+					}
+					catch (Exception)
+					{
+
+
 					}
 					break;
 				case "Желоба":

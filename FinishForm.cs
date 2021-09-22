@@ -22,6 +22,7 @@ namespace WorkApp
         public int levels = 0;
         public int withnames=0;
         public int poetagno = 0;
+        public bool countNewW;
         public bool splitLevel;
         public Phase retPhase;
 
@@ -49,6 +50,7 @@ namespace WorkApp
             SomeLevels.Enabled = false;
             RoomNames.Enabled = false;
             chkSplitLevel.Enabled = false;
+            checkBox1.Enabled = false;
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -56,6 +58,7 @@ namespace WorkApp
             levels = SomeLevels.Checked ? 1 : 0;
             withnames = RoomNames.Checked ? 1 : 0;
             splitLevel = chkSplitLevel.Checked;
+            countNewW = checkBox1.Checked;
             retPhase = (Phase)PhaseSelector.SelectedItem;
             this.Close();
         }

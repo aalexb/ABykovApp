@@ -36,8 +36,9 @@
             this.panel1 = new System.Windows.Forms.Panel();
             this.panel3 = new System.Windows.Forms.Panel();
             this.label2 = new System.Windows.Forms.Label();
-            this.panel2 = new System.Windows.Forms.Panel();
             this.chkSplitLevel = new System.Windows.Forms.CheckBox();
+            this.panel2 = new System.Windows.Forms.Panel();
+            this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.panel1.SuspendLayout();
             this.panel3.SuspendLayout();
             this.panel2.SuspendLayout();
@@ -99,6 +100,7 @@
             this.panel1.BackColor = System.Drawing.SystemColors.Control;
             this.panel1.Controls.Add(this.panel3);
             this.panel1.Controls.Add(this.RoomNames);
+            this.panel1.Controls.Add(this.checkBox1);
             this.panel1.Controls.Add(this.chkSplitLevel);
             this.panel1.Controls.Add(this.SomeLevels);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Right;
@@ -127,6 +129,16 @@
             this.label2.Text = "Параметры отделки";
             this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
+            // chkSplitLevel
+            // 
+            this.chkSplitLevel.AutoSize = true;
+            this.chkSplitLevel.Location = new System.Drawing.Point(3, 78);
+            this.chkSplitLevel.Name = "chkSplitLevel";
+            this.chkSplitLevel.Size = new System.Drawing.Size(125, 17);
+            this.chkSplitLevel.TabIndex = 0;
+            this.chkSplitLevel.Text = "Разбить по этажам";
+            this.chkSplitLevel.UseVisualStyleBackColor = true;
+            // 
             // panel2
             // 
             this.panel2.Controls.Add(this.button1);
@@ -136,15 +148,15 @@
             this.panel2.Size = new System.Drawing.Size(344, 64);
             this.panel2.TabIndex = 5;
             // 
-            // checkEtagno
+            // checkBox1
             // 
-            this.chkSplitLevel.AutoSize = true;
-            this.chkSplitLevel.Location = new System.Drawing.Point(3, 78);
-            this.chkSplitLevel.Name = "checkEtagno";
-            this.chkSplitLevel.Size = new System.Drawing.Size(125, 17);
-            this.chkSplitLevel.TabIndex = 0;
-            this.chkSplitLevel.Text = "Разбить по этажам";
-            this.chkSplitLevel.UseVisualStyleBackColor = true;
+            this.checkBox1.AutoSize = true;
+            this.checkBox1.Location = new System.Drawing.Point(3, 101);
+            this.checkBox1.Name = "checkBox1";
+            this.checkBox1.Size = new System.Drawing.Size(121, 17);
+            this.checkBox1.TabIndex = 0;
+            this.checkBox1.Text = "Считать для новых";
+            this.checkBox1.UseVisualStyleBackColor = true;
             // 
             // FinishForm
             // 
@@ -179,5 +191,6 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.CheckBox chkSplitLevel;
+        private System.Windows.Forms.CheckBox checkBox1;
     }
 }

@@ -17,6 +17,7 @@ namespace WorkApp
         public int Secondary { get; set; }
         public bool isLocal = false;
         public string sostav { get; set; }
+        public bool countNewW = false;
         
 
         public GhostWall (string room, ElementId level, double area, bool isLocal)
@@ -34,6 +35,10 @@ namespace WorkApp
             Area = wall.get_Parameter(BuiltInParameter.HOST_AREA_COMPUTED).AsDouble();
             isLocal= (wall as Wall).WallType.LookupParameter("rykomoika").AsInteger() == 1 ? true : false;
             sostav = (wall as Wall).WallType.LookupParameter("СоставОтделкиСтен").AsString();
+            if (wall.LookupParameter("ПоНовымСтенам")!=null)
+            {
+                countNewW = wall.LookupParameter("ПоНовымСтенам").AsInteger() == 1 ? true : false;
+            }        
 
         }
     }

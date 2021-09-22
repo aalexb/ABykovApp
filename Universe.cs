@@ -1,5 +1,4 @@
 ﻿using Autodesk.Revit.DB;
-using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.DB.Structure;
 using Autodesk.Revit.UI;
@@ -178,6 +177,10 @@ namespace WorkApp
 
             foreach (string eqGroup in allCube.Select(x => x.out_Group).Distinct())
             {
+                if (eqGroup==""|eqGroup==null)
+                {
+                    continue;
+                }
                 List<Cube> similarGroup = new List<Cube>();
                 foreach (Cube c in allCube)
                 {
@@ -195,22 +198,24 @@ namespace WorkApp
             {
                 int a = 1;
                 //int addpos = 1;
-
-                foreach (string eqName in item.Select(x=>x.out_Name).Distinct())
+                foreach (myTypes mt in item.Select(x => x.mType).Distinct())
                 {
-                    List<Cube> b = new List<Cube>();
-
-                    foreach (Cube i in item)
+                    foreach (string eqName in item.Select(x => x.out_Name).Distinct())
                     {
-                        if (i.out_Name ==eqName)
+                        List<Cube> b = item
+                            .Where(x => x.mType == mt)
+                            .Where(y => y.out_Name == eqName)
+                            .ToList();
+                        if (b.Count==0)
                         {
-                            b.Add(i);
+                            continue;
                         }
+                        (Cube addCube, int addpos) = Meta.forgeCube(b, a);
+                        a += addpos;
+                        outCube.Add(addCube);
                     }
-                    (Cube addCube, int addpos) = Meta.forgeCube(b, a);
-                    a += addpos;
-                    outCube.Add(addCube);
                 }
+                
             }
 
             List<List<Cube>> secondOutCube = new List<List<Cube>>();
@@ -262,11 +267,14 @@ namespace WorkApp
                 {
                     if (i.posElements.Count!=0)
                     {
-                        foreach (Element e in i.posElements)
+                        foreach (ElementExt e in i.posElements)
                         {
                             try
                             {
-                                e.LookupParameter("СП_Позиция").Set(i.out_Pos);
+                                e.refElement.LookupParameter("СП_Позиция").Set(i.out_Pos);
+                                e.refElement.LookupParameter("АН__Верх").Set(i.textUP);
+                                e.refElement.LookupParameter("АН__Низ").Set(e.textDOWN);
+
                             }
                             catch
                             {

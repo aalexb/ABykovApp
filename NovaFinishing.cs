@@ -100,6 +100,11 @@ namespace WorkApp
                         {
                             r.unitMainWallVal += w.Area;
                         }
+                        if (w.countNewW)
+                        {
+                            r.unitNewWallVal += w.Area;
+                        }
+                        
                     }
                 }
             }
@@ -123,7 +128,7 @@ namespace WorkApp
                 }
             }
 
-            RoomFinishing.makeFinish(MainForm.splitLevel);
+            RoomFinishing.makeFinish(MainForm.splitLevel,MainForm.countNewW);
             RoomFinishing.makeFloor(MainForm.splitLevel);
             using (Transaction tr = new Transaction(doc, "otdelka"))
             {
@@ -136,7 +141,7 @@ namespace WorkApp
                 int withNames = MainForm.withnames;
                 MoreThenOneLevel = MainForm.levels;
 
-                RoomFinishing.FinishTableCommit(MoreThenOneLevel, withNames, doc);
+                RoomFinishing.FinishTableCommit(MoreThenOneLevel, withNames, doc,MainForm.countNewW);
                 RoomFinishing.FloorTableCommit(MoreThenOneLevel, withNames, doc);
 
                 tr.Commit();

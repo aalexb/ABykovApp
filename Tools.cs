@@ -326,6 +326,7 @@ namespace WorkApp
 			{
                 try
                 {
+					//nova.
 					nova.posElements.Add(c.refElement);
 				}
                 catch 
@@ -333,8 +334,11 @@ namespace WorkApp
                 }
 				
 			}
+			nova.textUP = nova.out_Name;
 			nova.mType = IN[0].mType;
+			nova.Length = IN[0].Length;
 			//nova
+			//nova.Quantity=IN.Where(x=>x.Quantity)
             foreach (Cube i in IN)
             {
                 if (i.Quantity<=1)
@@ -372,6 +376,11 @@ namespace WorkApp
 			{
 				nova.out_Name = nova.out_Name + " l=" + nova.TotalLength.ToString("F1") + " м.п.";
 			}
+			if (nova.mType == myTypes.armNum)
+			{
+				nova.TotalMassa = nova.Massa * nova.Quantity;
+				nova.out_Name = nova.out_Name + " L=" + (Math.Round(nova.Length/10)*10).ToString("F0") + " мм";
+			}
 			nova.out_Gost = IN[0].out_Gost;
 			//nova.Prior = IN[0].Prior;
 			(nova.out_Kol_vo, nova.out_Mass, nova.out_Other) = Meta.chtoto(nova);
@@ -402,6 +411,9 @@ namespace WorkApp
 					c = cube.TotalMassa.ToString("F2") + " кг";
 					break;
 				case myTypes.armNum:
+					a = cube.Quantity.ToString();
+					b = cube.Massa.ToString("F3");
+					c = cube.TotalMassa.ToString("F2") + " кг";
 
 					break;
 				case myTypes.allNum:
