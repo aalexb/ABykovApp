@@ -66,6 +66,7 @@ namespace WorkApp
 		private const string NAME = "ADSK_Наименование";
 		private const string MAT_NAME = "ADSK_Материал наименование";
 		private const string MASS = "ADSK_Масса";
+		private const string STEEL_MARK = "КР_МаркаСтали";
 
 		public Cube(string group, string name)
         {
@@ -249,6 +250,12 @@ namespace WorkApp
 					break;
 				default:
 					out_Name = e.Document.GetElement(e.GetTypeId()).getP(NAME);
+					textUP = out_Name;
+					if (e.Document.GetElement(e.GetTypeId()).getP(STEEL_MARK) != null)
+					{
+						out_Name += " " + e.Document.GetElement(e.GetTypeId()).getP(STEEL_MARK);
+
+					}
 					Length = 0;
 					switch (e.Category.Name)
 					{
@@ -256,12 +263,13 @@ namespace WorkApp
 							mType = e.Document.GetElement(e.GetTypeId()).LookupParameter(MASS).AsDouble()!=0?myTypes.armLen:myTypes.commonLength;
 							Length = e.get_Parameter(BuiltInParameter.STRUCTURAL_FRAME_CUT_LENGTH).AsDouble() * FT;
 							Units = myUnits.mas;
+							
 							break;
 						case "Несущие колонны":
 							mType = myTypes.armLen;
 							Length = e.get_Parameter(BuiltInParameter.INSTANCE_LENGTH_PARAM).AsDouble() * FT;
-                            
 							
+
 							break;
 						default:
 

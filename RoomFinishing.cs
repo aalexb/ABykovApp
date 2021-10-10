@@ -277,7 +277,7 @@ namespace WorkApp
                         r.refElement.LookupParameter("testW").Set(fillText);
                         //r.refElement.LookupParameter("ОТД_Кол.Стены").Set(0);
                         r.refElement.LookupParameter("ОТД_Кол.Стены").Set(r.SimilarWallVal);
-
+                        r.refElement.LookupParameter("ОТД_Пом.Стены").Set(r.unitMainWallVal);
 
                         //r.refElement.LookupParameter("PlintusTotal").Set(r.Perimeter);
                         //item.Select(x => x.refElement.LookupParameter("testF").Set(fillText));

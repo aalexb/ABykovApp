@@ -208,6 +208,7 @@ namespace WorkApp
 		public static string getP(this Element e, string name)
 		{
 			return e.LookupParameter(name).AsString();
+			
 		}
 
 		public static double getP(this Element e, BuiltInParameter name)
@@ -334,7 +335,7 @@ namespace WorkApp
                 }
 				
 			}
-			nova.textUP = nova.out_Name;
+			nova.textUP = IN[0].textUP;
 			nova.mType = IN[0].mType;
 			nova.Length = IN[0].Length;
 			//nova
