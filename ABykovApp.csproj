@@ -94,6 +94,7 @@
     <Compile Include="Hydra.cs" />
     <Compile Include="metall.cs" />
     <Compile Include="Finishing.cs" />
+    <Compile Include="Multiverse.cs" />
     <Compile Include="NovaFinishing.cs" />
     <Compile Include="PerimetralWall.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

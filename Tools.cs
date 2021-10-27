@@ -201,6 +201,19 @@ namespace WorkApp
 	public static class Meta
 	{
 		public static double FT = 0.3048;
+		public static List<Element> getFilter<T>(this Document doc)
+		{
+			//new FilteredElementCollector(doc)
+			return new FilteredElementCollector(doc)
+				.OfClass(typeof(T))
+				.ToElements()
+				.ToList();
+		}
+		public static List<wtf.Product> addFilterResult <T,V>(this Document doc) where V:wtf.Creator, new()
+        {
+			//var ook = new V();
+			return doc.getFilter<T>().Select(x => new V().Create(x)).ToList();
+        }
 		public static void ororor(this List<Cube> a)
 		{
 
@@ -320,7 +333,10 @@ namespace WorkApp
 
 			return Out.Remove(Out.Length - 2);
 		}
-
+		public static (wtf.Product, int) forgeProduct(List<wtf.Product> IN, int position)
+        {
+			return (null,0);
+        }
 		public static (Cube,int) forgeCube(List<Cube> IN, int position)
 		{
 			int addpos = 1;
