@@ -308,6 +308,25 @@ namespace WorkApp
 
     }
 
+
+	public class SpecForm
+    {
+		public static List<SpecForm> allSpecForm = new List<SpecForm>();
+		ElementId eID { get; set; }
+		Element refElement { get; set; }
+		public string grouping;
+		public List<Cube> FillSpec { get; set; }
+
+		public SpecForm(ElementId eid, Document doc)
+        {
+			eID = eid;
+			refElement = doc.GetElement(eid);
+			grouping = refElement.getP("Группа");
+
+			allSpecForm.Add(this);
+			FillSpec = new List<Cube>();
+        }
+    }
      
 }
 

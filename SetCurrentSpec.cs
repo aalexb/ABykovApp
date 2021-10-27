@@ -179,6 +179,7 @@ namespace WorkApp
 
             
             
+
             List<List<Cube>> groupingCube = new List<List<Cube>>();
 
             //List<string> groupNum=allCube.Select(x => x.Group).Distinct().ToList();
@@ -223,61 +224,56 @@ namespace WorkApp
                     outCube.Add(addCube);
                 }
             }
-
-
-
-
-            Element elt = doc.GetElement(uidoc.Selection.GetElementIds().ToList().ElementAt(0));
-            string grouping = elt.getP("Группа");
-
-
-            List<Cube> FillSpec = new List<Cube>();
-            foreach (Cube c in outCube)
+            List<ElementId> argh = uidoc.Selection.GetElementIds().ToList();
+            List<wtf.Product> TabSel = new List<wtf.Product>();
+            foreach (var item in argh)
             {
-                if (c.out_Group==grouping)
+                TabSel.Add(new wtf.TABSCreator().Create(doc.GetElement(item)));
+            }
+            foreach (var item in TabSel)
+            {
+                foreach (Cube c in outCube)
                 {
-                    FillSpec.Add(c);
+                    if (item.grouping==c.out_Group)
+                    {
+                        item.linkedElt.Add(c);
+                    }
                 }
             }
-
-
-            
-            int rowCount = 0;
-
-            //TaskDialog msg = new TaskDialog("Вывод");
-            //msg.MainInstruction = elt.Name;
-            //msg.Show();
-            
-
             using (Transaction tr = new Transaction(doc,"SetCurrentSpec"))
             {
                 tr.Start();
-                if (FillSpec.Count<2)
+                foreach (wtf.Product i in TabSel)
                 {
-                    return Result.Failed;
-                }
-                elt.setP("Лист", doc.GetElement(elt.OwnerViewId).getP("Номер листа"));
-                elt.setP("Строк", FillSpec.Count);
-                FillSpec = FillSpec.OrderBy(x => x.Prior).ToList();
-                foreach (Cube cube in FillSpec)
-                {
-                    if (cube.out_Name.Contains("Исключение"))
+                    if (i.linkedElt.Count<2)
                     {
                         continue;
                     }
-                    rowCount++;
-                    elt.setP($"Поз__{rowCount}", cube.out_Pos);
-                    elt.setP($"Обозначение__{rowCount}", cube.out_Gost);
-                    elt.setP($"Наименование__{rowCount}", cube.out_Name);
-                    elt.setP($"К__{rowCount}", cube.out_Kol_vo);
-                    elt.setP($"М__{rowCount}", cube.out_Mass);
-                    elt.setP($"Прим__{rowCount}", cube.out_Other);
                 }
-                
+                int rowCount = 0;
+                foreach (wtf.Product e in TabSel)
+                {
+                    e.refElt.setP("Лист", doc.GetElement(e.refElt.OwnerViewId).getP("Номер листа"));
+                    e.refElt.setP("Строк", e.linkedElt.Count);
+                    e.linkedElt = e.linkedElt.OrderBy(x => x.Prior).ToList();
+                    foreach (Cube cube in e.linkedElt)
+                    {
+                        if (cube.out_Name.Contains("Исключение"))
+                        {
+                            continue;
+                        }
+                        rowCount++;
+                        e.refElt.setP($"Поз__{rowCount}", cube.out_Pos);
+                        e.refElt.setP($"Обозначение__{rowCount}", cube.out_Gost);
+                        e.refElt.setP($"Наименование__{rowCount}", cube.out_Name);
+                        e.refElt.setP($"К__{rowCount}", cube.out_Kol_vo);
+                        e.refElt.setP($"М__{rowCount}", cube.out_Mass);
+                        e.refElt.setP($"Прим__{rowCount}", cube.out_Other);
+                    }
+                    rowCount = 0;
+                }
                 tr.Commit();
             }
-            
-
             return Result.Succeeded;
         }
     }

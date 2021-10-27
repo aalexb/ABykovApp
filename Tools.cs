@@ -207,6 +207,10 @@ namespace WorkApp
 		}
 		public static string getP(this Element e, string name)
 		{
+            if (e.LookupParameter(name)==null)
+            {
+				return null;
+            }
 			return e.LookupParameter(name).AsString();
 			
 		}

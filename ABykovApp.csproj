@@ -114,6 +114,7 @@
     <Compile Include="WallLastStage.cs" />
     <Compile Include="Tools.cs" />
     <Compile Include="Universe.cs" />
+    <Compile Include="wtf\Product.cs" />
     <Compile Include="zWall.cs" />
   </ItemGroup>
   <ItemGroup>
