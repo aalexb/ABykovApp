@@ -209,11 +209,53 @@ namespace WorkApp
 				.ToElements()
 				.ToList();
 		}
-		public static List<wtf.Product> addFilterResult <T,V>(this Document doc) where V:wtf.Creator, new()
-        {
+		public static List<Element> getFilter(this Document doc,BuiltInCategory cat, string s) 
+		{
+			//new FilteredElementCollector(doc)
+			return new FilteredElementCollector(doc)
+				.OfCategory(cat)
+				.WhereElementIsNotElementType()
+				.Where(x=>((FamilyInstance)x).StructuralType.ToString()!=s)
+				.Cast<Element>()
+				.ToList();
+		}
+		public static List<Element> getFilter(this Document doc, BuiltInCategory cat)
+		{
+			//new FilteredElementCollector(doc)
+			return new FilteredElementCollector(doc)
+				.OfCategory(cat)
+				.WhereElementIsNotElementType()
+				.Cast<Element>()
+				.ToList();
+		}
+		public static List<wtf.Product> addFilterResult<T, V>(this Document doc) where V : wtf.Creator, new()
+		{
 			//var ook = new V();
 			return doc.getFilter<T>().Select(x => new V().Create(x)).ToList();
-        }
+		}
+		public static List<wtf.Product> addFilterResult<V>(this Document doc,BuiltInCategory b,string s)where V:wtf.Creator, new()
+		{
+			return doc.getFilter(b,s).Select(x => new V().Create(x)).ToList();
+		}
+		public static List<wtf.Product> addFilterResult<V>(this Document doc, BuiltInCategory b) where V : wtf.Creator, new()
+		{
+			return doc.getFilter(b).Select(x => new V().Create(x)).ToList();
+		}
+		public static List<wtf.Product> addFilterResult(this Document doc, BuiltInCategory b)
+		{
+			List<Element> az = doc.getFilter(b);
+			List<wtf.Product> mat = null;
+            foreach (Element f in az)
+            {
+                foreach (ElementId m in f.GetMaterialIds(false))
+                {
+					mat.Add(new wtf.MaterialCreator().Create(doc.GetElement(m)));
+                }
+            }
+
+			return mat;
+		}
+
 		public static void ororor(this List<Cube> a)
 		{
 
@@ -227,6 +269,7 @@ namespace WorkApp
 			return e.LookupParameter(name).AsString();
 			
 		}
+		
 
 		public static double getP(this Element e, BuiltInParameter name)
 		{
@@ -241,7 +284,13 @@ namespace WorkApp
 		{
 			e.LookupParameter(name).Set(value);
 		}
-
+		public static PushButton AddButton2(this RibbonPanel rp, string name, Bitmap pic, string className)
+		{
+			string thisAssemblyPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+			PushButton butt = rp.AddItem(new PushButtonData(name, name, thisAssemblyPath, className)) as PushButton;
+			butt.LargeImage = Tools.GetImage(pic.GetHbitmap());
+			return butt;
+		}
 		public static PushButton AddButton(this RibbonPanel rp, string name, Bitmap pic, string className)
 		{
 			string thisAssemblyPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
@@ -335,6 +384,20 @@ namespace WorkApp
 		}
 		public static (wtf.Product, int) forgeProduct(List<wtf.Product> IN, int position)
         {
+			int addpos = 1;
+			string grName = IN[0].grouping == null ? "Без группы" : IN[0].grouping;
+			wtf.Product nova = new wtf.RebarCreator().Create(null);
+            foreach (var c in IN)
+            {
+                try
+                {
+					nova.posElements.Add(c.refElt);
+                }
+                catch{}
+            }
+			nova.textUP = IN[0].textUP;
+			nova.mType = IN[0].mType;
+			nova.Length = IN[0].Length;
 			return (null,0);
         }
 		public static (Cube,int) forgeCube(List<Cube> IN, int position)

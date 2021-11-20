@@ -26,9 +26,22 @@ namespace WorkApp
             Phase lastPhase = xcom.get_Item(xcom.Size - 1);
             ElementId idPhase = lastPhase.Id;
             FilterNumericRuleEvaluator evaluator = new FilterNumericEquals();
-            
+
+            GlobalParameter GlobePar2 = GlobalParametersManager.FindByName(doc, "FinData") != ElementId.InvalidElementId ?
+                doc.GetElement(GlobalParametersManager.FindByName(doc, "FinData")) as GlobalParameter :null;
             FinishForm MainForm = new FinishForm(doc);
             MainForm.ShowDialog();
+            using (Transaction tr=new Transaction(doc,"setGP"))
+            {
+                tr.Start();
+                GlobalParameter GlobePar = GlobalParametersManager.FindByName(doc, "FinData") != ElementId.InvalidElementId ?
+                doc.GetElement(GlobalParametersManager.FindByName(doc, "FinData")) as GlobalParameter :
+                GlobalParameter.Create(doc, "FinData", ParameterType.Text);
+                GlobePar.SetValue(new StringParameterValue(string.Join("|", MainForm.wTypeBoxes)));
+                //int MoreThenOneLevel = ((IntegerParameterValue)GlobePar.GetValue()).Value;
+                tr.Commit();
+            }
+
             lastPhase = MainForm.retPhase;
             idPhase = lastPhase.Id;
 
@@ -76,7 +89,7 @@ namespace WorkApp
             {
                 if (wall.LookupParameter("Помещение").AsString() != null & wall.LookupParameter("Помещение").AsString() != "")
                 {
-                    cWalls.Add(new GhostWall(wall));
+                    cWalls.Add(new GhostWall(wall,MainForm.LocType));
                 }
             }
 
@@ -91,7 +104,7 @@ namespace WorkApp
                             r.unitLocalWallVal += w.Area;
                             r.LocalWallText = w.sostav;
                         }
-                        else if (w.typeName== "!!отделка_колонн!!")
+                        else if (w.typeName== MainForm.ColType.Name)
                         {
                             r.unitKolonWallVal += w.Area;
                             r.KolonWallText = w.sostav;

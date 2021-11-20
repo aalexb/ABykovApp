@@ -253,8 +253,8 @@ namespace WorkApp
                 int rowCount = 0;
                 foreach (wtf.Product e in TabSel)
                 {
-                    e.refElt.setP("Лист", doc.GetElement(e.refElt.OwnerViewId).getP("Номер листа"));
-                    e.refElt.setP("Строк", e.linkedElt.Count);
+                    e.refElt.refElement.setP("Лист", doc.GetElement(e.refElt.refElement.OwnerViewId).getP("Номер листа"));
+                    e.refElt.refElement.setP("Строк", e.linkedElt.Count);
                     e.linkedElt = e.linkedElt.OrderBy(x => x.Prior).ToList();
                     foreach (Cube cube in e.linkedElt)
                     {
@@ -263,12 +263,12 @@ namespace WorkApp
                             continue;
                         }
                         rowCount++;
-                        e.refElt.setP($"Поз__{rowCount}", cube.out_Pos);
-                        e.refElt.setP($"Обозначение__{rowCount}", cube.out_Gost);
-                        e.refElt.setP($"Наименование__{rowCount}", cube.out_Name);
-                        e.refElt.setP($"К__{rowCount}", cube.out_Kol_vo);
-                        e.refElt.setP($"М__{rowCount}", cube.out_Mass);
-                        e.refElt.setP($"Прим__{rowCount}", cube.out_Other);
+                        e.refElt.refElement.setP($"Поз__{rowCount}", cube.out_Pos);
+                        e.refElt.refElement.setP($"Обозначение__{rowCount}", cube.out_Gost);
+                        e.refElt.refElement.setP($"Наименование__{rowCount}", cube.out_Name);
+                        e.refElt.refElement.setP($"К__{rowCount}", cube.out_Kol_vo);
+                        e.refElt.refElement.setP($"М__{rowCount}", cube.out_Mass);
+                        e.refElt.refElement.setP($"Прим__{rowCount}", cube.out_Other);
                     }
                     rowCount = 0;
                 }

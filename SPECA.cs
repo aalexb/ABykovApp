@@ -80,7 +80,7 @@ namespace WorkApp
         public SPEC_object(string Name)
         {
             id = new IDENTY();
-            Name = Name;
+            this.Name = Name;
             Output.Add(this);
         }
 

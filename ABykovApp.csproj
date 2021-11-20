@@ -92,6 +92,8 @@
     <Compile Include="GhostWall.cs" />
     <Compile Include="grouping.cs" />
     <Compile Include="Hydra.cs" />
+    <Compile Include="macros.cs" />
+    <Compile Include="macroses.cs" />
     <Compile Include="metall.cs" />
     <Compile Include="Finishing.cs" />
     <Compile Include="Multiverse.cs" />
@@ -112,10 +114,12 @@
     <Compile Include="ExportDWFX.cs" />
     <Compile Include="SPECA.cs" />
     <Compile Include="SuperTest.cs" />
+    <Compile Include="test2.cs" />
     <Compile Include="WallLastStage.cs" />
     <Compile Include="Tools.cs" />
     <Compile Include="Universe.cs" />
     <Compile Include="wtf\Product.cs" />
+    <Compile Include="wtf\Rebar.cs" />
     <Compile Include="zWall.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -170,6 +174,11 @@
     <None Include="Resources\block %281%29.png" />
     <None Include="Resources\free-icon-pdf-179483 %281%29.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\Modules\Modules.csproj">
+      <Project>{359e0e12-a920-4d12-8c52-31df764a6c64}</Project>
+      <Name>Modules</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

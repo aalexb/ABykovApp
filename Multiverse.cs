@@ -22,8 +22,20 @@ namespace WorkApp
 
             List<wtf.Product> allObj = new List<wtf.Product>();
 
+            allObj.AddRange(doc.addFilterResult<wtf.StructuralCreator>(BuiltInCategory.OST_StructuralFraming, "NonStructural"));
+            allObj.AddRange(doc.addFilterResult<wtf.StructuralCreator>(BuiltInCategory.OST_StructuralColumns, "NonStructural"));
+            allObj.AddRange(doc.addFilterResult<wtf.RoofCreator>(BuiltInCategory.OST_Roofs));
+            allObj.AddRange(doc.addFilterResult<wtf.PlatesCreator>(BuiltInCategory.OST_StructConnectionPlates));
+            allObj.AddRange(doc.addFilterResult<wtf.AnchorsCreator>(BuiltInCategory.OST_StructConnectionAnchors));
+            allObj.AddRange(doc.addFilterResult<wtf.GenericCreator>(BuiltInCategory.OST_GenericModel));
+            allObj.AddRange(doc.addFilterResult<RebarInSystem, wtf.RebarCreator>());
             allObj.AddRange(doc.addFilterResult<Rebar, wtf.RebarCreator>());
-
+            allObj.AddRange(doc.addFilterResult<Railing, wtf.RailingCreator>());
+            allObj.AddRange(doc.addFilterResult<HostedSweep, wtf.HostedSweepCreator>());
+            allObj.AddRange(doc.addFilterResult(BuiltInCategory.OST_Floors));
+            allObj.AddRange(doc.addFilterResult(BuiltInCategory.OST_Walls));
+            allObj.AddRange(doc.addFilterResult(BuiltInCategory.OST_StructuralFoundation));
+            allObj.AddRange(doc.addFilterResult(BuiltInCategory.OST_Stairs));
             ///===========================
             List<wtf.Product> outObj = new List<wtf.Product>();
 
@@ -80,8 +92,8 @@ namespace WorkApp
                 int rowCount = 0;
                 foreach (wtf.Product e in TabSel)
                 {
-                    e.refElt.setP("Лист", doc.GetElement(e.refElt.OwnerViewId).getP("Номер листа"));
-                    e.refElt.setP("Строк", e.linkedElt.Count);
+                    e.refElt.refElement.setP("Лист", doc.GetElement(e.refElt.refElement.OwnerViewId).getP("Номер листа"));
+                    e.refElt.refElement.setP("Строк", e.linkedElt.Count);
                     e.linkedElt = e.linkedElt.OrderBy(x => x.Prior).ToList();
                     foreach (wtf.Product cube in e.linkedEltP)
                     {
@@ -90,12 +102,12 @@ namespace WorkApp
                             continue;
                         }
                         rowCount++;
-                        e.refElt.setP($"Поз__{rowCount}", cube.ovt.Pos);
-                        e.refElt.setP($"Обозначение__{rowCount}", cube.ovt.Gost);
-                        e.refElt.setP($"Наименование__{rowCount}", cube.ovt.Name);
-                        e.refElt.setP($"К__{rowCount}", cube.ovt.Kol);
-                        e.refElt.setP($"М__{rowCount}", cube.ovt.Mass);
-                        e.refElt.setP($"Прим__{rowCount}", cube.ovt.Other);
+                        e.refElt.refElement.setP($"Поз__{rowCount}", cube.ovt.Pos);
+                        e.refElt.refElement.setP($"Обозначение__{rowCount}", cube.ovt.Gost);
+                        e.refElt.refElement.setP($"Наименование__{rowCount}", cube.ovt.Name);
+                        e.refElt.refElement.setP($"К__{rowCount}", cube.ovt.Kol);
+                        e.refElt.refElement.setP($"М__{rowCount}", cube.ovt.Mass);
+                        e.refElt.refElement.setP($"Прим__{rowCount}", cube.ovt.Other);
                     }
                     rowCount = 0;
                 }

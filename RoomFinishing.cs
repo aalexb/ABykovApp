@@ -250,7 +250,7 @@ namespace WorkApp
                                 r.refElement.setP("countNewW", "");
                             }
                         }
-                        r.refElement.LookupParameter("ОТД_Состав.Потолок").Set(r.CeilType == "__Отделка : ---" ? "Без отделки" : doc.GetElement(r.refElement.LookupParameter("ОТД_Потолок").AsElementId()).LookupParameter("АР_Состав отделки").AsString());
+                        r.refElement.LookupParameter("ОТД_Состав.Потолок").Set(r.CeilType == "__Отделка : ---" ? "" : doc.GetElement(r.refElement.LookupParameter("ОТД_Потолок").AsElementId()).LookupParameter("АР_Состав отделки").AsString());
 
                         try
                         {

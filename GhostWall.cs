@@ -27,13 +27,16 @@ namespace WorkApp
             Area = area;
             this.isLocal = isLocal;
         }
-        public GhostWall(Element wall) {
+        public GhostWall(Element wall, Element LocWall) {
             refEl = wall;
             typeName = (wall as Wall).WallType.Name;
             Room = wall.getP("Помещение");
             Level = wall.LevelId;
             Area = wall.get_Parameter(BuiltInParameter.HOST_AREA_COMPUTED).AsDouble();
-            isLocal= (wall as Wall).WallType.LookupParameter("rykomoika").AsInteger() == 1 ? true : false;
+            if (LocWall!=null)
+            {
+                isLocal = wall.Id == LocWall.Id;
+            }
             sostav = (wall as Wall).WallType.LookupParameter("СоставОтделкиСтен").AsString();
             if (wall.LookupParameter("ПоНовымСтенам")!=null)
             {

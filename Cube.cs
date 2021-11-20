@@ -271,6 +271,12 @@ namespace WorkApp
 							
 
 							break;
+						case "Фундамент несущей конструкции":
+							mType = myTypes.allNum;
+							//Length = e.get_Parameter(BuiltInParameter.INSTANCE_LENGTH_PARAM).AsDouble() * FT;
+
+
+							break;
 						default:
 
 							mType = e.Document.GetElement(e.GetTypeId()).LookupParameter("ЕслиЛинейный").AsInteger()==1? myTypes.commonLength:myTypes.allNum;

@@ -1,21 +1,14 @@
 ﻿using System;
 using Autodesk.Revit.UI;
-using Autodesk.Revit.DB;
-using Autodesk.Revit.ApplicationServices;
-using Autodesk.Revit.Attributes;
 using System.Collections.Generic;
-using System.Reflection;
-using System.Windows.Media.Imaging;
 using Autodesk.Revit.UI.Events;
-using System.IO;
-using System.Drawing;
-using System.Windows.Media;
 using WorkApp.Properties;
+using Modules;
 
 namespace WorkApp
 {
 
-    
+
 
     public class App : IExternalApplication
     {
@@ -32,7 +25,7 @@ namespace WorkApp
             PushButton button5 = panel.AddButton("Аннотации", Resources.MGN, "annot");
             PushButton button6 = panel.AddButton("Металл", Resources.gear,  "metall");
             PushButton button7 = panel.AddButton("Спецификация", Resources.block,  "grouping");
-            PushButton button8 = panel.AddButton("Периметр", Resources.emptyHouse,  "PerimetralWall");
+            PushButton button8 = panel.AddButton("Отделочный слой", Resources.emptyHouse,  "PerimetralWall");
             PushButton button9 = panel.AddButton("СуперТест", Resources.block, "SuperTest");
             PushButton buttonTest = panel.AddButton("Номер в отделку", Resources.fullHouse, "RNum2FWall");
             PushButton buttonUniv = panel.AddButton("Всё", Resources.atom, "Universe");
@@ -40,6 +33,7 @@ namespace WorkApp
             PushButton buttonSPEC = panel.AddButton("Общая спецификация", Resources.block, "SPECA");
             PushButton SetCurrentSpec = panel.AddButton("Спецификация - расчет", Resources.block, "SetCurrentSpec");
             PushButton Hydpra = panel.AddButton("Гидравлический расчет", Resources.block, "Hydra");
+            PushButton newSpace = panel.AddButton("Пространства", Resources.block, "macros");
 
 
 

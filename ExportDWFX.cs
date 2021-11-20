@@ -79,13 +79,7 @@ namespace WorkApp
 					kratn.Add(titleOnSheet[i].LookupParameter("Кратность").AsInteger());
 					knign.Add(titleOnSheet[i].LookupParameter("Книжная ориентация").AsInteger());
 				}
-                catch (Exception)
-                {
-                    
-                }
-             
-				
-
+                catch (Exception){}
 			}
 			string namePrefix = "Export";
 			//string nameOfExportDWFX = "AutoExport " + DateTime.Now.Hour.ToString() + "_" + DateTime.Now.Minute.ToString() + "_" + DateTime.Now.Second.ToString();
@@ -97,31 +91,10 @@ namespace WorkApp
 				b.Insert(doc.GetElement(i) as ViewSheet);
 				listNum.Add(doc.GetElement(i) as ViewSheet);
 			}
-            
-            
 			DWFXExportOptions options = new DWFXExportOptions();
 			options.MergedViews = true;
-			
-			
-            
 			string dir = doc.PathName.Substring(0, doc.PathName.Length - doc.Title.Length - 4);
-
-
-			//ModelPath mp=doc.GetWorksharingCentralModelPath();
-			//string vmp=ModelPathUtils.ConvertModelPathToUserVisiblePath(mp);
-			//int arr = 0;
-   //         for (int i = vmp.Length-1; i !=0; i--)
-   //         {
-   //             if (vmp.ElementAt(i)=='\\')
-   //             {
-			//		arr = i;
-			//		break;
-   //             }
-   //         }
-
-
 			string newPath = Path.GetTempPath();
-			//string newPath = vmp.Substring(0, arr+1)+"PDF";
 			for (int i = 0; i < listNum.Count(); i++)
 			{
 				viewName.Add(newPath + listNum[i].SheetNumber+listNum[i].Name+".dwfx");
@@ -135,22 +108,9 @@ namespace WorkApp
 				
 			{
 				tr.Start();
-				/*
-				foreach (ViewSheet i in listNum)
-				{
-					ViewSet vSet = new ViewSet();
-					vSet.Insert(i);
-				
-					doc.Export(newPath, i.SheetNumber + i.Name,vSet, options);
-                }
-				*/
 				doc.Export(newPath.Substring(0, newPath.Length - 1), namePrefix, b, options);
 				tr.Commit();
 			}
-			
-			//Form1 SheetControl = new Form1();
-			//SheetControl.ShowDialog();
-			//string[] amm=Directory.GetFiles(newPath+"\\");
 			
 			try
             {

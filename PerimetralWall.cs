@@ -22,11 +22,15 @@ namespace WorkApp
             Application app = uiapp.Application;
             Document doc = uidoc.Document;
 
+            FinishForm MainForm = new FinishForm(doc);
+            MainForm.disFElements("New");
+            MainForm.ShowDialog();
+
             double FT = 0.3048;
-            PhaseArray xcom = doc.Phases;
-            Phase lastPhase = xcom.get_Item(xcom.Size - 1);
-            ElementId idPhase = lastPhase.Id;
             
+
+            Phase lastPhase = MainForm.retPhase;
+            ElementId idPhase = lastPhase.Id;
             //Выбираем элементы в Ревите
             ICollection<ElementId> selectedElements = uidoc.Selection.GetElementIds();
             List<Room> selectedRooms = selectedElements.Select(x => doc.GetElement(x) as Room).ToList();
@@ -111,38 +115,45 @@ namespace WorkApp
             List<Element> wTypes = new List<Element>();
             List<Element> allWallTypes = new FilteredElementCollector(doc).OfClass(typeof(WallType)).ToList();
 
-            GlobalParameter OTD_Main;
-            using (Transaction tryGlobal = new Transaction(doc, "defineGlobal"))
-            {
-                tryGlobal.Start();
+            //GlobalParameter OTD_Main;
+            //using (Transaction tryGlobal = new Transaction(doc, "defineGlobal"))
+            //{
+            //    tryGlobal.Start();
 
-                if (GlobalParametersManager.FindByName(doc, "ОТД_Основная") != ElementId.InvalidElementId)
-                {
-                    OTD_Main = doc.GetElement(GlobalParametersManager.FindByName(doc, "ОТД_Основная")) as GlobalParameter;
-                }
-                else
-                {
-                    OTD_Main = GlobalParameter.Create(doc, "ОТД_Основная", ParameterType.Text);
+            //    if (GlobalParametersManager.FindByName(doc, "ОТД_Основная") != ElementId.InvalidElementId)
+            //    {
+            //        OTD_Main = doc.GetElement(GlobalParametersManager.FindByName(doc, "ОТД_Основная")) as GlobalParameter;
+            //    }
+            //    else
+            //    {
+            //        OTD_Main = GlobalParameter.Create(doc, "ОТД_Основная", ParameterType.Text);
                     
-                }
+            //    }
 
-                tryGlobal.Commit();
-            }
-
-            string s_OTD_Main = ((StringParameterValue)OTD_Main.GetValue()).Value;
-            
-            foreach (Room r in repeatedRoomsFl)
+            //    tryGlobal.Commit();
+            //}
+            string s_OTD_Main = MainForm.wTypeBoxes[0];
+            //string s_OTD_Main = ((StringParameterValue)OTD_Main.GetValue()).Value;
+            //wTypes.Add(MainForm.wTypeBoxes)
+            foreach (Element wt in allWallTypes)
             {
-                wHeights.Add(r.getP(s_OTD_Main));
-                //allWallTypes.Where(x => x.Name == r.getP("setFFF")).ToList();
-                foreach (Element wt in allWallTypes)
+                if (wt.Name == s_OTD_Main)
                 {
-                    if (wt.Name==r.getP(s_OTD_Main))
-                    {
-                        wTypes.Add(wt);
-                    }
+                    wTypes.Add(wt);
                 }
             }
+            //foreach (Room r in repeatedRoomsFl)
+            //{
+            //    //wHeights.Add(r.getP(s_OTD_Main));
+            //    //allWallTypes.Where(x => x.Name == r.getP("setFFF")).ToList();
+            //    foreach (Element wt in allWallTypes)
+            //    {
+            //        if (wt.Name==r.getP(s_OTD_Main))
+            //        {
+            //            wTypes.Add(wt);
+            //        }
+            //    }
+            //}
 
             //Level of each room
             List<Level> levels = repeatedRoomsFl.Select(x => x.Level).ToList();
@@ -153,7 +164,7 @@ namespace WorkApp
             count = 0;
             foreach (CurveLoop j in joinedCurvesFl)
             {
-                double valueWith = wTypes[count].get_Parameter(BuiltInParameter.WALL_ATTR_WIDTH_PARAM).AsDouble();
+                double valueWith = wTypes[0].get_Parameter(BuiltInParameter.WALL_ATTR_WIDTH_PARAM).AsDouble();
                 //double value = UnitUtils.Convert(valueWith, DisplayUnitType.DUT_DECIMAL_FEET, docLengthUnit);
                 double value = valueWith / FT;
                 CurveLoop gg=CurveLoop.CreateViaOffset(j, (valueWith*(0.5)),j.GetPlane().Normal);
@@ -204,7 +215,7 @@ namespace WorkApp
                     
                     foreach (Curve crv in group)
                     {
-                        Wall w = Wall.Create(doc, crv, wTypes[count].Id, levels[count].Id, 2/FT, 0, false, false);
+                        Wall w = Wall.Create(doc, crv, wTypes[0].Id, levels[count].Id, 2/FT, 0, false, false);
                         walls.Add(w);
                     }
                     

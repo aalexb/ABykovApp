@@ -21,8 +21,17 @@ namespace WorkApp
             Phase lastPhase = xcom.get_Item(xcom.Size - 1);
             ElementId idPhase = lastPhase.Id;
 
-
+            //ICollection<ElementId> selectedElementIds = uidoc.Selection.GetElementIds();
+            //List<Element> selElem = selectedElementIds.Select(x => doc.GetElement(x)).ToList();
+            //Element foundtype = doc.GetElement(selElem[0].GetTypeId());
+            //List<string> parlist = new List<string>();
+            //foreach (Parameter item in foundtype.Parameters)
+            //{
+            //    parlist.Add(item.Definition.Name);
+            //}
+            //int parvalue = foundtype.LookupParameter("шт/м/м2/м3").AsInteger();
             FilterableValueProvider valueProvider = new ParameterValueProvider(new ElementId(BuiltInParameter.PHASE_CREATED));
+            
             FilterNumericRuleEvaluator evaluator = new FilterNumericEquals();
             ElementId ruleValue = idPhase;
             ElementParameterFilter stageFilter = new ElementParameterFilter(new FilterElementIdRule(valueProvider, evaluator, ruleValue));
@@ -102,25 +111,12 @@ namespace WorkApp
                 .WherePasses(stageFilter)
                 .Cast<Element>()
                 .ToList();
-
-            
-
+            List<string> ororo = fundament.Select(x => x.Name).ToList();
 
             //genModel = genModel.Where(x => x.Name != "cube").ToList();
             List<Cube> allCube = new List<Cube>();
-            foreach (List<Element> a in collectFromModel)
-            {
-                foreach (Element e in a)
-                {
-                    Cube abc = new Cube(e);
-                    if (abc.out_Name == null)
-                    {
-                        abc.out_Name="Исключение: "+abc.typeName;
-                    }
-                    allCube.Add(abc);
-                }
-            }
-            
+            //List<Cube> someCube = new List<Cube>();
+
             foreach (Element f in floors)
             {
                 foreach (ElementId m in f.GetMaterialIds(false))
@@ -149,14 +145,26 @@ namespace WorkApp
 
             foreach (Element f in fundament)
             {
-                foreach (ElementId m in f.GetMaterialIds(false))
+                if (doc.GetElement(f.GetTypeId()).LookupParameter("шт/м/м2/м3") !=null && doc.GetElement(f.GetTypeId()).LookupParameter("шт/м/м2/м3").AsInteger()==0)
                 {
-                    Cube abc = new Cube(doc.GetElement(m), f);
+                    Cube abc = new Cube(f);
                     if (abc.out_Name != null)
                     {
                         allCube.Add(abc);
                     }
                 }
+                else
+                {
+                    foreach (ElementId m in f.GetMaterialIds(false))
+                    {
+                        Cube abc = new Cube(doc.GetElement(m), f);
+                        if (abc.out_Name != null)
+                        {
+                            allCube.Add(abc);
+                        }
+                    }
+                }
+                
 
             }
             foreach (Element f in lestnici)
@@ -170,6 +178,18 @@ namespace WorkApp
                     }
                 }
 
+            }
+            foreach (List<Element> a in collectFromModel)
+            {
+                foreach (Element e in a)
+                {
+                    Cube abc = new Cube(e);
+                    if (abc.out_Name == null)
+                    {
+                        abc.out_Name = "Исключение: " + abc.typeName;
+                    }
+                    allCube.Add(abc);
+                }
             }
             List<List<Cube>> groupingCube = new List<List<Cube>>();
 
@@ -256,7 +276,7 @@ namespace WorkApp
             List<FamilyInstance> existCubes = new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_GenericModel).WhereElementIsNotElementType().WherePasses(cubeFilter).Cast<FamilyInstance>().ToList();
 
 
-            using (Transaction tr = new Transaction(doc,"MOdelledSpec"))
+            using (Transaction tr = new Transaction(doc,"ModelledSpec"))
             {
                 tr.Start();
                 foreach (FamilyInstance i in existCubes)

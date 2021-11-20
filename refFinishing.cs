@@ -60,7 +60,7 @@ namespace WorkApp
             {
                 if (w.getP("Помещение")!=null &w.getP("Помещение")!="")
                 {
-                    walls.Add(new GhostWall(w));
+                    walls.Add(new GhostWall(w,null));
                 }
             }
             

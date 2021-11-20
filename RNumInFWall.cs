@@ -28,7 +28,7 @@ namespace WorkApp
             Phase lastPhase = xcom.get_Item(xcom.Size - 1);
             ElementId idPhase = lastPhase.Id;
             FinishForm MainForm = new FinishForm(doc);
-            MainForm.disFElements();
+            MainForm.disFElements("Number");
             MainForm.ShowDialog();
             lastPhase = MainForm.retPhase;
             idPhase = lastPhase.Id;

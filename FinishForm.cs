@@ -25,16 +25,75 @@ namespace WorkApp
         public bool countNewW;
         public bool splitLevel;
         public Phase retPhase;
+        public Element ColType;
+        public Element LocType;
+        List<ElementId> defSet = new List<ElementId>();
+        public List<string> wTypeBoxes = new List<string>();
 
         public FinishForm(Document doc)
         {
+            if (GlobalParametersManager.FindByName(doc, "FinData") != ElementId.InvalidElementId)
+            {
+                GlobalParameter GlobePar2 = doc.GetElement(GlobalParametersManager.FindByName(doc, "FinData")) as GlobalParameter;
+
+                StringParameterValue strPar =GlobePar2.GetValue() as StringParameterValue;
+                String GPar = strPar.Value;
+                wTypeBoxes = GPar.Split('|').ToList();
+            }
+            
             PhaseArray xcom = doc.Phases;
+            List<Element> walltypes1 = new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Walls).WhereElementIsElementType().ToList();
+            walltypes1 = walltypes1.OrderBy(x => x.Name).ToList();
+            List<Element> walltypes2 = walltypes1.Select(x=>x).ToList();
+            List<Element> walltypes3 = walltypes1.Select(x => x).ToList();
+
+
+            
             //xcom.
-            
-            
+
+
             //PhaseSelector.SelectedItem = xcom;
 
             InitializeComponent();
+            comboBox1.DataSource = walltypes1;
+            comboBox1.DisplayMember = "Name";
+            comboBox1.ValueMember = "Id";
+            
+            try
+            {
+                comboBox1.SelectedIndex = walltypes1.IndexOf(walltypes1.First(x => x.Name == wTypeBoxes[0]));
+            }
+            catch (Exception)
+            {
+
+                
+            }
+            
+            
+            LocFinSelector.DataSource = walltypes2;
+            LocFinSelector.DisplayMember = "Name";
+            LocFinSelector.ValueMember = "Id";
+            try
+            {
+                LocFinSelector.SelectedIndex = walltypes2.IndexOf(walltypes2.First(x => x.Name == wTypeBoxes[1]));
+            }
+            catch (Exception)
+            {
+
+
+            }
+            ColumnFinSelector.DataSource = walltypes3;
+            ColumnFinSelector.DisplayMember = "Name";
+            ColumnFinSelector.ValueMember = "Id";
+            try
+            {
+                ColumnFinSelector.SelectedIndex = walltypes3.IndexOf(walltypes3.First(x => x.Name == wTypeBoxes[2]));
+            }
+            catch (Exception)
+            {
+
+
+            }
 
             PhaseSelector.DataSource = xcom as IList<Phase>;
             PhaseSelector.DisplayMember = "Name";
@@ -45,12 +104,20 @@ namespace WorkApp
             }
             PhaseSelector.SelectedIndex = xcom.Size-1;
         }
-        public void disFElements()
+        public void disFElements(string who)
         {
             SomeLevels.Enabled = false;
             RoomNames.Enabled = false;
             chkSplitLevel.Enabled = false;
             checkBox1.Enabled = false;
+            if (who=="New")
+            {
+                LocFinSelector.Enabled = false;
+                ColumnFinSelector.Enabled = false;
+                checkBox2.Enabled = false;
+                checkBox3.Enabled = false;
+                checkCol.Enabled = false;
+            }
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -60,12 +127,28 @@ namespace WorkApp
             splitLevel = chkSplitLevel.Checked;
             countNewW = checkBox1.Checked;
             retPhase = (Phase)PhaseSelector.SelectedItem;
+            ColType = (Element)ColumnFinSelector.SelectedItem;
+            LocType = (Element)LocFinSelector.SelectedItem;
+            wTypeBoxes = new List<string>();
+            wTypeBoxes.Add((comboBox1.SelectedItem as Element).Name);
+            wTypeBoxes.Add((LocFinSelector.SelectedItem as Element).Name);
+            wTypeBoxes.Add((ColumnFinSelector.SelectedItem as Element).Name);
             this.Close();
         }
 
         private void PhaseSelector_SelectedIndexChanged(object sender, EventArgs e)
         {
 
+        }
+
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void checkBox1_MouseHover(object sender, EventArgs e)
+        {
+            
         }
     }
 }
