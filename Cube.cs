@@ -60,7 +60,8 @@ namespace WorkApp
 		public string textDOWN { get; set; }
 		//==================================
 		double FT = 0.3048;
-		private const string GROUP = "ADSK_Группирование";
+        public bool DontSetPos { get; set; }
+        private const string GROUP = "ADSK_Группирование";
 		private const string GOST = "ADSK_Обозначение";
 		private const string MAT_GOST = "ADSK_Материал обозначение";
 		private const string NAME = "ADSK_Наименование";
@@ -263,7 +264,16 @@ namespace WorkApp
 							mType = e.Document.GetElement(e.GetTypeId()).LookupParameter(MASS).AsDouble()!=0?myTypes.armLen:myTypes.commonLength;
 							Length = e.get_Parameter(BuiltInParameter.STRUCTURAL_FRAME_CUT_LENGTH).AsDouble() * FT;
 							Units = myUnits.mas;
-							
+							try
+							{
+
+								refElement.textDOWN += "шаг " + (((e as FamilyInstance).Host as BeamSystem).LookupParameter("Интервал между осевыми линиями").AsDouble() * FT * 1000).ToString("F0");
+							}
+							catch (Exception)
+							{
+								
+
+							}
 							break;
 						case "Несущие колонны":
 							mType = myTypes.armLen;

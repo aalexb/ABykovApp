@@ -28,6 +28,7 @@ namespace WorkApp
         public ElementId Level { get; set; }
         public string CeilType { get; set; }
         public string WallType { get; set; }
+        public string KolonType { get; set; }
         public string FloorType { get; set; }
         public double Perimeter { get; set; }
         public string PlintusType { get; set; }
@@ -57,6 +58,7 @@ namespace WorkApp
             CeilType = e.LookupParameter("ОТД_Потолок").AsValueString();
             WallType = e.LookupParameter("ОТД_Стены").AsValueString();
             FloorType = e.LookupParameter("ОТД_Пол").AsValueString();
+            KolonType = e.LookupParameter("ОТД_Колонны").AsValueString();
             PlintusType = e.LookupParameter("ОТД_Плинтус").AsValueString();
             Perimeter = e.get_Parameter(BuiltInParameter.ROOM_PERIMETER).AsDouble();
             MainWallVal = 0;
@@ -68,11 +70,49 @@ namespace WorkApp
             newWallVal = 0;
             unitNewWallVal = 0;
         }
-        public static void makeFinish(bool splitLvl, bool countNewW)
+        public static void makeFinish(FinishForm form)
         {
-            if (splitLvl)
+            if (form.ColFromMat)
             {
-                foreach (var lvl in Rooms.Select(x => x.Level).Distinct())
+                if (form.splitLevel)
+                {
+                    foreach (var lvl in Rooms.Select(x => x.Level).Distinct())
+                    {
+                        foreach (string k in Rooms.Select(x => x.KolonWallText).Distinct())
+                        {
+                            foreach (string l in Rooms.Select(x => x.LocalWallText).Distinct())
+                            {
+                                foreach (string c in Rooms.Select(x => x.CeilType).Distinct())
+                                {
+                                    foreach (string w in Rooms.Select(x => x.WallType).Distinct())
+                                    {
+                                        List<RoomFinishing> cw = Rooms
+                                            .Where(x => x.CeilType == c)
+                                            .Where(y => y.WallType == w)
+                                            .Where(z => z.LocalWallText == l)
+                                            .Where(j => j.KolonWallText == k)
+                                            .Where(g => g.Level == lvl)
+                                            .ToList();
+                                        FinishTable.Add(cw);
+                                        foreach (RoomFinishing r in cw)
+                                        {
+                                            r.SimilarWallVal = cw.Sum(x => x.unitMainWallVal);
+                                            r.LocalWallVal = cw.Sum(x => x.unitLocalWallVal);
+                                            r.KolonWallVal = cw.Sum(x => x.unitKolonWallVal);
+                                            if (form.countNewW)
+                                            {
+                                                r.newWallVal = cw.Sum(x => x.unitNewWallVal);
+                                            }
+                                        }
+
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                }
+                else
                 {
                     foreach (string k in Rooms.Select(x => x.KolonWallText).Distinct())
                     {
@@ -87,7 +127,6 @@ namespace WorkApp
                                         .Where(y => y.WallType == w)
                                         .Where(z => z.LocalWallText == l)
                                         .Where(j => j.KolonWallText == k)
-                                        .Where(g=>g.Level==lvl)
                                         .ToList();
                                     FinishTable.Add(cw);
                                     foreach (RoomFinishing r in cw)
@@ -95,7 +134,7 @@ namespace WorkApp
                                         r.SimilarWallVal = cw.Sum(x => x.unitMainWallVal);
                                         r.LocalWallVal = cw.Sum(x => x.unitLocalWallVal);
                                         r.KolonWallVal = cw.Sum(x => x.unitKolonWallVal);
-                                        if (countNewW)
+                                        if (form.countNewW)
                                         {
                                             r.newWallVal = cw.Sum(x => x.unitNewWallVal);
                                         }
@@ -106,41 +145,82 @@ namespace WorkApp
                         }
                     }
                 }
-                
             }
             else
             {
-                foreach (string k in Rooms.Select(x => x.KolonWallText).Distinct())
+                if (form.splitLevel)
                 {
-                    foreach (string l in Rooms.Select(x => x.LocalWallText).Distinct())
+                    foreach (var lvl in Rooms.Select(x => x.Level).Distinct())
                     {
-                        foreach (string c in Rooms.Select(x => x.CeilType).Distinct())
+                        foreach (string k in Rooms.Select(x => x.KolonType).Distinct())
                         {
-                            foreach (string w in Rooms.Select(x => x.WallType).Distinct())
+                            foreach (string l in Rooms.Select(x => x.LocalWallText).Distinct())
                             {
-                                List<RoomFinishing> cw = Rooms
-                                    .Where(x => x.CeilType == c)
-                                    .Where(y => y.WallType == w)
-                                    .Where(z => z.LocalWallText == l)
-                                    .Where(j => j.KolonWallText == k)
-                                    .ToList();
-                                FinishTable.Add(cw);
-                                foreach (RoomFinishing r in cw)
+                                foreach (string c in Rooms.Select(x => x.CeilType).Distinct())
                                 {
-                                    r.SimilarWallVal = cw.Sum(x => x.unitMainWallVal);
-                                    r.LocalWallVal = cw.Sum(x => x.unitLocalWallVal);
-                                    r.KolonWallVal = cw.Sum(x => x.unitKolonWallVal);
-                                    if (countNewW)
+                                    foreach (string w in Rooms.Select(x => x.WallType).Distinct())
                                     {
-                                        r.newWallVal = cw.Sum(x => x.unitNewWallVal);
+                                        List<RoomFinishing> cw = Rooms
+                                            .Where(x => x.CeilType == c)
+                                            .Where(y => y.WallType == w)
+                                            .Where(z => z.LocalWallText == l)
+                                            .Where(j => j.KolonType == k)
+                                            .Where(g => g.Level == lvl)
+                                            .ToList();
+                                        FinishTable.Add(cw);
+                                        foreach (RoomFinishing r in cw)
+                                        {
+                                            r.SimilarWallVal = cw.Sum(x => x.unitMainWallVal);
+                                            r.LocalWallVal = cw.Sum(x => x.unitLocalWallVal);
+                                            r.KolonWallVal = cw.Sum(x => x.unitKolonWallVal);
+                                            if (form.countNewW)
+                                            {
+                                                r.newWallVal = cw.Sum(x => x.unitNewWallVal);
+                                            }
+                                        }
+
                                     }
                                 }
+                            }
+                        }
+                    }
 
+                }
+                else
+                {
+                    foreach (string k in Rooms.Select(x => x.KolonWallText).Distinct())
+                    {
+                        foreach (string l in Rooms.Select(x => x.LocalWallText).Distinct())
+                        {
+                            foreach (string c in Rooms.Select(x => x.CeilType).Distinct())
+                            {
+                                foreach (string w in Rooms.Select(x => x.WallType).Distinct())
+                                {
+                                    List<RoomFinishing> cw = Rooms
+                                        .Where(x => x.CeilType == c)
+                                        .Where(y => y.WallType == w)
+                                        .Where(z => z.LocalWallText == l)
+                                        .Where(j => j.KolonWallText == k)
+                                        .ToList();
+                                    FinishTable.Add(cw);
+                                    foreach (RoomFinishing r in cw)
+                                    {
+                                        r.SimilarWallVal = cw.Sum(x => x.unitMainWallVal);
+                                        r.LocalWallVal = cw.Sum(x => x.unitLocalWallVal);
+                                        r.KolonWallVal = cw.Sum(x => x.unitKolonWallVal);
+                                        if (form.countNewW)
+                                        {
+                                            r.newWallVal = cw.Sum(x => x.unitNewWallVal);
+                                        }
+                                    }
+
+                                }
                             }
                         }
                     }
                 }
             }
+            
 
             
 
@@ -198,8 +278,9 @@ namespace WorkApp
 
 
 
-        public static void FinishTableCommit(int MoreThenOneLevel, int withNames,Document doc, bool countNewW) 
+        public static void FinishTableCommit(Document doc, FinishForm form) 
         {
+            int i = 1;
             foreach (List<RoomFinishing> item in FinishTable)
             {
                 if (item == null)
@@ -209,11 +290,11 @@ namespace WorkApp
                 String fillText = "";
                 foreach (ElementId lev in item.Select(x => x.Level).Distinct())
                 {
-                    if (MoreThenOneLevel == 1)
+                    if (form.levels == 1)
                     {
                         fillText += doc.GetElement(lev).LookupParameter("Название уровня").AsString() + ":\n";
                     }
-                    if (withNames == 1)
+                    if (form.withnames == 1)
                     {
                         foreach (RoomFinishing gg in item.Where(x => x.Level == lev))
                         {
@@ -224,6 +305,7 @@ namespace WorkApp
                     }
                     fillText += Meta.shortLists(item.Where(x => x.Level == lev).Select(y => y.Num).ToList()) + "\n";
                 }
+
                 foreach (ElementId lev in item.Select(x => x.Level).Distinct())
                 {
                     foreach (RoomFinishing r in item.Where(x => x.Level == lev))
@@ -238,7 +320,10 @@ namespace WorkApp
 
                         //    r.refElement.LookupParameter("ОТД_Состав.Потолок").Set("Без отделки");
                         //}
-                        if (countNewW)
+                        r.refElement.LookupParameter("Н_Отделка").Set(i);
+                        
+
+                        if (form.countNewW)
                         {
                             
                             if (r.newWallVal>0)
@@ -265,7 +350,24 @@ namespace WorkApp
                         if (r.refElement.LookupParameter("ОТД_Кол.Колонны")!=null)
                         {
                             r.refElement.LookupParameter("ОТД_Кол.Колонны").Set(r.KolonWallVal > 0 ? r.KolonWallVal.ToString("F1") : "");
-                            r.refElement.LookupParameter("ОТД_Состав.Колонны").Set(r.KolonWallText);
+                            if (form.ColFromMat)
+                            {
+                                r.refElement.LookupParameter("ОТД_Состав.Колонны").Set(r.KolonWallText);
+                            }
+                            else
+                            {
+                                try
+                                {
+                                    r.refElement.LookupParameter("ОТД_Состав.Колонны").Set(doc.GetElement(r.refElement.LookupParameter("ОТД_Колонны").AsElementId()).LookupParameter("АР_Состав отделки").AsString());
+                                }
+                                catch (Exception)
+                                {
+
+                                    r.refElement.LookupParameter("ОТД_Состав.Колонны").Set("");
+                                }
+
+                            }
+                            
                         }
                         if (r.refElement.LookupParameter("ОТД_Кол.Доп")!=null)
                         {
@@ -284,6 +386,7 @@ namespace WorkApp
                         //item.Select(x => x.refElement.LookupParameter("PlintusTotal").Set(x.SimilarPlintusVal));
 
                     }
+                    i++;
                 }
             }
         }

@@ -403,7 +403,10 @@ namespace WorkApp
 		public static (Cube,int) forgeCube(List<Cube> IN, int position)
 		{
 			int addpos = 1;
-            
+            if (IN[0].DontSetPos)
+            {
+				addpos = 0;
+            }
 			string grName = IN[0].out_Group == null ?"Без группы": IN[0].out_Group;
 			Cube nova = new Cube(grName, IN[0].out_Name);
 			foreach (Cube c in IN)

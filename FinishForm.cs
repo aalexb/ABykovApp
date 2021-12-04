@@ -20,18 +20,31 @@ namespace WorkApp
     public partial class FinishForm : System.Windows.Forms.Form
     {
         public int levels = 0;
-        public int withnames=0;
+        public int withnames = 0;
         public int poetagno = 0;
         public bool countNewW;
         public bool splitLevel;
         public Phase retPhase;
         public Element ColType;
+        public bool ColFromMat;
         public Element LocType;
         List<ElementId> defSet = new List<ElementId>();
         public List<string> wTypeBoxes = new List<string>();
+        Document doc;
 
-        public FinishForm(Document doc)
+        void readFromGlobal()
         {
+            wTypeBoxes = ((doc.GetElement(GlobalParametersManager.FindByName(doc, "FinData")) as GlobalParameter).GetValue() as StringParameterValue).Value.Split('|').ToList();
+
+        }
+        void writeToGlobal()
+        {
+            
+        }
+
+        public FinishForm(Document Doc)
+        {
+            this.doc = Doc;
             if (GlobalParametersManager.FindByName(doc, "FinData") != ElementId.InvalidElementId)
             {
                 GlobalParameter GlobePar2 = doc.GetElement(GlobalParametersManager.FindByName(doc, "FinData")) as GlobalParameter;
@@ -124,6 +137,7 @@ namespace WorkApp
         {
             levels = SomeLevels.Checked ? 1 : 0;
             withnames = RoomNames.Checked ? 1 : 0;
+            ColFromMat = checkCol.Checked;
             splitLevel = chkSplitLevel.Checked;
             countNewW = checkBox1.Checked;
             retPhase = (Phase)PhaseSelector.SelectedItem;

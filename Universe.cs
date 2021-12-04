@@ -21,9 +21,9 @@ namespace WorkApp
             Phase lastPhase = xcom.get_Item(xcom.Size - 1);
             ElementId idPhase = lastPhase.Id;
 
-            //ICollection<ElementId> selectedElementIds = uidoc.Selection.GetElementIds();
-            //List<Element> selElem = selectedElementIds.Select(x => doc.GetElement(x)).ToList();
-            //Element foundtype = doc.GetElement(selElem[0].GetTypeId());
+            ICollection<ElementId> selectedElementIds = uidoc.Selection.GetElementIds();
+            List<Element> selElem = selectedElementIds.Select(x => doc.GetElement(x)).ToList();
+            Element foundtype = doc.GetElement(selElem[0].GetTypeId());
             //List<string> parlist = new List<string>();
             //foreach (Parameter item in foundtype.Parameters)
             //{
@@ -187,6 +187,7 @@ namespace WorkApp
                     if (abc.out_Name == null)
                     {
                         abc.out_Name = "Исключение: " + abc.typeName;
+                        abc.DontSetPos = true;
                     }
                     allCube.Add(abc);
                 }
@@ -231,7 +232,12 @@ namespace WorkApp
                             continue;
                         }
                         (Cube addCube, int addpos) = Meta.forgeCube(b, a);
-                        a += addpos;
+                        if (!addCube.DontSetPos)
+                        {
+                            a += addpos;
+                        }
+
+                        
                         outCube.Add(addCube);
                     }
                 }

@@ -99,7 +99,7 @@ namespace WorkApp
                 {
                     if (r.Num==w.Room)
                     {
-                        if (w.isLocal)
+                        if (w.typeName == MainForm.LocType.Name)
                         {
                             r.unitLocalWallVal += w.Area;
                             r.LocalWallText = w.sostav;
@@ -141,7 +141,7 @@ namespace WorkApp
                 }
             }
 
-            RoomFinishing.makeFinish(MainForm.splitLevel,MainForm.countNewW);
+            RoomFinishing.makeFinish(MainForm);
             RoomFinishing.makeFloor(MainForm.splitLevel);
             using (Transaction tr = new Transaction(doc, "otdelka"))
             {
@@ -154,7 +154,7 @@ namespace WorkApp
                 int withNames = MainForm.withnames;
                 MoreThenOneLevel = MainForm.levels;
 
-                RoomFinishing.FinishTableCommit(MoreThenOneLevel, withNames, doc,MainForm.countNewW);
+                RoomFinishing.FinishTableCommit(doc, MainForm);
                 RoomFinishing.FloorTableCommit(MoreThenOneLevel, withNames, doc);
 
                 tr.Commit();
