@@ -155,6 +155,25 @@ namespace WorkApp
 
 			switch (e.Category.Name)
             {
+				case "Арматурная сетка несущей конструкции":
+					mType = myTypes.totalArea;
+					Area = e.LookupParameter("Общая длина выреза").AsDouble() * e.LookupParameter("Общая ширина выреза").AsDouble();
+					ElementId provolokType = e.Document.GetElement(e.GetTypeId()).LookupParameter("Тип проволоки основного направления").AsElementId();
+					string innerName= e.Document.GetElement(provolokType).Name;
+					string step1= (e.Document.GetElement(e.GetTypeId()).LookupParameter("Шаг стержней основного направления").AsDouble()*1000*FT).ToString("F0");
+					string step2 = (e.Document.GetElement(e.GetTypeId()).LookupParameter("Шаг стержней вспомогательного направления").AsDouble() * 1000 * FT).ToString("F0");
+					out_Name =
+						"Сетка "
+						+ innerName
+						+ "-"
+						+ step1
+						+ "/"
+						+ innerName
+						+ "-"
+						+ step2;
+					Massa =e.Document.GetElement(e.GetTypeId()).LookupParameter("Масса сетки на единицу площади").AsDouble()/(FT*FT);
+
+					break;
 				case "Пластины":
 					mType = myTypes.plastini;
 					double plLength = e.get_Parameter(BuiltInParameter.STEEL_ELEM_PLATE_LENGTH).AsDouble() * 1000*FT;

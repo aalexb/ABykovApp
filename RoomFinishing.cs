@@ -58,7 +58,16 @@ namespace WorkApp
             CeilType = e.LookupParameter("ОТД_Потолок").AsValueString();
             WallType = e.LookupParameter("ОТД_Стены").AsValueString();
             FloorType = e.LookupParameter("ОТД_Пол").AsValueString();
-            KolonType = e.LookupParameter("ОТД_Колонны").AsValueString();
+            try
+            {
+                KolonType = e.LookupParameter("ОТД_Колонны").AsValueString();
+            }
+            catch (Exception)
+            {
+
+                
+            }
+            
             PlintusType = e.LookupParameter("ОТД_Плинтус").AsValueString();
             Perimeter = e.get_Parameter(BuiltInParameter.ROOM_PERIMETER).AsDouble();
             MainWallVal = 0;
@@ -320,7 +329,14 @@ namespace WorkApp
 
                         //    r.refElement.LookupParameter("ОТД_Состав.Потолок").Set("Без отделки");
                         //}
-                        r.refElement.LookupParameter("Н_Отделка").Set(i);
+                        try
+                        {
+                            r.refElement.LookupParameter("Н_Отделка").Set(i);
+                        }
+                        catch (Exception)
+                        { 
+                        }
+                        
                         
 
                         if (form.countNewW)
@@ -349,7 +365,8 @@ namespace WorkApp
 
                         if (r.refElement.LookupParameter("ОТД_Кол.Колонны")!=null)
                         {
-                            r.refElement.LookupParameter("ОТД_Кол.Колонны").Set(r.KolonWallVal > 0 ? r.KolonWallVal.ToString("F1") : "");
+                            r.refElement.LookupParameter("ОТД_Кол.Колонны").Set(r.KolonWallVal > 0 ? (r.KolonWallVal*Meta.FT*Meta.FT).ToString("F1") : "");
+                            //r.refElement.LookupParameter("УДАЛИТЬ").Set(r.KolonWallVal > 0 ? r.KolonWallVal : 0);
                             if (form.ColFromMat)
                             {
                                 r.refElement.LookupParameter("ОТД_Состав.Колонны").Set(r.KolonWallText);
@@ -379,7 +396,15 @@ namespace WorkApp
                         r.refElement.LookupParameter("testW").Set(fillText);
                         //r.refElement.LookupParameter("ОТД_Кол.Стены").Set(0);
                         r.refElement.LookupParameter("ОТД_Кол.Стены").Set(r.SimilarWallVal);
-                        r.refElement.LookupParameter("ОТД_Пом.Стены").Set(r.unitMainWallVal);
+                        try
+                        {
+                            r.refElement.LookupParameter("ОТД_Пом.Стены").Set(r.unitMainWallVal);
+                        }
+                        catch (Exception)
+                        {
+
+                        }
+                        
 
                         //r.refElement.LookupParameter("PlintusTotal").Set(r.Perimeter);
                         //item.Select(x => x.refElement.LookupParameter("testF").Set(fillText));

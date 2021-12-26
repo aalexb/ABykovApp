@@ -29,6 +29,7 @@ namespace WorkApp
 		armNum,//Длина штуки
 		allNum,//количество
 		plastini,//для пластин пример
+		totalArea,//общая площадь
 		commonLength,//чтото в м.п.
 	}
 	public enum myUnits
@@ -395,7 +396,14 @@ namespace WorkApp
                 }
                 catch{}
             }
-			nova.textUP = IN[0].textUP;
+            try
+            {
+				nova.textUP = IN[0].textUP;
+			}
+            catch (Exception)
+            {
+            }
+			
 			nova.mType = IN[0].mType;
 			nova.Length = IN[0].Length;
 			return (null,0);
@@ -448,6 +456,13 @@ namespace WorkApp
 				nova.out_Pos = position.ToString();
 				nova.Prior = 10;
 			}
+			if (IN[0].mType == myTypes.totalArea)
+			{
+				addpos = 0;
+				nova.out_Pos = IN[0].typeName;
+				nova.Prior = 100;
+			}
+			
 			//nova.Quantity = IN.Count;
 			nova.Massa = IN[0].Massa;
 			
@@ -455,19 +470,41 @@ namespace WorkApp
 			foreach (Cube b in IN)
 			{
 				nova.TotalLength += b.Length;
-				nova.TotalMassa += b.Length*b.Massa;
+				nova.TotalMassa +=b.Length>0?b.Length*b.Massa: b.Massa;
 				nova.TotalArea += b.Area;
 				nova.TotalVolume += b.Volume;
 			}
-			if (nova.mType == myTypes.armLen)
-			{
-				nova.out_Name = nova.out_Name + " l=" + nova.TotalLength.ToString("F1") + " м.п.";
-			}
-			if (nova.mType == myTypes.armNum)
-			{
-				nova.TotalMassa = nova.Massa * nova.Quantity;
-				nova.out_Name = nova.out_Name + " L=" + (Math.Round(nova.Length/10)*10).ToString("F0") + " мм";
-			}
+            switch (nova.mType)
+            {
+                case myTypes.matVol:
+                    break;
+                case myTypes.matArea:
+                    break;
+                case myTypes.kmLen:
+                    break;
+                case myTypes.kmNum:
+                    break;
+                case myTypes.armLen:
+					nova.out_Name = nova.out_Name + " l=" + nova.TotalLength.ToString("F1") + " м.п.";
+					break;
+                case myTypes.armNum:
+					nova.TotalMassa = nova.Massa * nova.Quantity;
+					nova.out_Name = nova.out_Name + " L=" + (Math.Round(nova.Length / 10) * 10).ToString("F0") + " мм";
+					break;
+                case myTypes.allNum:
+                    break;
+                case myTypes.plastini:
+                    break;
+                case myTypes.totalArea:
+					nova.out_Name = nova.out_Name + " S=" + (nova.TotalArea*FT*FT).ToString("F2") + " м²";
+					nova.TotalMassa = nova.Massa * nova.TotalArea*FT*FT;
+					break;
+                case myTypes.commonLength:
+                    break;
+                default:
+                    break;
+            }
+
 			nova.out_Gost = IN[0].out_Gost;
 			//nova.Prior = IN[0].Prior;
 			(nova.out_Kol_vo, nova.out_Mass, nova.out_Other) = Meta.chtoto(nova);
@@ -516,6 +553,11 @@ namespace WorkApp
 					a = cube.Quantity.ToString();
 					b = cube.Massa.ToString("F2");
 					c = cube.TotalMassa.ToString("F2") + " кг";
+					break;
+				case myTypes.totalArea:
+					a = "-";
+					b= cube.Massa.ToString("F2");
+					c= cube.TotalMassa.ToString("F2") + " кг";
 					break;
 				default:
 					a = cube.Quantity.ToString();

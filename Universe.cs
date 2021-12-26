@@ -21,9 +21,9 @@ namespace WorkApp
             Phase lastPhase = xcom.get_Item(xcom.Size - 1);
             ElementId idPhase = lastPhase.Id;
 
-            ICollection<ElementId> selectedElementIds = uidoc.Selection.GetElementIds();
-            List<Element> selElem = selectedElementIds.Select(x => doc.GetElement(x)).ToList();
-            Element foundtype = doc.GetElement(selElem[0].GetTypeId());
+            //ICollection<ElementId> selectedElementIds = uidoc.Selection.GetElementIds();
+            //List<Element> selElem = selectedElementIds.Select(x => doc.GetElement(x)).ToList();
+            //Element foundtype = doc.GetElement(selElem[0].GetTypeId());
             //List<string> parlist = new List<string>();
             //foreach (Parameter item in foundtype.Parameters)
             //{
@@ -72,6 +72,11 @@ namespace WorkApp
                 .WhereElementIsNotElementType()
                 .WherePasses(stageFilter)
                 .Cast<Element>()
+                .ToList());
+            collectFromModel.Add(new FilteredElementCollector(doc).OfClass(typeof(FabricSheet))
+                .WhereElementIsNotElementType()
+                .WherePasses(stageFilter)
+                .ToElements()
                 .ToList());
             collectFromModel.Add(new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_StructConnectionPlates)
                 .WhereElementIsNotElementType()
