@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Modules", "..\Modules\Modul
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Runner", "..\Runner\Runner.csproj", "{2F9CD9F7-41C2-467A-A0AB-0382A77FD233}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reborn", "Reborn\Reborn.csproj", "{ECD1CE14-05DF-4C11-ACFE-E913F3F40D0A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{2F9CD9F7-41C2-467A-A0AB-0382A77FD233}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2F9CD9F7-41C2-467A-A0AB-0382A77FD233}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2F9CD9F7-41C2-467A-A0AB-0382A77FD233}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ECD1CE14-05DF-4C11-ACFE-E913F3F40D0A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ECD1CE14-05DF-4C11-ACFE-E913F3F40D0A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ECD1CE14-05DF-4C11-ACFE-E913F3F40D0A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ECD1CE14-05DF-4C11-ACFE-E913F3F40D0A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

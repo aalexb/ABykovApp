@@ -83,15 +83,10 @@ namespace WorkApp
 		public Cube (Element material, Element source)
 		{
 			out_Group = source.getP(GROUP);
-            if (material.getP(MAT_NAME)=="")
-            {
-				out_Name = "Назв: " + material.Name;
-
-			}
-            else
-            {
-				out_Name = material.getP(MAT_NAME);
-			}
+			out_Name = material.getP(MAT_NAME) == "" ? 
+				"Назв: " + material.Name :
+				material.getP(MAT_NAME);
+            
 			if (material.getP(MAT_GOST) == "")
 			{
 				out_Gost = "Обозн: " + material.Name;

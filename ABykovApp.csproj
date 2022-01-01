@@ -68,6 +68,8 @@
     <Compile Include="annot.cs" />
     <Compile Include="Book.cs" />
     <Compile Include="Cube.cs" />
+    <Compile Include="Empty.cs" />
+    <Compile Include="ExportDWFX.cs" />
     <Compile Include="ExportDWG.cs" />
     <Compile Include="ExportPDFspec.cs" />
     <Compile Include="FinishForm.cs">
@@ -111,7 +113,6 @@
     <Compile Include="SetCurrentSpec.cs" />
     <Compile Include="SheetNum.cs" />
     <Compile Include="RoomElements.cs" />
-    <Compile Include="ExportDWFX.cs" />
     <Compile Include="SPECA.cs" />
     <Compile Include="SuperTest.cs" />
     <Compile Include="test2.cs" />
@@ -179,6 +180,9 @@
       <Project>{359e0e12-a920-4d12-8c52-31df764a6c64}</Project>
       <Name>Modules</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="type1\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
