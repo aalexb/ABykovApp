@@ -52,6 +52,10 @@
             this.label7 = new System.Windows.Forms.Label();
             this.label8 = new System.Windows.Forms.Label();
             this.PhaseSelector = new System.Windows.Forms.ComboBox();
+            this.label9 = new System.Windows.Forms.Label();
+            this.label10 = new System.Windows.Forms.Label();
+            this.modelFloor = new System.Windows.Forms.CheckBox();
+            this.modelCeil = new System.Windows.Forms.CheckBox();
             this.panel1.SuspendLayout();
             this.panel3.SuspendLayout();
             this.panel2.SuspendLayout();
@@ -82,7 +86,7 @@
             // 
             this.label1.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(7, 241);
+            this.label1.Location = new System.Drawing.Point(7, 227);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(100, 13);
             this.label1.TabIndex = 3;
@@ -100,7 +104,7 @@
             this.panel1.Dock = System.Windows.Forms.DockStyle.Right;
             this.panel1.Location = new System.Drawing.Point(441, 0);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(201, 325);
+            this.panel1.Size = new System.Drawing.Size(201, 351);
             this.panel1.TabIndex = 4;
             // 
             // panel3
@@ -149,7 +153,7 @@
             // 
             this.panel2.Controls.Add(this.button1);
             this.panel2.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panel2.Location = new System.Drawing.Point(0, 261);
+            this.panel2.Location = new System.Drawing.Point(0, 287);
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(441, 64);
             this.panel2.TabIndex = 5;
@@ -184,19 +188,25 @@
             this.tableLayoutPanel1.Controls.Add(this.checkCol, 2, 3);
             this.tableLayoutPanel1.Controls.Add(this.label7, 2, 0);
             this.tableLayoutPanel1.Controls.Add(this.label8, 1, 0);
-            this.tableLayoutPanel1.Controls.Add(this.PhaseSelector, 1, 5);
-            this.tableLayoutPanel1.Controls.Add(this.label1, 0, 5);
+            this.tableLayoutPanel1.Controls.Add(this.label1, 0, 7);
+            this.tableLayoutPanel1.Controls.Add(this.PhaseSelector, 1, 7);
+            this.tableLayoutPanel1.Controls.Add(this.label9, 1, 4);
+            this.tableLayoutPanel1.Controls.Add(this.label10, 1, 5);
+            this.tableLayoutPanel1.Controls.Add(this.modelFloor, 2, 4);
+            this.tableLayoutPanel1.Controls.Add(this.modelCeil, 2, 5);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-            this.tableLayoutPanel1.RowCount = 6;
+            this.tableLayoutPanel1.RowCount = 8;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(441, 261);
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(441, 287);
             this.tableLayoutPanel1.TabIndex = 6;
             // 
             // label5
@@ -323,17 +333,59 @@
             // 
             this.PhaseSelector.Dock = System.Windows.Forms.DockStyle.Fill;
             this.PhaseSelector.FormattingEnabled = true;
-            this.PhaseSelector.Location = new System.Drawing.Point(113, 237);
+            this.PhaseSelector.Location = new System.Drawing.Point(113, 183);
             this.PhaseSelector.Name = "PhaseSelector";
             this.PhaseSelector.Size = new System.Drawing.Size(287, 21);
             this.PhaseSelector.TabIndex = 2;
             this.PhaseSelector.SelectedIndexChanged += new System.EventHandler(this.PhaseSelector_SelectedIndexChanged);
             // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.label9.Location = new System.Drawing.Point(113, 120);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(287, 20);
+            this.label9.TabIndex = 3;
+            this.label9.Text = "Пол в модели";
+            this.label9.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.label10.Location = new System.Drawing.Point(113, 140);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(287, 20);
+            this.label10.TabIndex = 3;
+            this.label10.Text = "Потолок в модели:";
+            this.label10.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // modelFloor
+            // 
+            this.modelFloor.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.modelFloor.AutoSize = true;
+            this.modelFloor.Location = new System.Drawing.Point(414, 123);
+            this.modelFloor.Name = "modelFloor";
+            this.modelFloor.Size = new System.Drawing.Size(15, 14);
+            this.modelFloor.TabIndex = 5;
+            this.modelFloor.UseVisualStyleBackColor = true;
+            // 
+            // modelCeil
+            // 
+            this.modelCeil.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.modelCeil.AutoSize = true;
+            this.modelCeil.Location = new System.Drawing.Point(414, 143);
+            this.modelCeil.Name = "modelCeil";
+            this.modelCeil.Size = new System.Drawing.Size(15, 14);
+            this.modelCeil.TabIndex = 5;
+            this.modelCeil.UseVisualStyleBackColor = true;
+            // 
             // FinishForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(642, 325);
+            this.ClientSize = new System.Drawing.Size(642, 351);
             this.Controls.Add(this.tableLayoutPanel1);
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.panel1);
@@ -377,5 +429,9 @@
         private System.Windows.Forms.CheckBox checkCol;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.CheckBox modelFloor;
+        private System.Windows.Forms.CheckBox modelCeil;
     }
 }

@@ -10,6 +10,8 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Forms;
 
 namespace WorkApp
 {
@@ -20,7 +22,7 @@ namespace WorkApp
 		{
 			UIApplication uiapp = commandData.Application;
 			UIDocument uidoc = uiapp.ActiveUIDocument;
-			Application app = uiapp.Application;
+            Autodesk.Revit.ApplicationServices.Application app = uiapp.Application;
 			Document doc = uidoc.Document;
 			List < Element > titleBlocks = new FilteredElementCollector(doc)
 				.OfCategory(BuiltInCategory.OST_TitleBlocks)
@@ -106,10 +108,13 @@ namespace WorkApp
 			
             
 			string dir = doc.PathName.Substring(0, doc.PathName.Length - doc.Title.Length - 4);
+			FolderBrowserDialog dialog = new FolderBrowserDialog();
+			dialog.ShowDialog();
+            //ialog.SelectedPath
+            
 
-
-			ModelPath mp=doc.GetWorksharingCentralModelPath();
-			string vmp=ModelPathUtils.ConvertModelPathToUserVisiblePath(mp);
+			//ModelPath mp=doc.GetWorksharingCentralModelPath();
+			string vmp= dialog.SelectedPath;
 			int arr = 0;
             for (int i = vmp.Length - 1; i != 0; i--)
             {
@@ -122,7 +127,7 @@ namespace WorkApp
 
 
             //string newPath = Path.GetTempPath();
-			string newPath = vmp.Substring(0, arr+1)+"DWG";
+			string newPath = vmp+"\\DWG";
 			for (int i = 0; i < listNum.Count(); i++)
 			{
 				viewName.Add(newPath + listNum[i].SheetNumber+listNum[i].Name+".dwfx");

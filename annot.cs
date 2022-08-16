@@ -23,54 +23,64 @@ namespace WorkApp
             Application app = uiapp.Application;
             Document doc = uidoc.Document;
 
+            /*-
+            var sel = uidoc.Selection.GetElementIds().First();
+            var selel =doc.GetElement( sel) as Wall;
+            var box = selel.get_BoundingBox(doc.ActiveView);
+            */
 
-            List<FamilyInstance> allAnnot = new FilteredElementCollector(doc)
+            var allAnnot = new FilteredElementCollector(doc)
                 .OfCategory(BuiltInCategory.OST_GenericAnnotation)
                 .WhereElementIsNotElementType()
-                .Cast<FamilyInstance>()
-                .ToList();
-
-            List<Element> allUzl = new FilteredElementCollector(doc)
+                .Cast<FamilyInstance>();
+            
+            var allUzl = new FilteredElementCollector(doc)
                 .OfCategory(BuiltInCategory.OST_DetailComponents)
                 .OfClass(typeof(FamilyInstance))
                 .WhereElementIsNotElementType()
-                .ToElements()
-                .ToList();
-
-
-
+                .ToElements();
+            var allSpec = new FilteredElementCollector(doc)
+                .OfCategory(BuiltInCategory.OST_Views)
+                .ToElements();
             
-            List<FamilyInstance> myAnnot = new List<FamilyInstance>();
-            List<FamilyInstance> myUzl = new List<FamilyInstance>();
-            foreach (FamilyInstance item in allAnnot)
-            {
-                if (item.Symbol.FamilyName=="Значки1")
-                {
-                    myAnnot.Add(item);
-                }
-            }
-            foreach (FamilyInstance i in allUzl)
-            {
-                if (i.Symbol.FamilyName=="ЛинияИнв")
-                {
-                    myUzl.Add(i);
-                }
-            }
             using (Transaction tr=new Transaction(doc,"annot"))
             {
                 tr.Start();
-                foreach (FamilyInstance i in myAnnot)
+                
+                foreach (var i in allSpec)
                 {
-                    i.LookupParameter("view").Set(doc.GetElement(i.OwnerViewId).Name);
+                    try
+                    {
+                        i.LookupParameter("СП_Лист").Set(doc.GetElement(i.OwnerViewId).Name);
+                    }
+                    catch (Exception) { }
                 }
-                foreach (FamilyInstance i in myUzl)
+                foreach (FamilyInstance i in allAnnot)
                 {
-                    i.LookupParameter("view").Set(doc.GetElement(i.OwnerViewId).Name);
+                    try
+                    {
+                        i.LookupParameter("СП_Лист").Set(doc.GetElement(i.OwnerViewId).Name);
+                    }
+                    catch (Exception) { }
+                    
                 }
+                foreach (FamilyInstance i in allUzl)
+                {
+                    try
+                    {
+                        i.LookupParameter("СП_Лист").Set(doc.GetElement(i.OwnerViewId).Name);
+                    }
+                    catch (Exception) { }
+                }
+
+                
+                
                 tr.Commit();
 
             }
             return Result.Succeeded;
         }
+
+        
     }
 }

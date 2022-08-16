@@ -22,7 +22,7 @@ namespace WorkApp
         public int levels = 0;
         public int withnames = 0;
         public int poetagno = 0;
-        public bool countNewW;
+        public bool countNewW=false;
         public bool splitLevel;
         public Phase retPhase;
         public Element ColType;

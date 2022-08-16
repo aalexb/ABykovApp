@@ -210,6 +210,18 @@ namespace WorkApp
 				.ToElements()
 				.ToList();
 		}
+		public static void setParamInForeach(this Document doc, IEnumerable<Element> mas)
+		{
+			foreach (var item in mas)
+			{
+				try
+				{
+					item.LookupParameter("СП_Лист").Set(doc.GetElement(item.OwnerViewId).Name);
+				}
+				catch (Exception) { }
+
+			}
+		}
 		public static List<Element> getFilter(this Document doc,BuiltInCategory cat, string s) 
 		{
 			//new FilteredElementCollector(doc)
@@ -481,7 +493,7 @@ namespace WorkApp
                 case myTypes.matArea:
                     break;
                 case myTypes.kmLen:
-                    break;
+					break;
                 case myTypes.kmNum:
                     break;
                 case myTypes.armLen:
@@ -526,6 +538,9 @@ namespace WorkApp
 					c = cube.TotalArea.ToString("F1") + " м²";
 					break;
 				case myTypes.kmLen:
+					a = cube.TotalLength.ToString("F1") + " м.п.";
+					b = "-";
+					c= cube.TotalMassa.ToString("F2") + " кг";
 					break;
 				case myTypes.kmNum:
 					break;

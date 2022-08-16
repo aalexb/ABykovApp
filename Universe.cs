@@ -88,6 +88,16 @@ namespace WorkApp
                 .WherePasses(stageFilter)
                 .Cast<Element>()
                 .ToList());
+            collectFromModel.Add(new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Site)
+                .WhereElementIsNotElementType()
+                .WherePasses(stageFilter)
+                .Cast<Element>()
+                .ToList());
+            collectFromModel.Add(new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Parking)
+                .WhereElementIsNotElementType()
+                .WherePasses(stageFilter)
+                .Cast<Element>()
+                .ToList());
             collectFromModel.Add( new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_GenericModel)
                 .WhereElementIsNotElementType()
                 .WherePasses(stageFilter)

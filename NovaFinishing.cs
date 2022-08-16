@@ -18,6 +18,9 @@ namespace WorkApp
     {
         Result IExternalCommand.Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
+            RoomFinishing.Rooms = new List<RoomFinishing>();
+            RoomFinishing.FinishTable = new List<List<RoomFinishing>>();
+            RoomFinishing.FloorTable = new List<List<RoomFinishing>>();
             UIApplication uiapp = commandData.Application;
             UIDocument uidoc = uiapp.ActiveUIDocument;
             Application app = uiapp.Application;
@@ -30,6 +33,8 @@ namespace WorkApp
             GlobalParameter GlobePar2 = GlobalParametersManager.FindByName(doc, "FinData") != ElementId.InvalidElementId ?
                 doc.GetElement(GlobalParametersManager.FindByName(doc, "FinData")) as GlobalParameter :null;
             FinishForm MainForm = new FinishForm(doc);
+
+            
             MainForm.ShowDialog();
             using (Transaction tr=new Transaction(doc,"setGP"))
             {
@@ -45,46 +50,51 @@ namespace WorkApp
             lastPhase = MainForm.retPhase;
             idPhase = lastPhase.Id;
 
-            List<SharedParameterElement> shParamElements = new FilteredElementCollector(doc)
+            var shParamElements = new FilteredElementCollector(doc)
                 .OfClass(typeof(SharedParameterElement))
                 .Cast<SharedParameterElement>()
                 .ToList();
             //Фильтр: Помещения на последней стадии
-            FilterableValueProvider providerRoom = new ParameterValueProvider(new ElementId((int)BuiltInParameter.ROOM_PHASE_ID));
-            FilterElementIdRule rRule = new FilterElementIdRule(providerRoom, evaluator, idPhase);
-            ElementParameterFilter room_filter = new ElementParameterFilter(rRule);
+            var providerRoom = new ParameterValueProvider(new ElementId((int)BuiltInParameter.ROOM_PHASE_ID));
+            var rRule = new FilterElementIdRule(providerRoom, evaluator, idPhase);
+            var room_filter = new ElementParameterFilter(rRule);
             //FilterableValueProvider provRoomSchool = new ParameterValueProvider(shParam.Id);
-            FilterStringRuleEvaluator StrEvaluator = new FilterStringEquals();
-            IList<Element> rooms = new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Rooms)
+            var StrEvaluator = new FilterStringEquals();
+            var rooms = new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Rooms)
                 .WhereElementIsNotElementType()
                 .WherePasses(room_filter)
                 //.WherePasses(roomSc_filter)
                 .ToElements();
 
             //Фильтр: Стены созданные на последней стадии
-            FilterableValueProvider provider = new ParameterValueProvider(new ElementId((int)BuiltInParameter.PHASE_CREATED));
-            FilterElementIdRule fRule = new FilterElementIdRule(provider, evaluator, idPhase);
-            ElementParameterFilter door_filter = new ElementParameterFilter(fRule);
+            var provider = new ParameterValueProvider(new ElementId((int)BuiltInParameter.PHASE_CREATED));
+            var fRule = new FilterElementIdRule(provider, evaluator, idPhase);
+            var door_filter = new ElementParameterFilter(fRule);
 
-            IList<Element> allWalls = new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Walls)
+            var allWalls = new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Walls)
                 .WhereElementIsNotElementType()
                 .WherePasses(door_filter)
                 .ToElements();
 
             //Фильтр: экземпляры дверей
-            List<FamilyInstance> doors = new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Doors)
+            var doors = new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Doors)
                 .WhereElementIsNotElementType()
                 .Cast<FamilyInstance>()
                 .ToList();
 
 
-            foreach (Element e in rooms)
+            //Create objects
+            foreach (var item in rooms)
             {
-                RoomFinishing.Rooms.Add(new RoomFinishing(e));
+                new RoomFinishing(item);
             }
+            //var _=rooms.Select(x => new RoomFinishing(x));
+
+            
             RoomFinishing.Rooms = RoomFinishing.Rooms.OrderBy(x => x.Num).ToList();
 
-            List<GhostWall> cWalls = new List<GhostWall>();
+
+            var cWalls = new List<GhostWall>();
             foreach (Element wall in allWalls)
             {
                 if (wall.LookupParameter("Помещение").AsString() != null & wall.LookupParameter("Помещение").AsString() != "")
@@ -93,9 +103,9 @@ namespace WorkApp
                 }
             }
 
-            foreach (GhostWall w in cWalls)
+            foreach (var w in cWalls)
             {
-                foreach (RoomFinishing r in RoomFinishing.Rooms)
+                foreach (var r in RoomFinishing.Rooms)
                 {
                     if (r.Num==w.Room)
                     {
@@ -117,16 +127,15 @@ namespace WorkApp
                         {
                             r.unitNewWallVal += w.Area;
                         }
-                        
                     }
                 }
             }
 
 
             //Плинтус
-            foreach (FamilyInstance d in doors)
+            foreach (var d in doors)
             {
-                foreach (RoomFinishing r in RoomFinishing.Rooms)
+                foreach (var r in RoomFinishing.Rooms)
                 {
                     try
                     {
@@ -146,16 +155,13 @@ namespace WorkApp
             using (Transaction tr = new Transaction(doc, "otdelka"))
             {
                 tr.Start();
-                GlobalParameter GlobePar = GlobalParametersManager.FindByName(doc, "НесколькоЭтажей") != ElementId.InvalidElementId ?
-                doc.GetElement(GlobalParametersManager.FindByName(doc, "НесколькоЭтажей")) as GlobalParameter :
-                GlobalParameter.Create(doc, "НесколькоЭтажей", ParameterType.YesNo);
-                int MoreThenOneLevel = ((IntegerParameterValue)GlobePar.GetValue()).Value;
 
-                int withNames = MainForm.withnames;
-                MoreThenOneLevel = MainForm.levels;
+                var GlobePar = GlobalParametersManager.FindByName(doc, "НесколькоЭтажей") != ElementId.InvalidElementId ?
+                    doc.GetElement(GlobalParametersManager.FindByName(doc, "НесколькоЭтажей")) as GlobalParameter :
+                    GlobalParameter.Create(doc, "НесколькоЭтажей", ParameterType.YesNo);
 
                 RoomFinishing.FinishTableCommit(doc, MainForm);
-                RoomFinishing.FloorTableCommit(MoreThenOneLevel, withNames, doc);
+                RoomFinishing.FloorTableCommit(MainForm.levels, MainForm.withnames, doc);
 
                 tr.Commit();
             }

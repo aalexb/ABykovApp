@@ -264,7 +264,16 @@ namespace WorkApp
 					out_Name = e.Document.GetElement(e.GetTypeId()).getP(NAME);
 					break;
 				default:
-					out_Name = e.Document.GetElement(e.GetTypeId()).getP(NAME);
+                    if (e.Document.GetElement(e.GetTypeId()).getP(NAME) == null)
+                    {
+						out_Name = e.getP(NAME);
+                    }
+                    else
+                    {
+						out_Name = e.Document.GetElement(e.GetTypeId()).getP(NAME);
+
+					}
+					//out_Name = e.Document.GetElement(e.GetTypeId()).getP(NAME)?null:e.getP(NAME);
 					textUP = out_Name;
 					if (e.Document.GetElement(e.GetTypeId()).getP(STEEL_MARK) != null)
 					{
@@ -302,12 +311,38 @@ namespace WorkApp
 
 							break;
 						default:
-
-							mType = e.Document.GetElement(e.GetTypeId()).LookupParameter("ЕслиЛинейный").AsInteger()==1? myTypes.commonLength:myTypes.allNum;
-							if (e.LookupParameter("АММО_Длина_КМ") != null)
-							{
-								Length = e.LookupParameter("АММО_Длина_КМ").AsDouble() * FT;
+                            if (e.Document.GetElement(e.GetTypeId())
+								.LookupParameter("ЕслиЛинейный")!=null)
+                            {
+								mType = e.Document.GetElement(e.GetTypeId())
+								.LookupParameter("ЕслиЛинейный")
+								.AsInteger() == 1 ? myTypes.commonLength : myTypes.allNum;
 							}
+                            else
+                            {
+								mType = myTypes.allNum;
+							}
+							if (e.Document.GetElement(e.GetTypeId())
+								.LookupParameter("шт/м/м2/м3") != null)
+							{
+								mType = e.Document.GetElement(e.GetTypeId())
+								.LookupParameter("шт/м/м2/м3")
+								.AsInteger() == 1 ? myTypes.kmLen : myTypes.allNum;
+							}
+							else
+							{
+								mType = myTypes.allNum;
+							}
+
+							try
+                            {
+								if (e.LookupParameter("АММО_Длина_КМ") != null)
+								{
+									Length = e.LookupParameter("АММО_Длина_КМ").AsDouble() * FT;
+								}
+							}
+                            catch (Exception){}
+							
 							break;
 					}
 					Massa = e.Document.GetElement(e.GetTypeId()).LookupParameter(MASS).AsDouble();

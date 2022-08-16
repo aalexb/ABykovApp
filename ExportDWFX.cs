@@ -22,29 +22,37 @@ namespace WorkApp
 			UIDocument uidoc = uiapp.ActiveUIDocument;
 			Application app = uiapp.Application;
 			Document doc = uidoc.Document;
+
+
 			List < Element > titleBlocks = new FilteredElementCollector(doc)
 				.OfCategory(BuiltInCategory.OST_TitleBlocks)
 				.WhereElementIsNotElementType()
 				.ToElements()
 				.ToList();
 
-			List<ElementId> elt = uidoc.Selection.GetElementIds().ToList();
-
+			List<ElementId> selectedSheets = uidoc
+				.Selection
+				.GetElementIds()
+				.ToList();
+            
+			/*
 			List<Element> beta = new List<Element>();
-            foreach (ElementId i in elt)
+            foreach (ElementId i in SelectedSheets)
             {
 				beta.Add(doc.GetElement(i));
             }
-			ViewSheet a;
-			a = doc.GetElement(elt.First()) as ViewSheet;
+			*/
+
+			ViewSheet viewOfSheet;
+			viewOfSheet = doc.GetElement(selectedSheets.First()) as ViewSheet;
 			ViewSet b = new ViewSet();
 			List<List<Element>> elementOnSheet = new List<List<Element>>();
 
 
-            for (int i = 0; i < elt.Count(); i++)
+            for (int i = 0; i < selectedSheets.Count(); i++)
             {
 				List<Element> sheetEl = new List<Element>();
-                foreach (Element e in new FilteredElementCollector(doc).OwnedByView(elt[i]))
+                foreach (Element e in new FilteredElementCollector(doc).OwnedByView(selectedSheets[i]))
                 {
 					sheetEl.Add(e);
                 }
@@ -53,7 +61,7 @@ namespace WorkApp
 			List<Element> titleOnSheet = new List<Element>();
 
 
-            for (int i = 0; i < elt.Count(); i++)
+            for (int i = 0; i < selectedSheets.Count(); i++)
             {
 				titleOnSheet.Add(null);
                 foreach (Element e in elementOnSheet[i])
@@ -85,7 +93,7 @@ namespace WorkApp
 			//string nameOfExportDWFX = "AutoExport " + DateTime.Now.Hour.ToString() + "_" + DateTime.Now.Minute.ToString() + "_" + DateTime.Now.Second.ToString();
 			List<string> viewName = new List<string>();
 			List<ViewSheet> listNum = new List<ViewSheet>();
-			foreach (ElementId i in elt)
+			foreach (ElementId i in selectedSheets)
 			{
 
 				b.Insert(doc.GetElement(i) as ViewSheet);

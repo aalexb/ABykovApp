@@ -1,17 +1,7 @@
 ﻿using Autodesk.Revit.DB;
-using Autodesk.Revit.DB.Architecture;
-using Autodesk.Revit.DB.Structure;
-using Autodesk.Revit.UI;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Globalization;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Media.Imaging;
 
 namespace WorkApp
 {
@@ -31,9 +21,11 @@ namespace WorkApp
         public string KolonType { get; set; }
         public string FloorType { get; set; }
         public double Perimeter { get; set; }
+        //=============
         public string PlintusType { get; set; }
         public double PlintusVal { get; set; }
         public double SimilarPlintusVal { get; set; }
+        //=============
         public double MainWallVal { get; set; }//Значение основной отделки стен
         public double SimilarWallVal { get; set; }
         public double LocalWallVal { get; set; }//Значение местной отделки стен
@@ -78,9 +70,17 @@ namespace WorkApp
             unitKolonWallVal = 0;
             newWallVal = 0;
             unitNewWallVal = 0;
+            Rooms.Add(this);
+        }
+        static void sumWallArea()
+        {
+
         }
         public static void makeFinish(FinishForm form)
         {
+            
+
+
             if (form.ColFromMat)
             {
                 if (form.splitLevel)
@@ -388,7 +388,7 @@ namespace WorkApp
                         }
                         if (r.refElement.LookupParameter("ОТД_Кол.Доп")!=null)
                         {
-                            r.refElement.LookupParameter("ОТД_Кол.Доп").Set(r.LocalWallVal > 0 ? r.LocalWallVal.ToString("F1") : "");
+                            r.refElement.LookupParameter("ОТД_Кол.Доп").Set(r.LocalWallVal > 0 ? (r.LocalWallVal*Meta.FT*Meta.FT).ToString("F1") : "");
                             r.refElement.LookupParameter("ОТД_Состав.Доп").Set(r.LocalWallText);
                         }
                         

@@ -1,9 +1,13 @@
 ﻿using System;
+using System.Reflection;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using adWin = Autodesk.Windows;
 using Autodesk.Revit.UI;
 using System.Collections.Generic;
 using Autodesk.Revit.UI.Events;
 using WorkApp.Properties;
-using Modules;
+using winform = System.Windows.Forms;
 
 namespace WorkApp
 {
@@ -12,28 +16,65 @@ namespace WorkApp
 
     public class App : IExternalApplication
     {
-        public Result OnStartup(UIControlledApplication a)
+        public Result OnStartup(UIControlledApplication app)
         {
-            RibbonPanel panel = ribbonPanel(a);
+            try
+            {
+                adWin.RibbonControl ribbon = adWin.ComponentManager.Ribbon;
+                Color customColor = Color.FromRgb(255, 255, 255);
+                SolidColorBrush brush = new SolidColorBrush(customColor);
+                foreach (adWin.RibbonTab tab in ribbon.Tabs)
+                {
+                    
+                    foreach (adWin.RibbonPanel pan in tab.Panels)
+                    {
+                        pan.CustomPanelTitleBarBackground = brush;
+                        pan.CustomPanelBackground = brush;
+                        
+                        
+                    }
+                }
+                adWin.ComponentManager.UIElementActivated += ComponentManager_UIElementActivated;
+            }
+            catch (Exception ex)
+            {
 
-            PushButton button1 = panel.AddButton("Получить ПДФ", Resources.PDF, "ExportDWFX");
-            PushButton buttonPDFspec = panel.AddButton("ПДФ спец.", Resources.PDF, "ExportPDFspec");
-            PushButton buttonDWG = panel.AddButton("Получить DWG", Resources.dwgpic, "ExportDWG");
-            PushButton button2 = panel.AddButton("Смена номера", Resources.tudaSyda, "SheetNum");
-            PushButton button3 = panel.AddButton("Эл-ты помещ.", Resources.Peace, "RoomElements");
-            PushButton button4 = panel.AddButton("Отделка", Resources.Brush, "NovaFinishing");
-            PushButton button5 = panel.AddButton("Аннотации", Resources.MGN, "annot");
-            PushButton button6 = panel.AddButton("Металл", Resources.gear,  "metall");
-            PushButton button7 = panel.AddButton("Спецификация", Resources.block,  "grouping");
-            PushButton button8 = panel.AddButton("Отделочный слой", Resources.emptyHouse,  "PerimetralWall");
-            PushButton button9 = panel.AddButton("СуперТест", Resources.block, "SuperTest");
-            PushButton buttonTest = panel.AddButton("Номер в отделку", Resources.fullHouse, "RNum2FWall");
-            PushButton buttonUniv = panel.AddButton("Всё", Resources.atom, "Universe");
-            PushButton buttonWLS= panel.AddButton("Стены 2021", Resources.plane, "WallLastStage");
-            PushButton buttonSPEC = panel.AddButton("Общая спецификация", Resources.block, "SPECA");
-            PushButton SetCurrentSpec = panel.AddButton("Спецификация - расчет", Resources.block, "SetCurrentSpec");
-            PushButton Hydpra = panel.AddButton("Гидравлический расчет", Resources.block, "Hydra");
-            PushButton newSpace = panel.AddButton("Пространства", Resources.block, "macros");
+                System.Windows.Forms.MessageBox.Show(ex.StackTrace + "\r\n" + ex.InnerException, "Error", System.Windows.Forms.MessageBoxButtons.OK);
+            }
+
+            RibbonPanel panelSheet = ribbonPanel(app,"Листы");
+            RibbonPanel panelFinish = ribbonPanel(app, "Отделка");
+            RibbonPanel panelOther = ribbonPanel(app, "Прочее");
+            //PushButton buttonPDFspec = panelSheet.AddButton("ПДФ спец.", Resources.PDF, "ExportPDFspec");
+
+            PushButton button110 = panelSheet.AddButton("Получить ПДФ", Resources.PDF, "ExportDWFX2");
+            PushButton button120 = panelSheet.AddButton("Получить DWG", Resources.dwgpic, "ExportDWG");
+            PushButton button130 = panelSheet.AddButton("Смена номера", Resources.tudaSyda, "SheetNum");
+            //PushButton button3 = panelOther.AddButton("Эл-ты помещ.", Resources.Peace, "RoomElements");
+            
+
+
+            PushButton button210 = panelFinish.AddButton("Отделочный слой", Resources.emptyHouse, "PerimetralWall");
+            PushButton button220 = panelFinish.AddButton("Номер в отделку", Resources.fullHouse, "RNum2FWall");
+            PushButton button230 = panelFinish.AddButton("Отделка", Resources.Brush, "NovaFinishing");
+
+
+
+            PushButton button310 = panelOther.AddButton("Аннотации", Resources.MGN, "annot");
+            PushButton button320 = panelOther.AddButton("Металл", Resources.gear,  "metall");
+            PushButton button330 = panelOther.AddButton("Спецификация", Resources.block,  "grouping");
+            PushButton button340 = panelOther.AddButton("СуперТест", Resources.block, "SuperTest");
+            PushButton button350 = panelOther.AddButton("Всё", Resources.atom, "Universe");
+            PushButton button360 = panelOther.AddButton("Стены 2021", Resources.plane, "WallLastStage");
+            PushButton button370 = panelOther.AddButton("Общая спецификация", Resources.block, "SPECA");
+            PushButton button380 = panelOther.AddButton("Спецификация - расчет", Resources.block, "SetCurrentSpec");
+            PushButton button390 = panelOther.AddButton("Гидравлический расчет", Resources.block, "Hydra");
+            PushButton button395 = panelOther.AddButton("Пространства", Resources.block, "macros");
+            PushButton button399 = panelOther.AddButton("Сброс номеров помещений", Resources.block, "RoomRenumerate");
+
+
+            PushButton button410 = panelOther.AddButton("Тесты", Resources.block, "TableDraw");
+            PushButton button420 = panelOther.AddButton("Тест дверей", Resources.block, "Doors");
 
 
 
@@ -41,10 +82,15 @@ namespace WorkApp
 
 
 
-            a.ApplicationClosing += a_ApplicationClosing;
-            a.Idling += A_Idling;
+            app.ApplicationClosing += a_ApplicationClosing;
+            app.Idling += A_Idling;
             
             return Result.Succeeded;
+        }
+
+        private void ComponentManager_UIElementActivated(object sender, adWin.UIElementActivatedEventArgs e)
+        {
+            //winform.MessageBox.Show("Title","Error",winform.MessageBoxButtons.OK);
         }
 
         void A_Idling(object sender, IdlingEventArgs e)
@@ -57,7 +103,7 @@ namespace WorkApp
             throw new NotImplementedException();
         }
 
-        public RibbonPanel ribbonPanel(UIControlledApplication a)
+        public RibbonPanel ribbonPanel(UIControlledApplication a,string name)
         {
             RibbonPanel ribbonPanel = null;
             try
@@ -68,7 +114,7 @@ namespace WorkApp
             catch { }
             try
             {
-                RibbonPanel panel = a.CreateRibbonPanel("АММО", "Настройка листов");
+                RibbonPanel panel = a.CreateRibbonPanel("АММО", name);
                 //RibbonPanel secondPanel = a.CreateRibbonPanel("АММО", "Общее");
 
             }
@@ -76,7 +122,7 @@ namespace WorkApp
             List<RibbonPanel> panels = a.GetRibbonPanels("АММО");
             foreach (RibbonPanel p in panels)
             {
-                if (p.Name == "Настройка листов")
+                if (p.Name == name)
                 {
                     ribbonPanel = p;
                 }

@@ -137,7 +137,7 @@ namespace WorkApp
             //wTypes.Add(MainForm.wTypeBoxes)
             foreach (Element wt in allWallTypes)
             {
-                if (wt.Name == s_OTD_Main)
+                if (wt.Name == MainForm.wTypeBoxes[0])
                 {
                     wTypes.Add(wt);
                 }
