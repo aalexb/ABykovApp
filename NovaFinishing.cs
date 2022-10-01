@@ -16,8 +16,13 @@ namespace WorkApp
     [Autodesk.Revit.Attributes.Transaction(Autodesk.Revit.Attributes.TransactionMode.Manual)]
     class NovaFinishing : IExternalCommand
     {
+        
         Result IExternalCommand.Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
+            
+        
+
+
             RoomFinishing.Rooms = new List<RoomFinishing>();
             RoomFinishing.FinishTable = new List<List<RoomFinishing>>();
             RoomFinishing.FloorTable = new List<List<RoomFinishing>>();
@@ -25,15 +30,27 @@ namespace WorkApp
             UIDocument uidoc = uiapp.ActiveUIDocument;
             Application app = uiapp.Application;
             Document doc = uidoc.Document;
+            
+
             PhaseArray xcom = doc.Phases;
             Phase lastPhase = xcom.get_Item(xcom.Size - 1);
             ElementId idPhase = lastPhase.Id;
             FilterNumericRuleEvaluator evaluator = new FilterNumericEquals();
+            var presel = false;
 
             GlobalParameter GlobePar2 = GlobalParametersManager.FindByName(doc, "FinData") != ElementId.InvalidElementId ?
                 doc.GetElement(GlobalParametersManager.FindByName(doc, "FinData")) as GlobalParameter :null;
             FinishForm MainForm = new FinishForm(doc);
-
+            List<Element> selEl=new List<Element>();
+            if (uidoc.Selection!=null& uidoc.Selection.GetElementIds().Count!=0)
+            {
+                presel = true;
+                foreach (var item in uidoc.Selection.GetElementIds())
+                {
+                    selEl.Add(doc.GetElement(item));
+                }
+                MainForm.selElem(selEl.Count.ToString());
+            }
             
             MainForm.ShowDialog();
             using (Transaction tr=new Transaction(doc,"setGP"))
@@ -65,6 +82,10 @@ namespace WorkApp
                 .WherePasses(room_filter)
                 //.WherePasses(roomSc_filter)
                 .ToElements();
+            if (MainForm.groupCheck)
+            {
+                rooms = rooms.Where(x => x.LookupParameter("ADSK_Группирование").AsString() == MainForm.groupField).ToList();
+            }
 
             //Фильтр: Стены созданные на последней стадии
             var provider = new ParameterValueProvider(new ElementId((int)BuiltInParameter.PHASE_CREATED));
@@ -72,6 +93,10 @@ namespace WorkApp
             var door_filter = new ElementParameterFilter(fRule);
 
             var allWalls = new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Walls)
+                .WhereElementIsNotElementType()
+                .WherePasses(door_filter)
+                .ToElements();
+            var allFloors = new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Floors)
                 .WhereElementIsNotElementType()
                 .WherePasses(door_filter)
                 .ToElements();
@@ -93,39 +118,41 @@ namespace WorkApp
             
             RoomFinishing.Rooms = RoomFinishing.Rooms.OrderBy(x => x.Num).ToList();
 
-
+            
             var cWalls = new List<GhostWall>();
             foreach (Element wall in allWalls)
             {
-                if (wall.LookupParameter("Помещение").AsString() != null & wall.LookupParameter("Помещение").AsString() != "")
+                if (wall.LookupParameter("Помещение_Имя").AsString() != null & wall.LookupParameter("Помещение_Имя").AsString() != "")
                 {
                     cWalls.Add(new GhostWall(wall,MainForm.LocType));
                 }
             }
 
+            
             foreach (var w in cWalls)
             {
                 foreach (var r in RoomFinishing.Rooms)
                 {
-                    if (r.Num==w.Room)
+                    
+                    if (r.Id.IntegerValue==w.RoomID)
                     {
                         if (w.typeName == MainForm.LocType.Name)
                         {
-                            r.unitLocalWallVal += w.Area;
-                            r.LocalWallText = w.sostav;
+                            r.LocalWall.unitValue += w.Area;
+                            r.LocalWall.Text = w.sostav;
                         }
                         else if (w.typeName== MainForm.ColType.Name)
                         {
-                            r.unitKolonWallVal += w.Area;
-                            r.KolonWallText = w.sostav;
+                            r.Kolon.unitValue+= w.Area;
+                            r.Kolon.Text = w.sostav;
                         }
                         else
                         {
-                            r.unitMainWallVal += w.Area;
+                            r.MainWall.unitValue += w.Area;
                         }
                         if (w.countNewW)
                         {
-                            r.unitNewWallVal += w.Area;
+                            r.NewWall.unitValue += w.Area;
                         }
                     }
                 }
@@ -141,7 +168,7 @@ namespace WorkApp
                     {
                         if (d.get_FromRoom(lastPhase).Id == r.Id | d.get_ToRoom(lastPhase).Id == r.Id)
                         {
-                            r.Perimeter -= d.LookupParameter("сп_Ширина проёма").AsDouble();
+                            r.Plintus.unitValue-= d.LookupParameter("сп_Ширина проёма").AsDouble();
                         }
                     }
                     catch (Exception)
@@ -150,19 +177,15 @@ namespace WorkApp
                 }
             }
 
+            
+            RoomFinishing.makeFloor(MainForm);
             RoomFinishing.makeFinish(MainForm);
-            RoomFinishing.makeFloor(MainForm.splitLevel);
+
             using (Transaction tr = new Transaction(doc, "otdelka"))
             {
                 tr.Start();
-
-                var GlobePar = GlobalParametersManager.FindByName(doc, "НесколькоЭтажей") != ElementId.InvalidElementId ?
-                    doc.GetElement(GlobalParametersManager.FindByName(doc, "НесколькоЭтажей")) as GlobalParameter :
-                    GlobalParameter.Create(doc, "НесколькоЭтажей", ParameterType.YesNo);
-
                 RoomFinishing.FinishTableCommit(doc, MainForm);
-                RoomFinishing.FloorTableCommit(MainForm.levels, MainForm.withnames, doc);
-
+                RoomFinishing.FloorTableCommit(MainForm.levels, MainForm.withnames, doc,MainForm);
                 tr.Commit();
             }
             TaskDialog msg = new TaskDialog("Info");

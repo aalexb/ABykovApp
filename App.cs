@@ -50,8 +50,9 @@ namespace WorkApp
             PushButton button110 = panelSheet.AddButton("Получить ПДФ", Resources.PDF, "ExportDWFX2");
             PushButton button120 = panelSheet.AddButton("Получить DWG", Resources.dwgpic, "ExportDWG");
             PushButton button130 = panelSheet.AddButton("Смена номера", Resources.tudaSyda, "SheetNum");
+            PushButton button140 = panelSheet.AddButton("Нумерация", Resources.block, "PageNumerator");
             //PushButton button3 = panelOther.AddButton("Эл-ты помещ.", Resources.Peace, "RoomElements");
-            
+
 
 
             PushButton button210 = panelFinish.AddButton("Отделочный слой", Resources.emptyHouse, "PerimetralWall");

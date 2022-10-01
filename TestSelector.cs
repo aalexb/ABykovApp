@@ -23,10 +23,11 @@ namespace WorkApp
             Application app = uiapp.Application;
             Document doc = uidoc.Document;
 
-            
-            var sel = uidoc.Selection.GetElementIds();
+            var form= new FinishEnterprise(doc);
+            form.Show();
+            //var sel = uidoc.Selection.GetElementIds();
 
-            var selel =sel.Select(x=>doc.GetElement(x));
+            //var selel =sel.Select(x=>doc.GetElement(x));
             //var box = selel.get_BoundingBox(doc.ActiveView);
            
             

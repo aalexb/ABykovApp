@@ -23,7 +23,7 @@ namespace WorkApp
             Document doc = uidoc.Document;
 
             FinishForm MainForm = new FinishForm(doc);
-            MainForm.disFElements("New");
+            MainForm.disableSomeElements("New");
             MainForm.ShowDialog();
 
             double FT = 0.3048;

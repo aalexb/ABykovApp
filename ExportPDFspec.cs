@@ -170,10 +170,10 @@ namespace WorkApp
             PrintManager PrintMan = doc.PrintManager;
             PaperSizeSet myPSize = PrintMan.PaperSizes;
 
-            Form1 newForm = new Form1(myPSize);
-            newForm.ShowDialog();
-            
-            PaperSize myPS=newForm.ps;
+            //PagesForm newForm = new PagesForm(myPSize);
+            //newForm.ShowDialog();
+            PaperSize myPS = null;
+            //PaperSize myPS=newForm.ps;
             return myPS;
         }
         string batchPrint(List<string> name, List<int> fA, List<int> kr, List<int> kniga)

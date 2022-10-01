@@ -12,6 +12,7 @@ namespace WorkApp
         public Element refEl { get; set; }
         public string typeName { get; set; }
         public ElementId Level { get; set; }
+        public int RoomID { get; set; }
         public string Room { get; set; }
         public double Area { get; set; }
         public int Secondary { get; set; }
@@ -30,7 +31,8 @@ namespace WorkApp
         public GhostWall(Element wall, Element LocWall) {
             refEl = wall;
             typeName = (wall as Wall).WallType.Name;
-            Room = wall.getP("Помещение");
+            RoomID = wall.LookupParameter("Room_ID").AsInteger();
+            //Room = wall.getP("Помещение");
             Level = wall.LevelId;
             Area = wall.get_Parameter(BuiltInParameter.HOST_AREA_COMPUTED).AsDouble();
             if (LocWall!=null)

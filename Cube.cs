@@ -328,6 +328,16 @@ namespace WorkApp
 								mType = e.Document.GetElement(e.GetTypeId())
 								.LookupParameter("шт/м/м2/м3")
 								.AsInteger() == 1 ? myTypes.kmLen : myTypes.allNum;
+                                try
+                                {
+									Length=e.LookupParameter("СП_Длина").AsDouble()*FT;
+									break;
+                                }
+                                catch (Exception)
+                                {
+
+                                    
+                                }
 							}
 							else
 							{

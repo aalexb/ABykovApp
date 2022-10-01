@@ -28,24 +28,40 @@ namespace WorkApp
             Phase lastPhase = xcom.get_Item(xcom.Size - 1);
             ElementId idPhase = lastPhase.Id;
             FinishForm MainForm = new FinishForm(doc);
-            MainForm.disFElements("Number");
+            MainForm.disableSomeElements("Number");
             MainForm.ShowDialog();
             lastPhase = MainForm.retPhase;
             idPhase = lastPhase.Id;
 
 
 
+            
+            
+
+
+
+
+            var providerRoom = new ParameterValueProvider(new ElementId((int)BuiltInParameter.ROOM_PHASE_ID));
             FilterNumericRuleEvaluator evaluator = new FilterNumericEquals();
             FilterableValueProvider provider = new ParameterValueProvider(new ElementId((int)BuiltInParameter.PHASE_CREATED));
             FilterElementIdRule fRule = new FilterElementIdRule(provider, evaluator, idPhase);
+            FilterElementIdRule rRule = new FilterElementIdRule(providerRoom, evaluator, idPhase);
+            ElementParameterFilter room_filter = new ElementParameterFilter(rRule);
             ElementParameterFilter door_filter = new ElementParameterFilter(fRule);
+
+            IList<Element> rooms = new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Rooms)
+                .WhereElementIsNotElementType()
+                .WherePasses(room_filter)
+                .ToElements();
 
             IList<Element> allWalls = new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Walls)
                 .WhereElementIsNotElementType()
                 .WherePasses(door_filter)
                 .ToElements();
 
-            List<Element> otdWalls=allWalls.Where(x => x.Name.StartsWith("!!отделка")).ToList();
+            List<Element> otdWalls=allWalls.Where(x => x.Name.StartsWith("(Вн_О)")).ToList();
+
+            //List<Element> otdWalls=allWalls.Where(x => x.Name.StartsWith("!!отделка")).ToList();
             List<Room> roomofWall = new List<Room>();
 
 
@@ -56,6 +72,11 @@ namespace WorkApp
             using (Transaction tr = new Transaction(doc, "creating"))
             {
                 tr.Start();
+                foreach (Room item in rooms)
+                {
+                    PickWall(item, doc);
+                }
+                /*
                 foreach (Element i in otdWalls)
                 {
 
@@ -71,13 +92,20 @@ namespace WorkApp
                         catch (Exception)
                         {
                         }
+                        try
+                        {
+                            i.setP("Имя помещения", doc.GetRoomAtPoint(origin, lastPhase).Number);
+                        }
+                        catch (Exception)
+                        {
+                        }
                     }
 
 
                    
                        
             }
-
+                */
 
 
 
@@ -87,6 +115,28 @@ namespace WorkApp
             }
 
                 return Result.Succeeded;
+        }
+
+        void PickWall(Room room,Document doc)
+        {
+            var boundary = room.GetBoundarySegments(new SpatialElementBoundaryOptions());
+
+            foreach (var b in boundary)
+            {
+                foreach (var s in b)
+                {
+                    var neighbour = doc.GetElement(s.ElementId);
+                    if (neighbour is Wall)
+                    {
+                        var wall = neighbour as Wall;
+                        if (wall.Name.StartsWith("(Вн_О)"))
+                        {
+                            wall.setP("Room_ID", room.Id.IntegerValue);
+                        }
+                        
+                    }
+                }
+            }
         }
     }
 

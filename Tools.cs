@@ -321,6 +321,7 @@ namespace WorkApp
 		//public static string 
 		public static string shortLists(List<string> IN)
 		{
+			IN=IN.Distinct().ToList();
 			string Out = "";
 			int first = -1;
 			int current;

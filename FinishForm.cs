@@ -1,18 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using Autodesk.Revit.ApplicationServices;
-//using Autodesk.Revit.Creation;
 using Autodesk.Revit.DB;
-using Autodesk.Revit.DB.Architecture;
-using Autodesk.Revit.UI;
-using Autodesk.Revit.UI.Events;
 
 
 namespace WorkApp
@@ -23,10 +13,12 @@ namespace WorkApp
         public int withnames = 0;
         public int poetagno = 0;
         public bool countNewW=false;
+        public bool groupCheck = false;
         public bool splitLevel;
         public Phase retPhase;
         public Element ColType;
         public bool ColFromMat;
+        public string groupField;
         public Element LocType;
         List<ElementId> defSet = new List<ElementId>();
         public List<string> wTypeBoxes = new List<string>();
@@ -60,14 +52,8 @@ namespace WorkApp
             List<Element> walltypes2 = walltypes1.Select(x=>x).ToList();
             List<Element> walltypes3 = walltypes1.Select(x => x).ToList();
 
-
-            
-            //xcom.
-
-
-            //PhaseSelector.SelectedItem = xcom;
-
             InitializeComponent();
+            GroupSelector.Enabled = false;
             comboBox1.DataSource = walltypes1;
             comboBox1.DisplayMember = "Name";
             comboBox1.ValueMember = "Id";
@@ -116,8 +102,31 @@ namespace WorkApp
                 PhaseSelector.Items.Add(item);
             }
             PhaseSelector.SelectedIndex = xcom.Size-1;
+            var roomGroup = new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Rooms)
+                 .WhereElementIsNotElementType()
+                 .ToElements();
+            try
+            {
+                var lll = roomGroup.Select(x => x.LookupParameter("ADSK_Группирование").AsString()).Distinct().ToList();
+                foreach (var item in lll)
+                {
+                    if (item != null)
+                    {
+                        GroupSelector.Items.Add(item);
+                    }
+
+                }
+                GroupSelector.DataSource = lll;
+            }
+            catch (Exception)
+            {
+
+                
+            }
+            
+            
         }
-        public void disFElements(string who)
+        public void disableSomeElements(string who)
         {
             SomeLevels.Enabled = false;
             RoomNames.Enabled = false;
@@ -133,6 +142,10 @@ namespace WorkApp
             }
         }
 
+        public void selElem(string a)
+        {
+            SelNum.Text = a;
+        }
         private void button1_Click(object sender, EventArgs e)
         {
             levels = SomeLevels.Checked ? 1 : 0;
@@ -147,6 +160,11 @@ namespace WorkApp
             wTypeBoxes.Add((comboBox1.SelectedItem as Element).Name);
             wTypeBoxes.Add((LocFinSelector.SelectedItem as Element).Name);
             wTypeBoxes.Add((ColumnFinSelector.SelectedItem as Element).Name);
+            groupCheck = checkGroup.Checked;
+            if (groupCheck)
+            {
+                groupField = GroupSelector.Text;
+            }
             this.Close();
         }
 
@@ -163,6 +181,18 @@ namespace WorkApp
         private void checkBox1_MouseHover(object sender, EventArgs e)
         {
             
+        }
+
+        private void checkGroup_CheckedChanged(object sender, EventArgs e)
+        {
+            if (checkGroup.Checked == false)
+            {
+                GroupSelector.Enabled = false;
+            }
+            else
+            {
+                GroupSelector.Enabled = true;
+            }
         }
     }
 }
