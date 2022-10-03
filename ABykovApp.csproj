@@ -103,6 +103,7 @@
       <DependentUpon>addParamForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Class1.cs" />
+    <Compile Include="NovaShedule.cs" />
     <Compile Include="PageNumerator.cs" />
     <Compile Include="FinishEnterprise.cs">
       <SubType>Form</SubType>
