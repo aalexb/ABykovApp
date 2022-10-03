@@ -254,7 +254,7 @@ namespace WorkApp
                 foreach (wtf.Product e in TabSel)
                 {
                     e.refElt.refElement.setP("Лист", doc.GetElement(e.refElt.refElement.OwnerViewId).getP("Номер листа"));
-                    e.refElt.refElement.setP("Строк", e.linkedElt.Count);
+                    e.refElt.refElement.setP("Строк", e.linkedElt.Count==1?2: e.linkedElt.Count);
                     e.linkedElt = e.linkedElt.OrderBy(x => x.Prior).ToList();
                     foreach (Cube cube in e.linkedElt)
                     {

@@ -100,7 +100,7 @@ namespace WorkApp
 			
 			out_Mass = material.Name;
 			out_Snos = source.get_Parameter(BuiltInParameter.PHASE_DEMOLISHED).AsValueString();
-			if (material.LookupParameter("Объем_Площадь").AsInteger()==0)
+			if (material.LookupParameter("шт/м/м2/м3 экз").AsInteger()==2)
 			{
 				Area = source.GetMaterialArea(material.Id,false)*FT*FT;
 				mType = myTypes.matArea;
