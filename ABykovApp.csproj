@@ -112,6 +112,7 @@
       <DependentUpon>FinishEnterprise.cs</DependentUpon>
     </Compile>
     <Compile Include="Log.cs" />
+    <Compile Include="template.cs" />
     <Compile Include="TestSelector.cs" />
     <Compile Include="App.cs" />
     <Compile Include="annot.cs" />

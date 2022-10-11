@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media.Imaging;
@@ -319,9 +320,11 @@ namespace WorkApp
 			return butt;
 		}
 		//public static string 
-		public static string shortLists(List<string> IN)
+		public static string shortLists(List<string> s)
 		{
-			IN=IN.Distinct().ToList();
+			var comparer=new CustomComparer();
+			var IN=s.Distinct().ToList();
+			IN.Sort(comparer);
 			string Out = "";
 			int first = -1;
 			int current;
@@ -582,6 +585,26 @@ namespace WorkApp
 					break;
 			}
 			return (a,b,c);
+		}
+	}
+	public class CustomComparer : IComparer<string>
+	{
+		public int Compare(string x, string y)
+		{
+			var regex = new Regex("^(d+)");
+
+			// run the regex on both strings
+			var xRegexResult = regex.Match(x);
+			var yRegexResult = regex.Match(y);
+
+			// check if they are both numbers
+			if (xRegexResult.Success && yRegexResult.Success)
+			{
+				return int.Parse(xRegexResult.Groups[1].Value).CompareTo(int.Parse(yRegexResult.Groups[1].Value));
+			}
+
+			// otherwise return as string comparison
+			return x.CompareTo(y);
 		}
 	}
 }

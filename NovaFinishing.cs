@@ -162,21 +162,20 @@ namespace WorkApp
             //Плинтус
             foreach (var d in doors)
             {
+                new doorObj(d, lastPhase);
+                
+            }
+            foreach (var item in doorObj.AllDoorObj)
+            {
                 foreach (var r in RoomFinishing.Rooms)
                 {
-                    try
+                    if (item.fromRoom == r.Id | item.toRoom == r.Id)
                     {
-                        if (d.get_FromRoom(lastPhase).Id == r.Id | d.get_ToRoom(lastPhase).Id == r.Id)
-                        {
-                            r.Plintus.unitValue-= d.LookupParameter("сп_Ширина проёма").AsDouble();
-                        }
+                        r.Plintus.unitValue -= item.width;
                     }
-                    catch (Exception)
-                    {
-                    }
+                    
                 }
             }
-
             
             RoomFinishing.makeFloor(MainForm);
             RoomFinishing.makeFinish(MainForm);
@@ -192,6 +191,37 @@ namespace WorkApp
             msg.MainInstruction =  $"Выполнен расчет отделки для стадии \"{MainForm.retPhase.Name}\"";
             msg.Show();
             return Result.Succeeded;
+        }
+    }
+    class doorObj
+    {
+        public static List<doorObj> AllDoorObj=new List<doorObj>();
+        public ElementId fromRoom { get; set; } = null;
+        public ElementId toRoom { get; set; } = null;
+        public double width { get; set; }
+        Element refEl { get; set; }
+        public doorObj(Element e,Phase phase)
+        {
+            refEl = e;
+
+            width= e.Document.GetElement(e.GetTypeId()).get_Parameter(BuiltInParameter.CASEWORK_WIDTH).AsDouble();
+            try
+            {
+                fromRoom = (e as FamilyInstance).get_FromRoom(phase).Id;
+            }
+            catch (Exception)
+            {
+            }
+            
+            try
+            {
+                toRoom = (e as FamilyInstance).get_ToRoom(phase).Id;
+            }
+            catch (Exception)
+            {
+            }
+            
+            AllDoorObj.Add(this);
         }
     }
 }

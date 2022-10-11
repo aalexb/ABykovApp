@@ -39,7 +39,7 @@ namespace WorkApp
             {
                 isLocal = wall.Id == LocWall.Id;
             }
-            sostav = (wall as Wall).WallType.LookupParameter("СоставОтделкиСтен").AsString();
+            sostav = (wall as Wall).WallType.LookupParameter("Состав").AsString();
             if (wall.LookupParameter("ПоНовымСтенам")!=null)
             {
                 countNewW = wall.LookupParameter("ПоНовымСтенам").AsInteger() == 1 ? true : false;

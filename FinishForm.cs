@@ -116,7 +116,7 @@ namespace WorkApp
                     }
 
                 }
-                GroupSelector.DataSource = lll;
+                //GroupSelector.DataSource = lll;
             }
             catch (Exception)
             {

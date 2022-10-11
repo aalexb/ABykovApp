@@ -18,6 +18,12 @@ namespace WorkApp
             Type = "";
             Text = "";
         }
+        public void setType(string t, Element r)
+        {
+            Type = t;
+            Text = t == "__Отделка : ---" ? "" : r.Document.GetElement(r.LookupParameter("ОТД_Потолок").AsElementId()).LookupParameter("АР_Состав отделки").AsString();
+
+        }
     }
     public class RoomFinishing
     {
@@ -49,7 +55,7 @@ namespace WorkApp
             Level = e.LevelId;
 
 
-            Ceil.Type= e.LookupParameter("ОТД_Потолок").AsValueString();
+            Ceil.setType( e.LookupParameter("ОТД_Потолок").AsValueString(),e);
             MainWall.Type = e.LookupParameter("ОТД_Стены").AsValueString();
             Floor.Type = e.LookupParameter("ОТД_Пол").AsValueString();
             Kolon.Type = e.LookupParameter("ОТД_Колонны").AsValueString();
@@ -116,158 +122,151 @@ namespace WorkApp
                     continue;
                 }
                 String fillText = "";
-                foreach (ElementId lev in item.Select(x => x.Level).Distinct())
+
+                if (form.levels==1)
                 {
-                    if (form.levels == 1)
+                    foreach (ElementId lev in item.Select(x => x.Level).Distinct())
                     {
                         fillText += doc.GetElement(lev).LookupParameter("Название уровня").AsString() + ":\n";
-                    }
-                    if (form.withnames == 1)
-                    {
-                        foreach (RoomFinishing gg in item.Where(x => x.Level == lev))
+                        if (form.withnames == 1)
                         {
-                            fillText += gg.Name + "-" + gg.Num + ", ";
+                            foreach (RoomFinishing gg in item.Where(x => x.Level == lev))
+                            {
+                                fillText += gg.Name + "-" + gg.Num + ", ";
+                            }
+                            fillText = fillText.Remove(fillText.Length - 2, 2) + "\n";
+                            continue;
                         }
-                        fillText = fillText.Remove(fillText.Length - 2, 2) + "\n";
-                        continue;
+                        fillText += Meta.shortLists(item.Where(x => x.Level == lev).Select(y => y.Num).ToList()) + "\n";
                     }
-                    fillText += Meta.shortLists(item.Where(x => x.Level == lev).Select(y => y.Num).ToList()) + "\n";
                 }
-
-                foreach (ElementId lev in item.Select(x => x.Level).Distinct())
+                else
                 {
-                    foreach (RoomFinishing r in item.Where(x => x.Level == lev))
+                    fillText += Meta.shortLists(item.Select(y => y.Num).ToList()) + "\n";
+                }
+
+                foreach (RoomFinishing r in item)
+                {
+                    try
+                    {
+                        r.refElement.LookupParameter("Н_Отделка").Set(i);
+                    }
+                    catch (Exception)
+                    {
+                    }
+
+
+
+                    if (form.countNewW)
                     {
 
-                        //try
-                        //{
-                        //    r.refElement.LookupParameter("ОТД_Состав.Потолок").Set(doc.GetElement(r.refElement.LookupParameter("ОТД_Потолок").AsElementId()).LookupParameter("АР_Состав отделки").AsString());
-                        //}
-                        //catch (Exception)
-                        //{
-
-                        //    r.refElement.LookupParameter("ОТД_Состав.Потолок").Set("Без отделки");
-                        //}
-                        try
+                        if (r.NewWall.Value > 0)
                         {
-                            r.refElement.LookupParameter("Н_Отделка").Set(i);
-                        }
-                        catch (Exception)
-                        { 
-                        }
-                        
-                        
-
-                        if (form.countNewW)
-                        {
-                            
-                            if (r.NewWall.Value>0)
-                            {
-                                r.refElement.setP("countNewW", $"В т.ч. по вновь устраиваемым перегородкам - {r.NewWall.Value * Meta.FT * Meta.FT:F1} м²");
-                            }
-                            else
-                            {
-                                r.refElement.setP("countNewW", "");
-                            }
-                        }
-                        r.refElement.LookupParameter("ОТД_Состав.Потолок").Set(r.Ceil.Type == "__Отделка : ---" ? "" : doc.GetElement(r.refElement.LookupParameter("ОТД_Потолок").AsElementId()).LookupParameter("АР_Состав отделки").AsString());
-
-                        try
-                        {
-                            r.refElement.LookupParameter("ОТД_Состав.Стены").Set(doc.GetElement(r.refElement.LookupParameter("ОТД_Стены").AsElementId()).LookupParameter("АР_Состав отделки").AsString());
-                        }
-                        catch (Exception)
-                        {
-
-                            r.refElement.LookupParameter("ОТД_Состав.Стены").Set("");
-                        }
-
-                        if (r.refElement.LookupParameter("ОТД_Кол.Колонны")!=null)
-                        {
-                            if (form.groupCheck)
-                            {
-                                r.refElement.LookupParameter("ОТД_Кол.КолонныGROUP").Set(r.Kolon.Value > 0 ? (r.Kolon.Value * Meta.FT * Meta.FT).ToString("F1") : "");
-                            }
-                            else
-                            {
-                                r.refElement.LookupParameter("ОТД_Кол.Колонны").Set(r.Kolon.Value > 0 ? (r.Kolon.Value * Meta.FT * Meta.FT).ToString("F1") : "");
-                            }
-                            
-                            //r.refElement.LookupParameter("УДАЛИТЬ").Set(r.KolonWallVal > 0 ? r.KolonWallVal : 0);
-                            if (form.ColFromMat)
-                            {
-                                r.refElement.LookupParameter("ОТД_Состав.Колонны").Set(r.Kolon.Text);
-                            }
-                            else
-                            {
-                                try
-                                {
-                                    r.refElement.LookupParameter("ОТД_Состав.Колонны").Set(doc.GetElement(r.refElement.LookupParameter("ОТД_Колонны").AsElementId()).LookupParameter("АР_Состав отделки").AsString());
-                                }
-                                catch (Exception)
-                                {
-
-                                    r.refElement.LookupParameter("ОТД_Состав.Колонны").Set("");
-                                }
-
-                            }
-                            
-                        }
-                        if (r.refElement.LookupParameter("ОТД_Кол.Доп") == null)
-                        {
-                            Log.msg("Отсутствует параметр ОТД_Кол.Доп");
-                            return;
-                        }
-                        if (r.refElement.LookupParameter("ОТД_Кол.Доп")!=null) //Проверяем что существует
-                        {
-                            if (form.groupCheck)
-                            {
-                                r.refElement.LookupParameter("ОТД_Кол.ДопGROUP").Set(r.LocalWall.Value > 0 ? (r.LocalWall.Value*Meta.FT*Meta.FT).ToString("F1") : "");
-                            }
-                            else
-                            {
-                                r.refElement.LookupParameter("ОТД_Кол.Доп").Set(r.LocalWall.Value > 0 ? (r.LocalWall.Value*Meta.FT*Meta.FT).ToString("F1") : "");
-                            }
-                            
-                            r.refElement.LookupParameter("ОТД_Состав.Доп").Set(r.LocalWall.Text);
-                        }
-
-                        if (form.groupCheck)
-                        {
-                            r.refElement.LookupParameter("WMulAdd").Set(fillText);
+                            r.refElement.setP("countNewW", $"В т.ч. по вновь устраиваемым перегородкам - {r.NewWall.Value * Meta.FT * Meta.FT:F1} м²");
                         }
                         else
                         {
-                            r.refElement.LookupParameter("testW").Set(fillText);
+                            r.refElement.setP("countNewW", "");
                         }
+                    }
+                    r.refElement.LookupParameter("ОТД_Состав.Потолок").Set(r.Ceil.Type == "__Отделка : ---" ? "" : doc.GetElement(r.refElement.LookupParameter("ОТД_Потолок").AsElementId()).LookupParameter("АР_Состав отделки").AsString());
 
-                        //r.refElement.LookupParameter("ОТД_Кол.Стены").Set(0);
+                    try
+                    {
+                        r.refElement.LookupParameter("ОТД_Состав.Стены").Set(doc.GetElement(r.refElement.LookupParameter("ОТД_Стены").AsElementId()).LookupParameter("АР_Состав отделки").AsString());
+                    }
+                    catch (Exception)
+                    {
+
+                        r.refElement.LookupParameter("ОТД_Состав.Стены").Set("");
+                    }
+
+                    if (r.refElement.LookupParameter("ОТД_Кол.Колонны") != null)
+                    {
                         if (form.groupCheck)
                         {
-                            r.refElement.LookupParameter("ОТД_Кол.СтеныGROUP").Set(r.MainWall.Value);
+                            r.refElement.LookupParameter("ОТД_Кол.КолонныGROUP").Set(r.Kolon.Value > 0 ? (r.Kolon.Value * Meta.FT * Meta.FT).ToString("F1") : "");
                         }
                         else
                         {
-                            r.refElement.LookupParameter("ОТД_Кол.Стены").Set(r.MainWall.Value);
+                            r.refElement.LookupParameter("ОТД_Кол.Колонны").Set(r.Kolon.Value > 0 ? (r.Kolon.Value * Meta.FT * Meta.FT).ToString("F1") : "");
                         }
-                        
-                        try
+
+                        //r.refElement.LookupParameter("УДАЛИТЬ").Set(r.KolonWallVal > 0 ? r.KolonWallVal : 0);
+                        if (form.ColFromMat)
                         {
-                            r.refElement.LookupParameter("ОТД_Пом.Стены").Set(r.MainWall.Value);
+                            r.refElement.LookupParameter("ОТД_Состав.Колонны").Set(r.Kolon.Text);
                         }
-                        catch (Exception)
+                        else
                         {
+                            try
+                            {
+                                r.refElement.LookupParameter("ОТД_Состав.Колонны").Set(doc.GetElement(r.refElement.LookupParameter("ОТД_Колонны").AsElementId()).LookupParameter("АР_Состав отделки").AsString());
+                            }
+                            catch (Exception)
+                            {
+
+                                r.refElement.LookupParameter("ОТД_Состав.Колонны").Set("");
+                            }
 
                         }
-                        
-
-                        //r.refElement.LookupParameter("PlintusTotal").Set(r.Perimeter);
-                        //item.Select(x => x.refElement.LookupParameter("testF").Set(fillText));
-                        //item.Select(x => x.refElement.LookupParameter("PlintusTotal").Set(x.SimilarPlintusVal));
 
                     }
-                    i++;
+                    if (r.refElement.LookupParameter("ОТД_Кол.Доп") == null)
+                    {
+                        Log.msg("Отсутствует параметр ОТД_Кол.Доп");
+                        return;
+                    }
+                    if (r.refElement.LookupParameter("ОТД_Кол.Доп") != null) //Проверяем что существует
+                    {
+                        if (form.groupCheck)
+                        {
+                            r.refElement.LookupParameter("ОТД_Кол.ДопGROUP").Set(r.LocalWall.Value > 0 ? (r.LocalWall.Value * Meta.FT * Meta.FT).ToString("F1") : "");
+                        }
+                        else
+                        {
+                            r.refElement.LookupParameter("ОТД_Кол.Доп").Set(r.LocalWall.Value > 0 ? (r.LocalWall.Value * Meta.FT * Meta.FT).ToString("F1") : "");
+                        }
+
+                        r.refElement.LookupParameter("ОТД_Состав.Доп").Set(r.LocalWall.Text);
+                    }
+
+                    if (form.groupCheck)
+                    {
+                        r.refElement.LookupParameter("WMulAdd").Set(fillText);
+                    }
+                    else
+                    {
+                        r.refElement.LookupParameter("testW").Set(fillText);
+                    }
+
+                    //r.refElement.LookupParameter("ОТД_Кол.Стены").Set(0);
+                    if (form.groupCheck)
+                    {
+                        r.refElement.LookupParameter("ОТД_Кол.СтеныGROUP").Set(r.MainWall.Value);
+                    }
+                    else
+                    {
+                        r.refElement.LookupParameter("ОТД_Кол.Стены").Set(r.MainWall.Value);
+                    }
+
+                    try
+                    {
+                        r.refElement.LookupParameter("ОТД_Пом.Стены").Set(r.MainWall.Value);
+                    }
+                    catch (Exception)
+                    {
+
+                    }
+
+
+                    //r.refElement.LookupParameter("PlintusTotal").Set(r.Perimeter);
+                    //item.Select(x => x.refElement.LookupParameter("testF").Set(fillText));
+                    //item.Select(x => x.refElement.LookupParameter("PlintusTotal").Set(x.SimilarPlintusVal));
+
                 }
+                i++;
+                
             }
         }
 
@@ -280,64 +279,70 @@ namespace WorkApp
                     continue;
                 }
                 String fillText = "";
-                foreach (ElementId lev in item.Select(x => x.Level).Distinct())
+
+                /*
+                 * Если 1 уровень
+                 * 
+                 * 
+                 * 
+                 * 
+                 * 
+                 * 
+                 * 
+                 */
+                if (MoreThenOneLevel==1)
                 {
-                    if (MoreThenOneLevel == 1)
+                    foreach (ElementId lev in item.Select(x => x.Level).Distinct())
                     {
                         fillText += doc.GetElement(lev).LookupParameter("Название уровня").AsString() + ":\n";
-                    }
-                    if (withNames == 1)
-                    {
-                        foreach (RoomFinishing gg in item.Where(x => x.Level == lev))
+                        if (withNames == 1)
                         {
-                            fillText += gg.Name + "-" + gg.Num + ", ";
+                            foreach (RoomFinishing gg in item.Where(x => x.Level == lev))
+                            {
+                                fillText += gg.Name + "-" + gg.Num + ", ";
+                            }
+                            fillText = fillText.Remove(fillText.Length - 2, 2) + "\n";
+                            continue;
                         }
-                        fillText = fillText.Remove(fillText.Length - 2, 2) + "\n";
-                        continue;
+                        fillText += Meta.shortLists(item.Where(x => x.Level == lev).Select(y => y.Num).ToList()) + "\n";
                     }
-                    fillText += Meta.shortLists(item.Where(x => x.Level == lev).Select(y => y.Num).ToList()) + "\n";
                 }
-                foreach (ElementId lev in item.Select(x => x.Level).Distinct())
+                else
                 {
-                    foreach (RoomFinishing r in item.Where(x => x.Level == lev))
+                    fillText += Meta.shortLists(item.Select(y => y.Num).ToList()) + "\n";
+                }
+
+                //Транзакция
+
+                foreach (var r in item)
+                {
+                    r.refElement.LookupParameter("ОТД_Состав.Пол").Set("");
+                    try
+                    {
+                        r.refElement.LookupParameter("ОТД_Состав.Пол").Set(doc.GetElement(r.refElement.LookupParameter("ОТД_Пол").AsElementId()).LookupParameter("АР_Состав отделки").AsString());
+                    }
+                    catch (Exception)
                     {
                         r.refElement.LookupParameter("ОТД_Состав.Пол").Set("");
-                        try
-                        {
-                            r.refElement.LookupParameter("ОТД_Состав.Пол").Set(doc.GetElement(r.refElement.LookupParameter("ОТД_Пол").AsElementId()).LookupParameter("АР_Состав отделки").AsString());
-                        }
-                        catch (Exception)
-                        {
-
-                            r.refElement.LookupParameter("ОТД_Состав.Пол").Set("");
-                        }
-                        try
-                        {
-                            r.refElement.LookupParameter("ОТД_Состав.Плинтус").Set(doc.GetElement(r.refElement.LookupParameter("ОТД_Плинтус").AsElementId()).LookupParameter("АР_Состав отделки").AsString());
-                        }
-                        catch (Exception)
-                        {
-
-                            r.refElement.LookupParameter("ОТД_Состав.Плинтус").Set("");
-                        }
-                        if (form.groupCheck)
-                        {
-                            r.refElement.LookupParameter("FMulAdd").Set(fillText);
-                        }
-                        else
-                        {
-                            r.refElement.LookupParameter("testF").Set(fillText);
-                        }
-                        
-                        //r.refElement.LookupParameter("ОТД_Кол.Плинтус").Set("");
-                        r.refElement.LookupParameter("ОТД_Кол.Плинтус").Set(r.Plintus.Type == "__Отделка : ---" ? "" : (r.Plintus.Value * Meta.FT).ToString("F1"));
-                        
-
-                        r.refElement.LookupParameter("PlintusTotal").Set(r.Plintus.Value);
-                        //item.Select(x => x.refElement.LookupParameter("testF").Set(fillText));
-                        //item.Select(x => x.refElement.LookupParameter("PlintusTotal").Set(x.SimilarPlintusVal));
-
                     }
+                    try
+                    {
+                        r.refElement.LookupParameter("ОТД_Состав.Плинтус").Set(doc.GetElement(r.refElement.LookupParameter("ОТД_Плинтус").AsElementId()).LookupParameter("АР_Состав отделки").AsString());
+                    }
+                    catch (Exception)
+                    {
+                        r.refElement.LookupParameter("ОТД_Состав.Плинтус").Set("");
+                    }
+                    if (form.groupCheck)
+                    {
+                        r.refElement.LookupParameter("FMulAdd").Set(fillText);
+                    }
+                    else
+                    {
+                        r.refElement.LookupParameter("testF").Set(fillText);
+                    }
+                    r.refElement.LookupParameter("ОТД_Кол.Плинтус").Set(r.Plintus.Type == "__Отделка : ---" ? "" : (r.Plintus.Value * Meta.FT).ToString("F1"));
+                    r.refElement.LookupParameter("PlintusTotal").Set(r.Plintus.Value);
                 }
 
             }
