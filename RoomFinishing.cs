@@ -333,7 +333,7 @@ namespace WorkApp
                     {
                         r.refElement.LookupParameter("ОТД_Состав.Плинтус").Set("");
                     }
-                    if (form.groupCheck)
+                    if (form.groupFloorCheck)
                     {
                         r.refElement.LookupParameter("FMulAdd").Set(fillText);
                     }

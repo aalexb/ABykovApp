@@ -14,11 +14,13 @@ namespace WorkApp
         public int poetagno = 0;
         public bool countNewW=false;
         public bool groupCheck = false;
+        public bool groupFloorCheck = false;
         public bool splitLevel;
         public Phase retPhase;
         public Element ColType;
         public bool ColFromMat;
         public string groupField;
+        public string groupFloorField;
         public Element LocType;
         List<ElementId> defSet = new List<ElementId>();
         public List<string> wTypeBoxes = new List<string>();
@@ -54,6 +56,7 @@ namespace WorkApp
 
             InitializeComponent();
             GroupSelector.Enabled = false;
+            GroupFloorSelector.Enabled = false;
             comboBox1.DataSource = walltypes1;
             comboBox1.DisplayMember = "Name";
             comboBox1.ValueMember = "Id";
@@ -123,7 +126,24 @@ namespace WorkApp
 
                 
             }
-            
+            try
+            {
+                var lll = roomGroup.Select(x => x.LookupParameter("AG_Групп_Пол").AsString()).Distinct().ToList();
+                foreach (var item in lll)
+                {
+                    if (item != null)
+                    {
+                        GroupFloorSelector.Items.Add(item);
+                    }
+
+                }
+                //GroupSelector.DataSource = lll;
+            }
+            catch (Exception)
+            {
+
+                
+            }
             
         }
         public void disableSomeElements(string who)
@@ -161,9 +181,14 @@ namespace WorkApp
             wTypeBoxes.Add((LocFinSelector.SelectedItem as Element).Name);
             wTypeBoxes.Add((ColumnFinSelector.SelectedItem as Element).Name);
             groupCheck = checkGroup.Checked;
+            groupFloorCheck = checkFloorGroup.Checked;
             if (groupCheck)
             {
                 groupField = GroupSelector.Text;
+            }
+            if (groupFloorCheck)
+            {
+                groupFloorField = GroupFloorSelector.Text;
             }
             this.Close();
         }
@@ -192,6 +217,18 @@ namespace WorkApp
             else
             {
                 GroupSelector.Enabled = true;
+            }
+        }
+
+        private void checkFloorGroup_CheckedChanged(object sender, EventArgs e)
+        {
+            if (checkFloorGroup.Checked == false)
+            {
+                GroupFloorSelector.Enabled = false;
+            }
+            else
+            {
+                GroupFloorSelector.Enabled = true;
             }
         }
     }

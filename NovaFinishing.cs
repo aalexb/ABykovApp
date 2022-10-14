@@ -82,9 +82,20 @@ namespace WorkApp
                 .WherePasses(room_filter)
                 //.WherePasses(roomSc_filter)
                 .ToElements();
+            if (MainForm.groupCheck&MainForm.groupFloorCheck)
+            {
+                TaskDialog msger = new TaskDialog("Info");
+                msger.MainInstruction = "Не надо так делать";
+                msger.Show();
+                return Result.Failed;
+            }
             if (MainForm.groupCheck)
             {
                 rooms = rooms.Where(x => x.LookupParameter("ADSK_Группирование").AsString() == MainForm.groupField).ToList();
+            }
+            if (MainForm.groupFloorCheck)
+            {
+                rooms = rooms.Where(x => x.LookupParameter("AG_Групп_Пол").AsString() == MainForm.groupFloorField).ToList();
             }
 
             //Фильтр: Стены созданные на последней стадии
@@ -183,8 +194,16 @@ namespace WorkApp
             using (Transaction tr = new Transaction(doc, "otdelka"))
             {
                 tr.Start();
-                RoomFinishing.FinishTableCommit(doc, MainForm);
-                RoomFinishing.FloorTableCommit(MainForm.levels, MainForm.withnames, doc,MainForm);
+                if (!MainForm.groupFloorCheck)
+                {
+                    RoomFinishing.FinishTableCommit(doc, MainForm);
+                }
+                if (!MainForm.groupCheck)
+                {
+                    RoomFinishing.FloorTableCommit(MainForm.levels, MainForm.withnames, doc, MainForm);
+                }
+                
+                
                 tr.Commit();
             }
             TaskDialog msg = new TaskDialog("Info");

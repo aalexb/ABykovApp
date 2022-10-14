@@ -34,6 +34,7 @@
             this.panel1 = new System.Windows.Forms.Panel();
             this.panel3 = new System.Windows.Forms.Panel();
             this.label2 = new System.Windows.Forms.Label();
+            this.checkBox4 = new System.Windows.Forms.CheckBox();
             this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.chkSplitLevel = new System.Windows.Forms.CheckBox();
             this.panel2 = new System.Windows.Forms.Panel();
@@ -51,17 +52,19 @@
             this.checkCol = new System.Windows.Forms.CheckBox();
             this.label7 = new System.Windows.Forms.Label();
             this.label8 = new System.Windows.Forms.Label();
-            this.PhaseSelector = new System.Windows.Forms.ComboBox();
             this.label9 = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
             this.modelFloor = new System.Windows.Forms.CheckBox();
             this.modelCeil = new System.Windows.Forms.CheckBox();
             this.label11 = new System.Windows.Forms.Label();
-            this.label12 = new System.Windows.Forms.Label();
-            this.SelNum = new System.Windows.Forms.Label();
             this.checkGroup = new System.Windows.Forms.CheckBox();
             this.GroupSelector = new System.Windows.Forms.ComboBox();
-            this.checkBox4 = new System.Windows.Forms.CheckBox();
+            this.SelNum = new System.Windows.Forms.Label();
+            this.label12 = new System.Windows.Forms.Label();
+            this.PhaseSelector = new System.Windows.Forms.ComboBox();
+            this.label13 = new System.Windows.Forms.Label();
+            this.GroupFloorSelector = new System.Windows.Forms.ComboBox();
+            this.checkFloorGroup = new System.Windows.Forms.CheckBox();
             this.panel1.SuspendLayout();
             this.panel3.SuspendLayout();
             this.panel2.SuspendLayout();
@@ -90,11 +93,11 @@
             // 
             // label1
             // 
-            this.label1.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(16, 170);
+            this.label1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.label1.Location = new System.Drawing.Point(3, 187);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(100, 13);
+            this.label1.Size = new System.Drawing.Size(114, 20);
             this.label1.TabIndex = 3;
             this.label1.Text = "Выберите стадию:";
             // 
@@ -133,6 +136,18 @@
             this.label2.TabIndex = 1;
             this.label2.Text = "Параметры отделки";
             this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // checkBox4
+            // 
+            this.checkBox4.AutoSize = true;
+            this.checkBox4.Location = new System.Drawing.Point(3, 124);
+            this.checkBox4.Name = "checkBox4";
+            this.checkBox4.Size = new System.Drawing.Size(229, 17);
+            this.checkBox4.TabIndex = 0;
+            this.checkBox4.Text = "Помещения имеют одинаковые номера";
+            this.checkBox4.UseVisualStyleBackColor = true;
+            this.checkBox4.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
+            this.checkBox4.MouseHover += new System.EventHandler(this.checkBox1_MouseHover);
             // 
             // checkBox1
             // 
@@ -195,25 +210,29 @@
             this.tableLayoutPanel1.Controls.Add(this.checkCol, 2, 3);
             this.tableLayoutPanel1.Controls.Add(this.label7, 2, 0);
             this.tableLayoutPanel1.Controls.Add(this.label8, 1, 0);
-            this.tableLayoutPanel1.Controls.Add(this.label1, 0, 7);
-            this.tableLayoutPanel1.Controls.Add(this.PhaseSelector, 1, 7);
             this.tableLayoutPanel1.Controls.Add(this.label9, 1, 4);
             this.tableLayoutPanel1.Controls.Add(this.label10, 1, 5);
             this.tableLayoutPanel1.Controls.Add(this.modelFloor, 2, 4);
             this.tableLayoutPanel1.Controls.Add(this.modelCeil, 2, 5);
             this.tableLayoutPanel1.Controls.Add(this.label11, 0, 6);
-            this.tableLayoutPanel1.Controls.Add(this.label12, 0, 8);
-            this.tableLayoutPanel1.Controls.Add(this.SelNum, 1, 8);
             this.tableLayoutPanel1.Controls.Add(this.checkGroup, 2, 6);
             this.tableLayoutPanel1.Controls.Add(this.GroupSelector, 1, 6);
+            this.tableLayoutPanel1.Controls.Add(this.SelNum, 1, 9);
+            this.tableLayoutPanel1.Controls.Add(this.label12, 0, 9);
+            this.tableLayoutPanel1.Controls.Add(this.label1, 0, 8);
+            this.tableLayoutPanel1.Controls.Add(this.PhaseSelector, 1, 8);
+            this.tableLayoutPanel1.Controls.Add(this.label13, 0, 7);
+            this.tableLayoutPanel1.Controls.Add(this.GroupFloorSelector, 1, 7);
+            this.tableLayoutPanel1.Controls.Add(this.checkFloorGroup, 2, 7);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-            this.tableLayoutPanel1.RowCount = 9;
+            this.tableLayoutPanel1.RowCount = 10;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
@@ -226,7 +245,7 @@
             // 
             this.label5.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(24, 87);
+            this.label5.Location = new System.Drawing.Point(25, 87);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(92, 13);
             this.label5.TabIndex = 3;
@@ -236,7 +255,7 @@
             // 
             this.label4.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(18, 60);
+            this.label4.Location = new System.Drawing.Point(19, 60);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(98, 13);
             this.label4.TabIndex = 3;
@@ -246,7 +265,7 @@
             // 
             this.label3.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(12, 33);
+            this.label3.Location = new System.Drawing.Point(13, 33);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(104, 13);
             this.label3.TabIndex = 3;
@@ -258,7 +277,7 @@
             this.label6.Dock = System.Windows.Forms.DockStyle.Fill;
             this.label6.Location = new System.Drawing.Point(3, 0);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(113, 26);
+            this.label6.Size = new System.Drawing.Size(114, 26);
             this.label6.TabIndex = 3;
             this.label6.Text = "Элемент отделки:";
             this.label6.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -267,27 +286,27 @@
             // 
             this.ColumnFinSelector.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ColumnFinSelector.FormattingEnabled = true;
-            this.ColumnFinSelector.Location = new System.Drawing.Point(122, 83);
+            this.ColumnFinSelector.Location = new System.Drawing.Point(123, 83);
             this.ColumnFinSelector.Name = "ColumnFinSelector";
-            this.ColumnFinSelector.Size = new System.Drawing.Size(313, 21);
+            this.ColumnFinSelector.Size = new System.Drawing.Size(312, 21);
             this.ColumnFinSelector.TabIndex = 4;
             // 
             // LocFinSelector
             // 
             this.LocFinSelector.Dock = System.Windows.Forms.DockStyle.Fill;
             this.LocFinSelector.FormattingEnabled = true;
-            this.LocFinSelector.Location = new System.Drawing.Point(122, 56);
+            this.LocFinSelector.Location = new System.Drawing.Point(123, 56);
             this.LocFinSelector.Name = "LocFinSelector";
-            this.LocFinSelector.Size = new System.Drawing.Size(313, 21);
+            this.LocFinSelector.Size = new System.Drawing.Size(312, 21);
             this.LocFinSelector.TabIndex = 4;
             // 
             // comboBox1
             // 
             this.comboBox1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.comboBox1.FormattingEnabled = true;
-            this.comboBox1.Location = new System.Drawing.Point(122, 29);
+            this.comboBox1.Location = new System.Drawing.Point(123, 29);
             this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(313, 21);
+            this.comboBox1.Size = new System.Drawing.Size(312, 21);
             this.comboBox1.TabIndex = 4;
             // 
             // checkBox2
@@ -335,30 +354,20 @@
             // 
             this.label8.AutoSize = true;
             this.label8.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label8.Location = new System.Drawing.Point(122, 0);
+            this.label8.Location = new System.Drawing.Point(123, 0);
             this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(313, 26);
+            this.label8.Size = new System.Drawing.Size(312, 26);
             this.label8.TabIndex = 3;
             this.label8.Text = "Тип стен отделки";
             this.label8.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // PhaseSelector
-            // 
-            this.PhaseSelector.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.PhaseSelector.FormattingEnabled = true;
-            this.PhaseSelector.Location = new System.Drawing.Point(122, 170);
-            this.PhaseSelector.Name = "PhaseSelector";
-            this.PhaseSelector.Size = new System.Drawing.Size(313, 21);
-            this.PhaseSelector.TabIndex = 2;
-            this.PhaseSelector.SelectedIndexChanged += new System.EventHandler(this.PhaseSelector_SelectedIndexChanged);
             // 
             // label9
             // 
             this.label9.AutoSize = true;
             this.label9.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label9.Location = new System.Drawing.Point(122, 107);
+            this.label9.Location = new System.Drawing.Point(123, 107);
             this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(313, 20);
+            this.label9.Size = new System.Drawing.Size(312, 20);
             this.label9.TabIndex = 3;
             this.label9.Text = "Пол в модели";
             this.label9.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -367,9 +376,9 @@
             // 
             this.label10.AutoSize = true;
             this.label10.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label10.Location = new System.Drawing.Point(122, 127);
+            this.label10.Location = new System.Drawing.Point(123, 127);
             this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(313, 20);
+            this.label10.Size = new System.Drawing.Size(312, 20);
             this.label10.TabIndex = 3;
             this.label10.Text = "Потолок в модели:";
             this.label10.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -396,35 +405,13 @@
             // 
             // label11
             // 
-            this.label11.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(29, 150);
+            this.label11.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.label11.Location = new System.Drawing.Point(3, 147);
             this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(87, 13);
+            this.label11.Size = new System.Drawing.Size(114, 20);
             this.label11.TabIndex = 3;
             this.label11.Text = "Группирование:";
-            // 
-            // label12
-            // 
-            this.label12.AutoSize = true;
-            this.label12.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label12.Location = new System.Drawing.Point(3, 187);
-            this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(113, 100);
-            this.label12.TabIndex = 3;
-            this.label12.Text = "Выбрано элементов:";
-            this.label12.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
-            // SelNum
-            // 
-            this.SelNum.AutoSize = true;
-            this.SelNum.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.SelNum.Location = new System.Drawing.Point(122, 187);
-            this.SelNum.Name = "SelNum";
-            this.SelNum.Size = new System.Drawing.Size(313, 100);
-            this.SelNum.TabIndex = 3;
-            this.SelNum.Text = "Все помещения";
-            this.SelNum.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // checkGroup
             // 
@@ -441,22 +428,72 @@
             // 
             this.GroupSelector.Dock = System.Windows.Forms.DockStyle.Fill;
             this.GroupSelector.FormattingEnabled = true;
-            this.GroupSelector.Location = new System.Drawing.Point(122, 150);
+            this.GroupSelector.Location = new System.Drawing.Point(123, 150);
             this.GroupSelector.Name = "GroupSelector";
-            this.GroupSelector.Size = new System.Drawing.Size(313, 21);
+            this.GroupSelector.Size = new System.Drawing.Size(312, 21);
             this.GroupSelector.TabIndex = 6;
             // 
-            // checkBox4
+            // SelNum
             // 
-            this.checkBox4.AutoSize = true;
-            this.checkBox4.Location = new System.Drawing.Point(3, 124);
-            this.checkBox4.Name = "checkBox4";
-            this.checkBox4.Size = new System.Drawing.Size(229, 17);
-            this.checkBox4.TabIndex = 0;
-            this.checkBox4.Text = "Помещения имеют одинаковые номера";
-            this.checkBox4.UseVisualStyleBackColor = true;
-            this.checkBox4.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
-            this.checkBox4.MouseHover += new System.EventHandler(this.checkBox1_MouseHover);
+            this.SelNum.AutoSize = true;
+            this.SelNum.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.SelNum.Location = new System.Drawing.Point(123, 207);
+            this.SelNum.Name = "SelNum";
+            this.SelNum.Size = new System.Drawing.Size(312, 80);
+            this.SelNum.TabIndex = 3;
+            this.SelNum.Text = "Все помещения";
+            this.SelNum.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.label12.Location = new System.Drawing.Point(3, 207);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(114, 80);
+            this.label12.TabIndex = 3;
+            this.label12.Text = "Выбрано элементов:";
+            this.label12.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // PhaseSelector
+            // 
+            this.PhaseSelector.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.PhaseSelector.FormattingEnabled = true;
+            this.PhaseSelector.Location = new System.Drawing.Point(123, 190);
+            this.PhaseSelector.Name = "PhaseSelector";
+            this.PhaseSelector.Size = new System.Drawing.Size(312, 21);
+            this.PhaseSelector.TabIndex = 2;
+            this.PhaseSelector.SelectedIndexChanged += new System.EventHandler(this.PhaseSelector_SelectedIndexChanged);
+            // 
+            // label13
+            // 
+            this.label13.AutoSize = true;
+            this.label13.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.label13.Location = new System.Drawing.Point(3, 167);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(114, 20);
+            this.label13.TabIndex = 3;
+            this.label13.Text = "Группирование пола:";
+            // 
+            // GroupFloorSelector
+            // 
+            this.GroupFloorSelector.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.GroupFloorSelector.FormattingEnabled = true;
+            this.GroupFloorSelector.Location = new System.Drawing.Point(123, 170);
+            this.GroupFloorSelector.Name = "GroupFloorSelector";
+            this.GroupFloorSelector.Size = new System.Drawing.Size(312, 21);
+            this.GroupFloorSelector.TabIndex = 6;
+            // 
+            // checkFloorGroup
+            // 
+            this.checkFloorGroup.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.checkFloorGroup.AutoSize = true;
+            this.checkFloorGroup.Location = new System.Drawing.Point(451, 170);
+            this.checkFloorGroup.Name = "checkFloorGroup";
+            this.checkFloorGroup.Size = new System.Drawing.Size(15, 14);
+            this.checkFloorGroup.TabIndex = 5;
+            this.checkFloorGroup.UseVisualStyleBackColor = true;
+            this.checkFloorGroup.CheckedChanged += new System.EventHandler(this.checkFloorGroup_CheckedChanged);
             // 
             // FinishForm
             // 
@@ -516,5 +553,8 @@
         private System.Windows.Forms.CheckBox checkGroup;
         private System.Windows.Forms.ComboBox GroupSelector;
         private System.Windows.Forms.CheckBox checkBox4;
+        private System.Windows.Forms.Label label13;
+        private System.Windows.Forms.ComboBox GroupFloorSelector;
+        private System.Windows.Forms.CheckBox checkFloorGroup;
     }
 }
