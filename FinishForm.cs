@@ -16,7 +16,9 @@ namespace WorkApp
         public bool groupCheck = false;
         public bool groupFloorCheck = false;
         public bool splitLevel;
+        public string locWallString;
         public Phase retPhase;
+        public Element WallType;
         public Element ColType;
         public bool ColFromMat;
         public string groupField;
@@ -174,6 +176,7 @@ namespace WorkApp
             splitLevel = chkSplitLevel.Checked;
             countNewW = checkBox1.Checked;
             retPhase = (Phase)PhaseSelector.SelectedItem;
+            WallType = (Element)comboBox1.SelectedItem;
             ColType = (Element)ColumnFinSelector.SelectedItem;
             LocType = (Element)LocFinSelector.SelectedItem;
             wTypeBoxes = new List<string>();
@@ -182,6 +185,7 @@ namespace WorkApp
             wTypeBoxes.Add((ColumnFinSelector.SelectedItem as Element).Name);
             groupCheck = checkGroup.Checked;
             groupFloorCheck = checkFloorGroup.Checked;
+            locWallString = locWallParam.Text;
             if (groupCheck)
             {
                 groupField = GroupSelector.Text;

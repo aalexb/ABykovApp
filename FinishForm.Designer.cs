@@ -65,6 +65,7 @@
             this.label13 = new System.Windows.Forms.Label();
             this.GroupFloorSelector = new System.Windows.Forms.ComboBox();
             this.checkFloorGroup = new System.Windows.Forms.CheckBox();
+            this.locWallParam = new System.Windows.Forms.TextBox();
             this.panel1.SuspendLayout();
             this.panel3.SuspendLayout();
             this.panel2.SuspendLayout();
@@ -95,7 +96,7 @@
             // 
             this.label1.AutoSize = true;
             this.label1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label1.Location = new System.Drawing.Point(3, 187);
+            this.label1.Location = new System.Drawing.Point(3, 174);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(114, 20);
             this.label1.TabIndex = 3;
@@ -112,7 +113,7 @@
             this.panel1.Controls.Add(this.chkSplitLevel);
             this.panel1.Controls.Add(this.SomeLevels);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Right;
-            this.panel1.Location = new System.Drawing.Point(480, 0);
+            this.panel1.Location = new System.Drawing.Point(797, 0);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(235, 351);
             this.panel1.TabIndex = 4;
@@ -177,7 +178,7 @@
             this.panel2.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.panel2.Location = new System.Drawing.Point(0, 287);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(480, 64);
+            this.panel2.Size = new System.Drawing.Size(797, 64);
             this.panel2.TabIndex = 5;
             // 
             // button1
@@ -186,7 +187,7 @@
             this.button1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.button1.Location = new System.Drawing.Point(0, 0);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(480, 64);
+            this.button1.Size = new System.Drawing.Size(797, 64);
             this.button1.TabIndex = 1;
             this.button1.Text = "Посчитать";
             this.button1.UseVisualStyleBackColor = true;
@@ -194,10 +195,11 @@
             // 
             // tableLayoutPanel1
             // 
-            this.tableLayoutPanel1.ColumnCount = 3;
+            this.tableLayoutPanel1.ColumnCount = 4;
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 88.51964F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 11.48036F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 73.76637F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 9.566967F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 16.66667F));
             this.tableLayoutPanel1.Controls.Add(this.label5, 0, 3);
             this.tableLayoutPanel1.Controls.Add(this.label4, 0, 2);
             this.tableLayoutPanel1.Controls.Add(this.label3, 0, 1);
@@ -224,6 +226,7 @@
             this.tableLayoutPanel1.Controls.Add(this.label13, 0, 7);
             this.tableLayoutPanel1.Controls.Add(this.GroupFloorSelector, 1, 7);
             this.tableLayoutPanel1.Controls.Add(this.checkFloorGroup, 2, 7);
+            this.tableLayoutPanel1.Controls.Add(this.locWallParam, 3, 2);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
@@ -238,14 +241,14 @@
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(480, 287);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(797, 287);
             this.tableLayoutPanel1.TabIndex = 6;
             // 
             // label5
             // 
             this.label5.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(25, 87);
+            this.label5.Location = new System.Drawing.Point(25, 74);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(92, 13);
             this.label5.TabIndex = 3;
@@ -255,7 +258,7 @@
             // 
             this.label4.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(19, 60);
+            this.label4.Location = new System.Drawing.Point(19, 47);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(98, 13);
             this.label4.TabIndex = 3;
@@ -265,7 +268,7 @@
             // 
             this.label3.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(13, 33);
+            this.label3.Location = new System.Drawing.Point(13, 20);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(104, 13);
             this.label3.TabIndex = 3;
@@ -277,7 +280,7 @@
             this.label6.Dock = System.Windows.Forms.DockStyle.Fill;
             this.label6.Location = new System.Drawing.Point(3, 0);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(114, 26);
+            this.label6.Size = new System.Drawing.Size(114, 13);
             this.label6.TabIndex = 3;
             this.label6.Text = "Элемент отделки:";
             this.label6.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -286,34 +289,34 @@
             // 
             this.ColumnFinSelector.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ColumnFinSelector.FormattingEnabled = true;
-            this.ColumnFinSelector.Location = new System.Drawing.Point(123, 83);
+            this.ColumnFinSelector.Location = new System.Drawing.Point(123, 70);
             this.ColumnFinSelector.Name = "ColumnFinSelector";
-            this.ColumnFinSelector.Size = new System.Drawing.Size(312, 21);
+            this.ColumnFinSelector.Size = new System.Drawing.Size(493, 21);
             this.ColumnFinSelector.TabIndex = 4;
             // 
             // LocFinSelector
             // 
             this.LocFinSelector.Dock = System.Windows.Forms.DockStyle.Fill;
             this.LocFinSelector.FormattingEnabled = true;
-            this.LocFinSelector.Location = new System.Drawing.Point(123, 56);
+            this.LocFinSelector.Location = new System.Drawing.Point(123, 43);
             this.LocFinSelector.Name = "LocFinSelector";
-            this.LocFinSelector.Size = new System.Drawing.Size(312, 21);
+            this.LocFinSelector.Size = new System.Drawing.Size(493, 21);
             this.LocFinSelector.TabIndex = 4;
             // 
             // comboBox1
             // 
             this.comboBox1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.comboBox1.FormattingEnabled = true;
-            this.comboBox1.Location = new System.Drawing.Point(123, 29);
+            this.comboBox1.Location = new System.Drawing.Point(123, 16);
             this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(312, 21);
+            this.comboBox1.Size = new System.Drawing.Size(493, 21);
             this.comboBox1.TabIndex = 4;
             // 
             // checkBox2
             // 
             this.checkBox2.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.checkBox2.AutoSize = true;
-            this.checkBox2.Location = new System.Drawing.Point(451, 32);
+            this.checkBox2.Location = new System.Drawing.Point(643, 19);
             this.checkBox2.Name = "checkBox2";
             this.checkBox2.Size = new System.Drawing.Size(15, 14);
             this.checkBox2.TabIndex = 5;
@@ -323,7 +326,7 @@
             // 
             this.checkBox3.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.checkBox3.AutoSize = true;
-            this.checkBox3.Location = new System.Drawing.Point(451, 59);
+            this.checkBox3.Location = new System.Drawing.Point(643, 46);
             this.checkBox3.Name = "checkBox3";
             this.checkBox3.Size = new System.Drawing.Size(15, 14);
             this.checkBox3.TabIndex = 5;
@@ -333,7 +336,7 @@
             // 
             this.checkCol.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.checkCol.AutoSize = true;
-            this.checkCol.Location = new System.Drawing.Point(451, 86);
+            this.checkCol.Location = new System.Drawing.Point(643, 73);
             this.checkCol.Name = "checkCol";
             this.checkCol.Size = new System.Drawing.Size(15, 14);
             this.checkCol.TabIndex = 5;
@@ -343,9 +346,9 @@
             // 
             this.label7.AutoSize = true;
             this.label7.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label7.Location = new System.Drawing.Point(441, 0);
+            this.label7.Location = new System.Drawing.Point(622, 0);
             this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(36, 26);
+            this.label7.Size = new System.Drawing.Size(58, 13);
             this.label7.TabIndex = 3;
             this.label7.Text = "По типу:";
             this.label7.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -356,7 +359,7 @@
             this.label8.Dock = System.Windows.Forms.DockStyle.Fill;
             this.label8.Location = new System.Drawing.Point(123, 0);
             this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(312, 26);
+            this.label8.Size = new System.Drawing.Size(493, 13);
             this.label8.TabIndex = 3;
             this.label8.Text = "Тип стен отделки";
             this.label8.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -365,9 +368,9 @@
             // 
             this.label9.AutoSize = true;
             this.label9.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label9.Location = new System.Drawing.Point(123, 107);
+            this.label9.Location = new System.Drawing.Point(123, 94);
             this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(312, 20);
+            this.label9.Size = new System.Drawing.Size(493, 20);
             this.label9.TabIndex = 3;
             this.label9.Text = "Пол в модели";
             this.label9.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -376,9 +379,9 @@
             // 
             this.label10.AutoSize = true;
             this.label10.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label10.Location = new System.Drawing.Point(123, 127);
+            this.label10.Location = new System.Drawing.Point(123, 114);
             this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(312, 20);
+            this.label10.Size = new System.Drawing.Size(493, 20);
             this.label10.TabIndex = 3;
             this.label10.Text = "Потолок в модели:";
             this.label10.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -387,7 +390,7 @@
             // 
             this.modelFloor.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.modelFloor.AutoSize = true;
-            this.modelFloor.Location = new System.Drawing.Point(451, 110);
+            this.modelFloor.Location = new System.Drawing.Point(643, 97);
             this.modelFloor.Name = "modelFloor";
             this.modelFloor.Size = new System.Drawing.Size(15, 14);
             this.modelFloor.TabIndex = 5;
@@ -397,7 +400,7 @@
             // 
             this.modelCeil.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.modelCeil.AutoSize = true;
-            this.modelCeil.Location = new System.Drawing.Point(451, 130);
+            this.modelCeil.Location = new System.Drawing.Point(643, 117);
             this.modelCeil.Name = "modelCeil";
             this.modelCeil.Size = new System.Drawing.Size(15, 14);
             this.modelCeil.TabIndex = 5;
@@ -407,7 +410,7 @@
             // 
             this.label11.AutoSize = true;
             this.label11.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label11.Location = new System.Drawing.Point(3, 147);
+            this.label11.Location = new System.Drawing.Point(3, 134);
             this.label11.Name = "label11";
             this.label11.Size = new System.Drawing.Size(114, 20);
             this.label11.TabIndex = 3;
@@ -417,7 +420,7 @@
             // 
             this.checkGroup.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.checkGroup.AutoSize = true;
-            this.checkGroup.Location = new System.Drawing.Point(451, 150);
+            this.checkGroup.Location = new System.Drawing.Point(643, 137);
             this.checkGroup.Name = "checkGroup";
             this.checkGroup.Size = new System.Drawing.Size(15, 14);
             this.checkGroup.TabIndex = 5;
@@ -428,18 +431,18 @@
             // 
             this.GroupSelector.Dock = System.Windows.Forms.DockStyle.Fill;
             this.GroupSelector.FormattingEnabled = true;
-            this.GroupSelector.Location = new System.Drawing.Point(123, 150);
+            this.GroupSelector.Location = new System.Drawing.Point(123, 137);
             this.GroupSelector.Name = "GroupSelector";
-            this.GroupSelector.Size = new System.Drawing.Size(312, 21);
+            this.GroupSelector.Size = new System.Drawing.Size(493, 21);
             this.GroupSelector.TabIndex = 6;
             // 
             // SelNum
             // 
             this.SelNum.AutoSize = true;
             this.SelNum.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.SelNum.Location = new System.Drawing.Point(123, 207);
+            this.SelNum.Location = new System.Drawing.Point(123, 194);
             this.SelNum.Name = "SelNum";
-            this.SelNum.Size = new System.Drawing.Size(312, 80);
+            this.SelNum.Size = new System.Drawing.Size(493, 93);
             this.SelNum.TabIndex = 3;
             this.SelNum.Text = "Все помещения";
             this.SelNum.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -448,9 +451,9 @@
             // 
             this.label12.AutoSize = true;
             this.label12.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label12.Location = new System.Drawing.Point(3, 207);
+            this.label12.Location = new System.Drawing.Point(3, 194);
             this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(114, 80);
+            this.label12.Size = new System.Drawing.Size(114, 93);
             this.label12.TabIndex = 3;
             this.label12.Text = "Выбрано элементов:";
             this.label12.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -459,9 +462,9 @@
             // 
             this.PhaseSelector.Dock = System.Windows.Forms.DockStyle.Fill;
             this.PhaseSelector.FormattingEnabled = true;
-            this.PhaseSelector.Location = new System.Drawing.Point(123, 190);
+            this.PhaseSelector.Location = new System.Drawing.Point(123, 177);
             this.PhaseSelector.Name = "PhaseSelector";
-            this.PhaseSelector.Size = new System.Drawing.Size(312, 21);
+            this.PhaseSelector.Size = new System.Drawing.Size(493, 21);
             this.PhaseSelector.TabIndex = 2;
             this.PhaseSelector.SelectedIndexChanged += new System.EventHandler(this.PhaseSelector_SelectedIndexChanged);
             // 
@@ -469,7 +472,7 @@
             // 
             this.label13.AutoSize = true;
             this.label13.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label13.Location = new System.Drawing.Point(3, 167);
+            this.label13.Location = new System.Drawing.Point(3, 154);
             this.label13.Name = "label13";
             this.label13.Size = new System.Drawing.Size(114, 20);
             this.label13.TabIndex = 3;
@@ -479,27 +482,36 @@
             // 
             this.GroupFloorSelector.Dock = System.Windows.Forms.DockStyle.Fill;
             this.GroupFloorSelector.FormattingEnabled = true;
-            this.GroupFloorSelector.Location = new System.Drawing.Point(123, 170);
+            this.GroupFloorSelector.Location = new System.Drawing.Point(123, 157);
             this.GroupFloorSelector.Name = "GroupFloorSelector";
-            this.GroupFloorSelector.Size = new System.Drawing.Size(312, 21);
+            this.GroupFloorSelector.Size = new System.Drawing.Size(493, 21);
             this.GroupFloorSelector.TabIndex = 6;
             // 
             // checkFloorGroup
             // 
             this.checkFloorGroup.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.checkFloorGroup.AutoSize = true;
-            this.checkFloorGroup.Location = new System.Drawing.Point(451, 170);
+            this.checkFloorGroup.Location = new System.Drawing.Point(643, 157);
             this.checkFloorGroup.Name = "checkFloorGroup";
             this.checkFloorGroup.Size = new System.Drawing.Size(15, 14);
             this.checkFloorGroup.TabIndex = 5;
             this.checkFloorGroup.UseVisualStyleBackColor = true;
             this.checkFloorGroup.CheckedChanged += new System.EventHandler(this.checkFloorGroup_CheckedChanged);
             // 
+            // locWallParam
+            // 
+            this.locWallParam.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.locWallParam.Location = new System.Drawing.Point(686, 43);
+            this.locWallParam.Name = "locWallParam";
+            this.locWallParam.Size = new System.Drawing.Size(108, 20);
+            this.locWallParam.TabIndex = 7;
+            this.locWallParam.Text = "Состав";
+            // 
             // FinishForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(715, 351);
+            this.ClientSize = new System.Drawing.Size(1032, 351);
             this.Controls.Add(this.tableLayoutPanel1);
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.panel1);
@@ -556,5 +568,6 @@
         private System.Windows.Forms.Label label13;
         private System.Windows.Forms.ComboBox GroupFloorSelector;
         private System.Windows.Forms.CheckBox checkFloorGroup;
+        private System.Windows.Forms.TextBox locWallParam;
     }
 }

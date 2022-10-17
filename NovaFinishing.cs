@@ -139,36 +139,7 @@ namespace WorkApp
                 }
             }
 
-            
-            foreach (var w in cWalls)
-            {
-                foreach (var r in RoomFinishing.Rooms)
-                {
-                    
-                    if (r.Id.IntegerValue==w.RoomID)
-                    {
-                        if (w.typeName == MainForm.LocType.Name)
-                        {
-                            r.LocalWall.unitValue += w.Area;
-                            r.LocalWall.Text = w.sostav;
-                        }
-                        else if (w.typeName== MainForm.ColType.Name)
-                        {
-                            r.Kolon.unitValue+= w.Area;
-                            r.Kolon.Text = w.sostav;
-                        }
-                        else
-                        {
-                            r.MainWall.unitValue += w.Area;
-                        }
-                        if (w.countNewW)
-                        {
-                            r.NewWall.unitValue += w.Area;
-                        }
-                    }
-                }
-            }
-
+            RoomFinishing.SetWallToRoom(cWalls, MainForm);
 
             //Плинтус
             foreach (var d in doors)

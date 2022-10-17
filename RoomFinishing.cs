@@ -18,11 +18,22 @@ namespace WorkApp
             Type = "";
             Text = "";
         }
-        public void setType(string t, Element r)
+        public  void setType(string t, Element r)
         {
             Type = t;
             Text = t == "__Отделка : ---" ? "" : r.Document.GetElement(r.LookupParameter("ОТД_Потолок").AsElementId()).LookupParameter("АР_Состав отделки").AsString();
 
+        }
+        public static string getMultiString(List<FinishStructuralElement> l)
+        {
+            string a = "";
+            foreach (var item in l)
+            {
+                a += item.Text+" - ";
+                a += (item.Value*Meta.FT*Meta.FT).ToString("F1");
+                a += " м²\n";
+            }
+            return a;
         }
     }
     public class RoomFinishing
@@ -39,7 +50,8 @@ namespace WorkApp
         public ElementId Level { get; set; }
         //=============
         public FinishStructuralElement MainWall { get; set; }= new FinishStructuralElement();
-        public FinishStructuralElement LocalWall { get; set; } = new FinishStructuralElement();
+        public List<FinishStructuralElement> LocalWallList = new List<FinishStructuralElement>();
+        //public FinishStructuralElement LocalWall { get; set; } = new FinishStructuralElement();
         public FinishStructuralElement NewWall { get; set; } = new FinishStructuralElement();
         public FinishStructuralElement Kolon { get; set; } = new FinishStructuralElement();
         public FinishStructuralElement Floor { get; set; } = new FinishStructuralElement();
@@ -64,26 +76,71 @@ namespace WorkApp
 
             Rooms.Add(this);
         }
+        public static void SetWallToRoom(List<GhostWall> walls, FinishForm form)
+        {
+            foreach (var w in walls)
+            {
+                foreach (var r in RoomFinishing.Rooms)
+                {
+
+                    if (r.Id.IntegerValue == w.RoomID)
+                    {
+                        if (w.typeName != form.WallType.Name& w.typeName != form.ColType.Name)
+                        {
+                            r.LocalWallList.Add(new FinishStructuralElement() { Text = w.sostav, unitValue = w.Area });
+                        }
+                        else if (w.typeName == form.ColType.Name)
+                        {
+                            r.Kolon.unitValue += w.Area;
+                            r.Kolon.Text = w.sostav;
+                        }
+                        else
+                        {
+                            r.MainWall.unitValue += w.Area;
+                        }
+                        if (w.countNewW)
+                        {
+                            r.NewWall.unitValue += w.Area;
+                        }
+                    }
+                }
+            }
+        }
+
 
         public static void makeFinish(FinishForm form)
         {
-            bool combineLocalWall = true;
 
             var grfn = Rooms.GroupBy(key => (
             form.splitLevel?key.Level:null,
             form.ColFromMat?key.Kolon.Text:key.Kolon.Type,
             key.Ceil.Type,
-            key.MainWall.Type,
-            combineLocalWall?null: key.LocalWall.Type
+            key.MainWall.Type
             ));
 
             foreach (var f in grfn)
             {
                 FinishTable.Add(f.Select(x => x).ToList());
+                List<FinishStructuralElement> fseLocal=new List<FinishStructuralElement>();
+                foreach (var r in f)
+                {
+                    foreach (var item in r.LocalWallList)
+                    {
+                        fseLocal.Add(item);
+                    }
+                }
+
+                var ooo= fseLocal.GroupBy(x=>x.Text)
+                    .Select(g => new FinishStructuralElement
+                    {
+                        Value=g.Sum(x=>x.unitValue),
+                        Text=g.First().Text
+                    }).ToList();
                 foreach (RoomFinishing r in f)
                 {
                     r.MainWall.Value = f.Sum(x => x.MainWall.unitValue);
-                    r.LocalWall.Value = f.Sum(x => x.LocalWall.unitValue);
+                    r.LocalWallList=ooo;
+                    //r.LocalWall.Value = f.Sum(x => x.LocalWall.unitValue);
                     r.Kolon.Value = f.Sum(x => x.Kolon.unitValue);
                     if (form.countNewW)
                     {
@@ -221,14 +278,14 @@ namespace WorkApp
                     {
                         if (form.groupCheck)
                         {
-                            r.refElement.LookupParameter("ОТД_Кол.ДопGROUP").Set(r.LocalWall.Value > 0 ? (r.LocalWall.Value * Meta.FT * Meta.FT).ToString("F1") : "");
+                            r.refElement.LookupParameter("ОТД_Кол.ДопGROUP").Set(r.LocalWallList.Count>0 ? FinishStructuralElement.getMultiString(r.LocalWallList) : "");
                         }
                         else
                         {
-                            r.refElement.LookupParameter("ОТД_Кол.Доп").Set(r.LocalWall.Value > 0 ? (r.LocalWall.Value * Meta.FT * Meta.FT).ToString("F1") : "");
+                            r.refElement.LookupParameter("ОТД_Кол.Доп").Set(r.LocalWallList.Count > 0 ? FinishStructuralElement.getMultiString(r.LocalWallList) : "");
                         }
 
-                        r.refElement.LookupParameter("ОТД_Состав.Доп").Set(r.LocalWall.Text);
+                        //r.refElement.LookupParameter("ОТД_Состав.Доп").Set(r.LocalWall.Text);
                     }
 
                     if (form.groupCheck)
