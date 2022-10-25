@@ -26,6 +26,10 @@ namespace WorkApp
         }
         public static string getMultiString(List<FinishStructuralElement> l)
         {
+            if (l.Count==1)
+            {
+                return l.First().Text;
+            }
             string a = "";
             foreach (var item in l)
             {
@@ -50,11 +54,12 @@ namespace WorkApp
         public ElementId Level { get; set; }
         //=============
         public FinishStructuralElement MainWall { get; set; }= new FinishStructuralElement();
-        public List<FinishStructuralElement> LocalWallList = new List<FinishStructuralElement>();
+        public List<FinishStructuralElement> LocalWallList { get; set; } = new List<FinishStructuralElement>();
         //public FinishStructuralElement LocalWall { get; set; } = new FinishStructuralElement();
         public FinishStructuralElement NewWall { get; set; } = new FinishStructuralElement();
         public FinishStructuralElement Kolon { get; set; } = new FinishStructuralElement();
         public FinishStructuralElement Floor { get; set; } = new FinishStructuralElement();
+        public List<FinishStructuralElement> FloorList { get; set; } = new List<FinishStructuralElement>();
         public FinishStructuralElement Ceil{ get; set; } = new FinishStructuralElement();
         public FinishStructuralElement Plintus { get; set; } = new FinishStructuralElement();
 
@@ -70,6 +75,7 @@ namespace WorkApp
             Ceil.setType( e.LookupParameter("ОТД_Потолок").AsValueString(),e);
             MainWall.Type = e.LookupParameter("ОТД_Стены").AsValueString();
             Floor.Type = e.LookupParameter("ОТД_Пол").AsValueString();
+            Floor.unitValue = e.get_Parameter(BuiltInParameter.ROOM_AREA).AsDouble();
             Kolon.Type = e.LookupParameter("ОТД_Колонны").AsValueString();
             Plintus.Type = e.LookupParameter("ОТД_Плинтус").AsValueString();
             Plintus.unitValue = e.get_Parameter(BuiltInParameter.ROOM_PERIMETER).AsDouble();
@@ -106,6 +112,19 @@ namespace WorkApp
                 }
             }
         }
+        public static void SetFloorToRoom(List<GhostFloor> floors, FinishForm form)
+        {
+            foreach (var w in floors)
+            {
+                foreach (var r in RoomFinishing.Rooms)
+                {
+                    if (r.Id.IntegerValue == w.RoomID)
+                    {
+                        r.FloorList.Add(new FinishStructuralElement() { Text = w.sostav, unitValue = w.Area });
+                    }
+                }
+            }
+        }
 
 
         public static void makeFinish(FinishForm form)
@@ -121,7 +140,7 @@ namespace WorkApp
             foreach (var f in grfn)
             {
                 FinishTable.Add(f.Select(x => x).ToList());
-                List<FinishStructuralElement> fseLocal=new List<FinishStructuralElement>();
+                List<FinishStructuralElement> fseLocal = new List<FinishStructuralElement>();
                 foreach (var r in f)
                 {
                     foreach (var item in r.LocalWallList)
@@ -129,17 +148,11 @@ namespace WorkApp
                         fseLocal.Add(item);
                     }
                 }
-
-                var ooo= fseLocal.GroupBy(x=>x.Text)
-                    .Select(g => new FinishStructuralElement
-                    {
-                        Value=g.Sum(x=>x.unitValue),
-                        Text=g.First().Text
-                    }).ToList();
+                var SimilarElementList = GroupModelledTypes(fseLocal);
                 foreach (RoomFinishing r in f)
                 {
                     r.MainWall.Value = f.Sum(x => x.MainWall.unitValue);
-                    r.LocalWallList=ooo;
+                    r.LocalWallList = SimilarElementList;
                     //r.LocalWall.Value = f.Sum(x => x.LocalWall.unitValue);
                     r.Kolon.Value = f.Sum(x => x.Kolon.unitValue);
                     if (form.countNewW)
@@ -147,7 +160,17 @@ namespace WorkApp
                         r.NewWall.Value = f.Sum(x => x.NewWall.unitValue);
                     }
                 }
-            }   
+            }
+        }
+
+        private static List<FinishStructuralElement> GroupModelledTypes(List<FinishStructuralElement> eInRooms)
+        {
+            return eInRooms.GroupBy(x => x.Text)
+                .Select(g => new FinishStructuralElement
+                {
+                    Value = g.Sum(x => x.unitValue),
+                    Text = g.First().Text
+                }).ToList();
         }
 
         public static void makeFloor(FinishForm form)
@@ -156,18 +179,29 @@ namespace WorkApp
                 key =>(
                 form.splitLevel? key.Level:null, 
                 key.Floor.Type, 
-                key.Plintus.Type));
+                true?null:key.Plintus.Type));
             foreach (var f in grfl)
             {
                 FloorTable.Add(f.Select(x => x).ToList());
+                List<FinishStructuralElement> fseLocal = new List<FinishStructuralElement>();
                 foreach (RoomFinishing r in f)
                 {
                     r.Plintus.Value = f.Sum(x => x.Plintus.unitValue);
+                    foreach (var item in r.FloorList)
+                    {
+                        fseLocal.Add(item);
+                    }
+                }
+                var SimilarElementList = GroupModelledTypes(fseLocal);
+                foreach (RoomFinishing r in f)
+                {
+                    r.Floor.Value = f.Sum(x => x.Floor.unitValue);
+                    r.FloorList = SimilarElementList;
                 }
             }
         }
 
-
+        
 
         public static void FinishTableCommit(Document doc, FinishForm form) 
         {
@@ -376,33 +410,55 @@ namespace WorkApp
                     r.refElement.LookupParameter("ОТД_Состав.Пол").Set("");
                     try
                     {
-                        r.refElement.LookupParameter("ОТД_Состав.Пол").Set(doc.GetElement(r.refElement.LookupParameter("ОТД_Пол").AsElementId()).LookupParameter("АР_Состав отделки").AsString());
+                        if (r.FloorList.Count > 0)
+                        {
+                            r.refElement.LookupParameter("ОТД_Состав.Пол").Set(FinishStructuralElement.getMultiString(r.FloorList));
+                        }
+                        else
+                        {
+                            r.refElement.LookupParameter("ОТД_Состав.Пол").Set(doc.GetElement(r.refElement.LookupParameter("ОТД_Пол").AsElementId()).LookupParameter("АР_Состав отделки").AsString());
+                        }
+
                     }
                     catch (Exception)
                     {
                         r.refElement.LookupParameter("ОТД_Состав.Пол").Set("");
                     }
-                    try
-                    {
-                        r.refElement.LookupParameter("ОТД_Состав.Плинтус").Set(doc.GetElement(r.refElement.LookupParameter("ОТД_Плинтус").AsElementId()).LookupParameter("АР_Состав отделки").AsString());
-                    }
-                    catch (Exception)
-                    {
-                        r.refElement.LookupParameter("ОТД_Состав.Плинтус").Set("");
-                    }
-                    if (form.groupFloorCheck)
-                    {
-                        r.refElement.LookupParameter("FMulAdd").Set(fillText);
-                    }
-                    else
-                    {
-                        r.refElement.LookupParameter("testF").Set(fillText);
-                    }
-                    r.refElement.LookupParameter("ОТД_Кол.Плинтус").Set(r.Plintus.Type == "__Отделка : ---" ? "" : (r.Plintus.Value * Meta.FT).ToString("F1"));
-                    r.refElement.LookupParameter("PlintusTotal").Set(r.Plintus.Value);
-                }
+                    
+                    string floorParam = form.groupFloorCheck ? "FMulAdd" : "testF";
+                    
+                    writePlintus(doc, r);
 
+
+                    r.refElement.LookupParameter(floorParam).Set(fillText);
+                    string floorNumParamName = form.groupFloorCheck ? "ОТД_Кол.ПолGROUP" : "ОТД_Кол.Пол";
+                    string floorNumParamValue = "-";
+                    if (r.FloorList.Count == 1)
+                    {
+                        floorNumParamValue = (r.FloorList.First().Value * Meta.FT * Meta.FT).ToString("F1");
+                    }
+                    if (r.FloorList.Count == 0)
+                    {
+                        floorNumParamValue = (r.Floor.Value * Meta.FT * Meta.FT).ToString("F1");
+                    }
+                    r.refElement.LookupParameter(floorNumParamName).Set(floorNumParamValue);
+                }
             }
+        }
+
+
+        private static void writePlintus(Document doc, RoomFinishing r)
+        {
+            try
+            {
+                r.refElement.LookupParameter("ОТД_Состав.Плинтус").Set(doc.GetElement(r.refElement.LookupParameter("ОТД_Плинтус").AsElementId()).LookupParameter("АР_Состав отделки").AsString());
+            }
+            catch (Exception)
+            {
+                r.refElement.LookupParameter("ОТД_Состав.Плинтус").Set("");
+            }
+            r.refElement.LookupParameter("ОТД_Кол.Плинтус").Set(r.Plintus.Type == "__Отделка : ---" ? "" : (r.Plintus.Value * Meta.FT).ToString("F1"));
+            r.refElement.LookupParameter("PlintusTotal").Set(r.Plintus.Value);
         }
     }
 }

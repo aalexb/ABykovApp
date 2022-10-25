@@ -103,6 +103,7 @@
       <DependentUpon>addParamForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Class1.cs" />
+    <Compile Include="doorObj.cs" />
     <Compile Include="NovaShedule.cs" />
     <Compile Include="PageNumerator.cs" />
     <Compile Include="FinishEnterprise.cs">
@@ -194,6 +195,7 @@
     <Compile Include="WallLastStage.cs" />
     <Compile Include="Tools.cs" />
     <Compile Include="Universe.cs" />
+    <Compile Include="windowSquare.cs" />
     <Compile Include="wtf\Product.cs" />
     <Compile Include="wtf\Rebar.cs" />
     <Compile Include="zWall.cs" />
@@ -262,6 +264,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="type1\" />
+    <Folder Include="Отделка\" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="UserControl1.xaml">

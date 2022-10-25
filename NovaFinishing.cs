@@ -4,7 +4,6 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Events;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -138,7 +137,16 @@ namespace WorkApp
                     cWalls.Add(new GhostWall(wall,MainForm.LocType));
                 }
             }
-
+            var cFloors= new List<GhostFloor>();
+            foreach (Element e in allFloors)
+            {
+                //var par=e.LookupParameter("").AsString();
+                if ((e as Floor).FloorType.Name.Contains("Отделка А_"))
+                {
+                    cFloors.Add(new GhostFloor(e));
+                }
+            }
+            RoomFinishing.SetFloorToRoom(cFloors, MainForm);
             RoomFinishing.SetWallToRoom(cWalls, MainForm);
 
             //Плинтус
@@ -147,6 +155,7 @@ namespace WorkApp
                 new doorObj(d, lastPhase);
                 
             }
+
             foreach (var item in doorObj.AllDoorObj)
             {
                 foreach (var r in RoomFinishing.Rooms)
@@ -181,37 +190,6 @@ namespace WorkApp
             msg.MainInstruction =  $"Выполнен расчет отделки для стадии \"{MainForm.retPhase.Name}\"";
             msg.Show();
             return Result.Succeeded;
-        }
-    }
-    class doorObj
-    {
-        public static List<doorObj> AllDoorObj=new List<doorObj>();
-        public ElementId fromRoom { get; set; } = null;
-        public ElementId toRoom { get; set; } = null;
-        public double width { get; set; }
-        Element refEl { get; set; }
-        public doorObj(Element e,Phase phase)
-        {
-            refEl = e;
-
-            width= e.Document.GetElement(e.GetTypeId()).get_Parameter(BuiltInParameter.CASEWORK_WIDTH).AsDouble();
-            try
-            {
-                fromRoom = (e as FamilyInstance).get_FromRoom(phase).Id;
-            }
-            catch (Exception)
-            {
-            }
-            
-            try
-            {
-                toRoom = (e as FamilyInstance).get_ToRoom(phase).Id;
-            }
-            catch (Exception)
-            {
-            }
-            
-            AllDoorObj.Add(this);
         }
     }
 }

@@ -235,5 +235,10 @@ namespace WorkApp
                 GroupFloorSelector.Enabled = true;
             }
         }
+
+        private void GroupSelector_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            //SelNum.Text=roo GroupSelector.Text;
+        }
     }
 }

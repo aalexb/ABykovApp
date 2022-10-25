@@ -58,8 +58,13 @@ namespace WorkApp
                 .WhereElementIsNotElementType()
                 .WherePasses(door_filter)
                 .ToElements();
+            IList<Element> allFloors = new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Floors)
+                .WhereElementIsNotElementType()
+                .WherePasses(door_filter)
+                .ToElements();
 
             List<Element> otdWalls=allWalls.Where(x => x.Name.StartsWith("(Вн_О)")).ToList();
+
 
             //List<Element> otdWalls=allWalls.Where(x => x.Name.StartsWith("!!отделка")).ToList();
             List<Room> roomofWall = new List<Room>();
@@ -75,6 +80,39 @@ namespace WorkApp
                 foreach (Room item in rooms)
                 {
                     PickWall(item, doc);
+                }
+                foreach (var i in allFloors)
+                {
+                    if (i.LookupParameter("Room_ID").AsInteger()==0)
+                    {
+                        continue;
+                    }
+                    BoundingBoxXYZ bBox = i.get_BoundingBox(null);
+
+                    if (bBox != null)
+                    {
+                        XYZ origin = new XYZ((bBox.Max.X + bBox.Min.X) / 2, (bBox.Max.Y + bBox.Min.Y) / 2, (bBox.Max.Z + bBox.Min.Z) / 2);
+                        
+
+                        try
+                        {
+                            i.setP("Room_ID", doc.GetRoomAtPoint(origin, lastPhase).Id.IntegerValue);
+                        }
+                        catch (Exception)
+                        {
+                        }
+                        try
+                        {
+                            i.setP("Room_ID", doc.GetRoomAtPoint(origin, lastPhase).Id.IntegerValue);
+                        }
+                        catch (Exception)
+                        {
+                        }
+                    }
+
+
+
+
                 }
                 /*
                 foreach (Element i in otdWalls)
@@ -134,6 +172,21 @@ namespace WorkApp
                             wall.setP("Room_ID", room.Id.IntegerValue);
                         }
                         
+                    }
+                    if (neighbour is Floor)
+                    {
+                        var floor = neighbour as Floor;
+                        try
+                        {
+                            floor.setP("Room_ID", room.Id.IntegerValue);
+                        }
+                        catch (Exception)
+                        {
+
+                           
+                        }
+                        
+
                     }
                 }
             }

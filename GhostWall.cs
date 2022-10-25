@@ -7,17 +7,42 @@ using System.Threading.Tasks;
 
 namespace WorkApp
 {
-    public class GhostWall
+    public class Ghosty
     {
         public Element refEl { get; set; }
         public string typeName { get; set; }
         public ElementId Level { get; set; }
         public int RoomID { get; set; }
-        public string Room { get; set; }
         public double Area { get; set; }
+        public string sostav { get; set; }
+        public void init()
+        {
+            RoomID= refEl.LookupParameter("Room_ID").AsInteger();
+            Level = refEl.LevelId;
+            Area = refEl.get_Parameter(BuiltInParameter.HOST_AREA_COMPUTED).AsDouble();
+            
+        }
+    }
+
+
+    public class GhostFloor:Ghosty
+    {
+        public GhostFloor(Element e)
+        {
+            refEl = e;
+            init();
+            typeName = (e as Floor).FloorType.Name;
+            sostav = (e as Floor).FloorType.LookupParameter("Состав").AsString();
+        }
+        
+    }
+
+    public class GhostWall:Ghosty
+    {
+        
+        public string Room { get; set; }
         public int Secondary { get; set; }
         public bool isLocal = false;
-        public string sostav { get; set; }
         public bool countNewW = false;
         
 
@@ -30,11 +55,8 @@ namespace WorkApp
         }
         public GhostWall(Element wall, Element LocWall) {
             refEl = wall;
+            init();
             typeName = (wall as Wall).WallType.Name;
-            RoomID = wall.LookupParameter("Room_ID").AsInteger();
-            //Room = wall.getP("Помещение");
-            Level = wall.LevelId;
-            Area = wall.get_Parameter(BuiltInParameter.HOST_AREA_COMPUTED).AsDouble();
             if (LocWall!=null)
             {
                 isLocal = wall.Id == LocWall.Id;
