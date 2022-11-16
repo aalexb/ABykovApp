@@ -31,7 +31,7 @@ namespace WorkApp
             //listBox1.ValueMember = "Id";
             foreach (var item in pto)
             {
-                lbBegin.Items.Add(item.Num+" "+item.Name);
+                lbBegin.Items.Add(item.order+" "+item.Name);
             }
 
 

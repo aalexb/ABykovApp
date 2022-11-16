@@ -33,7 +33,11 @@ namespace WorkApp
             }
 			//StartList = StartList.OrderBy(s => s.Num, new CustomComparer()).ToList();
 			//StartList = NaturalSort(StartList.Select(x=>x.Num)).ToList();                            // Extract the values
-														   //StartList=StartList.OrderBy(x=>x.Num).ToList();
+			//StartList=StartList.OrderBy(x=>x.Num).ToList();
+			StartList = StartList.OrderBy(x => x.order).ToList();
+            
+			
+														  
 			var winform= new PagesForm(StartList);
 			winform.ShowDialog();
             if (!winform.cont)
@@ -87,17 +91,51 @@ namespace WorkApp
 		public Element refEl;
 		public string Name { get; set; }
 		public string Num { get; set; }
+		public int order { get; set; }
+
+		void getOrder()
+        {
+			order = 0;
+			string numericString=string.Empty;
+			foreach (var c in this.Num)
+            {
+                if (c >= '0' && c <= '9')
+                {
+					numericString=string.Concat(numericString, c.ToString());
+                }
+
+			}
+			order=int.Parse(numericString);
+        }
         public PageToObj(Autodesk.Revit.DB.ViewSheet s)
         {
 			refEl = s;
 			Name = s.Name;
 			Num = s.SheetNumber;
+            try
+            {
+				order = s.LookupParameter("_pageNum").AsInteger();
+            }
+            catch (Exception)
+            {
+				order = 0;
+            }
+			getOrder();
         }
 		public PageToObj(string name, string num, Element e)
 		{
 			refEl = e;
 			Name = name;
 			Num = num;
+			try
+			{
+				order = e.LookupParameter("_pageNum").AsInteger();
+			}
+			catch (Exception)
+			{
+				order = 0;
+			}
+			getOrder();
 		}
 	}
 }

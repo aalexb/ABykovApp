@@ -5,41 +5,6 @@ using System.Linq;
 
 namespace WorkApp
 {
-    public class FinishStructuralElement
-    {
-        public string Type { get; set; }
-        public string Text { get; set; }
-        public double unitValue { get; set; }
-        public double Value { get; set; }
-        public FinishStructuralElement()
-        {
-            unitValue = 0;
-            Value = 0;
-            Type = "";
-            Text = "";
-        }
-        public  void setType(string t, Element r)
-        {
-            Type = t;
-            Text = t == "__Отделка : ---" ? "" : r.Document.GetElement(r.LookupParameter("ОТД_Потолок").AsElementId()).LookupParameter("АР_Состав отделки").AsString();
-
-        }
-        public static string getMultiString(List<FinishStructuralElement> l)
-        {
-            if (l.Count==1)
-            {
-                return l.First().Text;
-            }
-            string a = "";
-            foreach (var item in l)
-            {
-                a += item.Text+" - ";
-                a += (item.Value*Meta.FT*Meta.FT).ToString("F1");
-                a += " м²\n";
-            }
-            return a;
-        }
-    }
     public class RoomFinishing
     {
         public static List<RoomFinishing> Rooms=new List<RoomFinishing>();
@@ -308,16 +273,12 @@ namespace WorkApp
                         Log.msg("Отсутствует параметр ОТД_Кол.Доп");
                         return;
                     }
-                    if (r.refElement.LookupParameter("ОТД_Кол.Доп") != null) //Проверяем что существует
+                    var localMultiText = form.groupCheck ? "ОТД_Кол.ДопGROUP" : "ОТД_Кол.Доп";
+                    if (r.refElement.LookupParameter(localMultiText) != null) //Проверяем что существует
                     {
-                        if (form.groupCheck)
-                        {
-                            r.refElement.LookupParameter("ОТД_Кол.ДопGROUP").Set(r.LocalWallList.Count>0 ? FinishStructuralElement.getMultiString(r.LocalWallList) : "");
-                        }
-                        else
-                        {
-                            r.refElement.LookupParameter("ОТД_Кол.Доп").Set(r.LocalWallList.Count > 0 ? FinishStructuralElement.getMultiString(r.LocalWallList) : "");
-                        }
+                        
+                        r.refElement.LookupParameter(localMultiText).Set(r.LocalWallList.Count > 0 ? FinishStructuralElement.getMultiString(r.LocalWallList,"withNum") : "");
+                        
 
                         //r.refElement.LookupParameter("ОТД_Состав.Доп").Set(r.LocalWall.Text);
                     }

@@ -35,6 +35,9 @@
   <PropertyGroup>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Enterprise|AnyCPU'">
+    <OutputPath>bin\Enterprise\</OutputPath>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="AdWindows">
       <HintPath>..\..\Program Files\Autodesk\Revit 2020\AdWindows.dll</HintPath>
@@ -104,7 +107,8 @@
     </Compile>
     <Compile Include="Class1.cs" />
     <Compile Include="doorObj.cs" />
-    <Compile Include="NovaShedule.cs" />
+    <Compile Include="Отделка\FinishStructuralElement.cs" />
+    <Compile Include="Отделка\NovaShedule.cs" />
     <Compile Include="PageNumerator.cs" />
     <Compile Include="FinishEnterprise.cs">
       <SubType>Form</SubType>
@@ -113,6 +117,7 @@
       <DependentUpon>FinishEnterprise.cs</DependentUpon>
     </Compile>
     <Compile Include="Log.cs" />
+    <Compile Include="RemoveAfterGP2.cs" />
     <Compile Include="template.cs" />
     <Compile Include="TestSelector.cs" />
     <Compile Include="App.cs" />
@@ -131,10 +136,10 @@
     <Compile Include="ExportDWFX.cs" />
     <Compile Include="ExportDWG.cs" />
     <Compile Include="ExportPDFspec.cs" />
-    <Compile Include="FinishForm.cs">
+    <Compile Include="Отделка\FinishForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="FinishForm.Designer.cs">
+    <Compile Include="Отделка\FinishForm.Designer.cs">
       <DependentUpon>FinishForm.cs</DependentUpon>
     </Compile>
     <Compile Include="PagesForm.cs">
@@ -164,8 +169,8 @@
     <Compile Include="metall.cs" />
     <Content Include="Finishing.txt" />
     <Compile Include="Multiverse.cs" />
-    <Compile Include="NovaFinishing.cs" />
-    <Compile Include="PerimetralWall.cs" />
+    <Compile Include="Отделка\NovaFinishing.cs" />
+    <Compile Include="Отделка\PerimetralWall.cs" />
     <Compile Include="PixelColorSelector.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -175,7 +180,7 @@
     </Compile>
     <Compile Include="refFinishing.cs" />
     <Compile Include="RNum2FWall.cs" />
-    <Compile Include="RoomFinishing.cs" />
+    <Compile Include="Отделка\RoomFinishing.cs" />
     <Compile Include="RoomRenumerate.cs" />
     <Compile Include="SetCurrentSpec.cs" />
     <Compile Include="SheetNum.cs" />
@@ -195,7 +200,6 @@
     <Compile Include="WallLastStage.cs" />
     <Compile Include="Tools.cs" />
     <Compile Include="Universe.cs" />
-    <Compile Include="windowSquare.cs" />
     <Compile Include="wtf\Product.cs" />
     <Compile Include="wtf\Rebar.cs" />
     <Compile Include="zWall.cs" />
@@ -210,7 +214,7 @@
     <EmbeddedResource Include="FinishEnterprise.resx">
       <DependentUpon>FinishEnterprise.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="FinishForm.resx">
+    <EmbeddedResource Include="Отделка\FinishForm.resx">
       <DependentUpon>FinishForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="PagesForm.resx">
@@ -264,7 +268,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="type1\" />
-    <Folder Include="Отделка\" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="UserControl1.xaml">

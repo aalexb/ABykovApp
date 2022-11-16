@@ -76,7 +76,7 @@ namespace WorkApp
 
             PushButton button410 = panelOther.AddButton("Тесты", Resources.block, "TableDraw");
             PushButton button420 = panelOther.AddButton("Тест дверей", Resources.block, "Doors");
-
+            PushButton button430 = panelOther.AddButton("Перемычки", Resources.block, "RemoveAfterGP2");
 
 
 
