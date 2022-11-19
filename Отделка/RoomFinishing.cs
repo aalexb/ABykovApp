@@ -40,6 +40,14 @@ namespace WorkApp
             Ceil.setType( e.LookupParameter("ОТД_Потолок").AsValueString(),e);
             MainWall.Type = e.LookupParameter("ОТД_Стены").AsValueString();
             Floor.Type = e.LookupParameter("ОТД_Пол").AsValueString();
+            try
+            {
+                Floor.Text = e.Document.GetElement(e.LookupParameter("ОТД_Пол").AsElementId()).LookupParameter("АР_Состав отделки").AsString();
+            }
+            catch (Exception)
+            {
+            }
+            
             Floor.unitValue = e.get_Parameter(BuiltInParameter.ROOM_AREA).AsDouble();
             Kolon.Type = e.LookupParameter("ОТД_Колонны").AsValueString();
             Plintus.Type = e.LookupParameter("ОТД_Плинтус").AsValueString();
@@ -322,9 +330,15 @@ namespace WorkApp
             }
         }
 
-        public static void FloorTableCommit(int MoreThenOneLevel, int withNames, Document doc, FinishForm form)
+        public static void FloorTableCommit(int MoreThenOneLevel, int withNames, Document doc, FinishForm form, ViewSchedule vs)
         {
-            foreach (List<RoomFinishing> item in FloorTable)
+            var shed = new Addons.NovaShedule(vs, 2);
+            List<int[]> groups=new List<int[]>();
+            //int[][] groups = null;
+            List<List<string>> data = new List<List<string>>();
+            data.Add((new string[] {  }).ToList());
+            int floorNum = 1;
+            foreach (var item in FloorTable)
             {
                 if (item == null)
                 {
@@ -332,19 +346,13 @@ namespace WorkApp
                 }
                 String fillText = "";
 
+                
                 /*
                  * Если 1 уровень
-                 * 
-                 * 
-                 * 
-                 * 
-                 * 
-                 * 
-                 * 
                  */
                 if (MoreThenOneLevel==1)
                 {
-                    foreach (ElementId lev in item.Select(x => x.Level).Distinct())
+                    foreach (var lev in item.Select(x => x.Level).Distinct())
                     {
                         fillText += doc.GetElement(lev).LookupParameter("Название уровня").AsString() + ":\n";
                         if (withNames == 1)
@@ -363,7 +371,21 @@ namespace WorkApp
                 {
                     fillText += Meta.shortLists(item.Select(y => y.Num).ToList()) + "\n";
                 }
-
+                if (item[0].FloorList.Count > 0)
+                {
+                    groups.Add(new int[] { data.Count, data.Count + item[0].FloorList.Count-1 });
+                    int suffix = 1;
+                    foreach (var fl in item[0].FloorList)
+                    {
+                        data.Add((new string[] { fillText, floorNum.ToString()+"."+suffix.ToString(), "", fl.Text, (fl.Value * Meta.FT * Meta.FT).ToString("F1") }).ToList());
+                        suffix++;
+                    }
+                }
+                else
+                {
+                    data.Add( (new string[] { fillText, floorNum.ToString(), "", item[0].Floor.Text, (item[0].Floor.Value*Meta.FT*Meta.FT).ToString("F1") }).ToList());
+                }
+                floorNum++;
                 //Транзакция
 
                 foreach (var r in item)
@@ -405,6 +427,14 @@ namespace WorkApp
                     r.refElement.LookupParameter(floorNumParamName).Set(floorNumParamValue);
                 }
             }
+
+            shed.CreateRow(data);
+            
+            shed.mergeRow(groups, 0);
+            shed.mergeCol();
+            shed.setHeight();
+            
+            
         }
 
 

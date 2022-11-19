@@ -29,7 +29,10 @@ namespace WorkApp
             UIDocument uidoc = uiapp.ActiveUIDocument;
             Application app = uiapp.Application;
             Document doc = uidoc.Document;
-            
+            var selx = uidoc.Selection.GetElementIds();
+            var ix = selx.Select(x => doc.GetElement(x));
+
+            ViewSchedule vs = doc.GetElement((ix.ElementAt(0) as ScheduleSheetInstance).ScheduleId) as ViewSchedule;
 
             PhaseArray xcom = doc.Phases;
             Phase lastPhase = xcom.get_Item(xcom.Size - 1);
@@ -174,13 +177,14 @@ namespace WorkApp
             using (Transaction tr = new Transaction(doc, "otdelka"))
             {
                 tr.Start();
+
                 if (!MainForm.groupFloorCheck)
                 {
                     RoomFinishing.FinishTableCommit(doc, MainForm);
                 }
                 if (!MainForm.groupCheck)
                 {
-                    RoomFinishing.FloorTableCommit(MainForm.levels, MainForm.withnames, doc, MainForm);
+                    RoomFinishing.FloorTableCommit(MainForm.levels, MainForm.withnames, doc, MainForm,vs);
                 }
                 
                 
