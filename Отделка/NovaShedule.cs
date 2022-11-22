@@ -42,7 +42,7 @@ namespace WorkApp.Addons
             {
                 tr.Start();
                 
-                shed.CreateRow(data);
+                //shed.CreateRow(data);
                 //shed.mergeRow(group, 0);
                 
                 tr.Commit();
@@ -62,11 +62,48 @@ namespace WorkApp.Addons
     /*
     ==========КЛАССЫ==========
     */
-    class SimpleSheduleData
+    
+    public class SheduleCell
     {
+        public string Type { get; }
+        public string Data { get; }
+         public SheduleCell(string Data,string Type = "Text")
+        {
+            this.Data = Data;
+            this.Type = Type;
+        }
+        static public List<SheduleCell> FloorRow(string listRoom, string typeNum, string text, double value, ElementId img = null)
+        {
+            //List<SheduleCell> operate = new List<SheduleCell>();
+            return new SheduleCell[]
+            {
+                new SheduleCell(listRoom),
+                new SheduleCell(typeNum),
+                null,
+                new SheduleCell(text),
+                new SheduleCell((value*Meta.FT*Meta.FT).ToString("F1"))
+            }.ToList();
+        }
+        static public SheduleCell[] FinishRow(string listRoom, string CeilText, double CeilValue, string TopWallText, double TopWallValue, double TopWallHeight = 0, string BotWallText="", double BotWallValue=0, double BotWallHeight=0, string Note="")
+        {
 
-        SimpleSheduleData() { }
+            return new SheduleCell []
+            {
+                new SheduleCell (listRoom),
+                new SheduleCell(CeilText),
+                new SheduleCell ((CeilValue*Meta.FT*Meta.FT).ToString ("F1")),
+                new SheduleCell (TopWallText),
+                TopWallValue==0?null:new SheduleCell((TopWallValue*Meta.FT*Meta.FT).ToString ("F1")),
+                TopWallHeight==0?null:new SheduleCell((TopWallHeight*Meta.FT).ToString ("F1")),
+                new SheduleCell (BotWallText),
+                BotWallValue==0?null:new SheduleCell((BotWallValue*Meta.FT*Meta.FT).ToString ("F1")),
+                BotWallHeight==0?null: new SheduleCell((BotWallHeight*Meta.FT).ToString ("F1")),
+                new SheduleCell(Note)
+            };
+        }
+        
     }
+
     public class NovaShedule
     {
         int Col;
@@ -135,7 +172,7 @@ namespace WorkApp.Addons
             }
         }
 
-        public void CreateRow(List<List<string>> data)
+        public void CreateRow(List<List<SheduleCell>> data)
         {
             var style=new TableCellStyle() { FontHorizontalAlignment=HorizontalAlignmentStyle.Left};
             clearTable();
@@ -151,7 +188,7 @@ namespace WorkApp.Addons
                     {
                         if (cell != null)
                         {
-                            tsd.SetCellText(offset, k, cell);
+                            tsd.SetCellText(offset, k, cell.Data);
                             tsd.ResetCellOverride(offset, k);
                             tsd.SetCellStyle(offset, k, style);
                         }

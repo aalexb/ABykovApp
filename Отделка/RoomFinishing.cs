@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using WorkApp.Addons;
 
 namespace WorkApp
 {
@@ -17,6 +18,8 @@ namespace WorkApp
         public string Name { get; }
         public string Num { get; set; }
         public ElementId Level { get; set; }
+        public string FinishGroup = "";
+        public string FloorGroup = "";
         //=============
         public FinishStructuralElement MainWall { get; set; }= new FinishStructuralElement();
         public List<FinishStructuralElement> LocalWallList { get; set; } = new List<FinishStructuralElement>();
@@ -34,12 +37,16 @@ namespace WorkApp
             Id = e.Id;
             Name=e.get_Parameter(BuiltInParameter.ROOM_NAME).AsString();
             Num = e.get_Parameter(BuiltInParameter.ROOM_NUMBER).AsString();
+
             Level = e.LevelId;
 
 
             Ceil.setType( e.LookupParameter("ОТД_Потолок").AsValueString(),e);
             MainWall.Type = e.LookupParameter("ОТД_Стены").AsValueString();
             Floor.Type = e.LookupParameter("ОТД_Пол").AsValueString();
+            FinishGroup= e.LookupParameter("ADSK_Группирование").AsValueString();
+            FloorGroup = e.LookupParameter("AG_Групп_Пол").AsValueString();
+
             try
             {
                 Floor.Text = e.Document.GetElement(e.LookupParameter("ОТД_Пол").AsElementId()).LookupParameter("АР_Состав отделки").AsString();
@@ -335,8 +342,8 @@ namespace WorkApp
             var shed = new Addons.NovaShedule(vs, 2);
             List<int[]> groups=new List<int[]>();
             //int[][] groups = null;
-            List<List<string>> data = new List<List<string>>();
-            data.Add((new string[] {  }).ToList());
+            List<List<SheduleCell>> data = new List<List<SheduleCell>>();
+            data.Add((new SheduleCell[] {  }).ToList());
             int floorNum = 1;
             foreach (var item in FloorTable)
             {
@@ -377,13 +384,21 @@ namespace WorkApp
                     int suffix = 1;
                     foreach (var fl in item[0].FloorList)
                     {
-                        data.Add((new string[] { fillText, floorNum.ToString()+"."+suffix.ToString(), "", fl.Text, (fl.Value * Meta.FT * Meta.FT).ToString("F1") }).ToList());
+                        data.Add(SheduleCell.FloorRow(
+                            fillText,
+                            floorNum.ToString() + "." + suffix.ToString(),
+                            fl.Text,
+                            fl.Value));
                         suffix++;
                     }
                 }
                 else
                 {
-                    data.Add( (new string[] { fillText, floorNum.ToString(), "", item[0].Floor.Text, (item[0].Floor.Value*Meta.FT*Meta.FT).ToString("F1") }).ToList());
+                    data.Add(SheduleCell.FloorRow(
+                            fillText,
+                            floorNum.ToString(),
+                            item[0].Floor.Text,
+                            item[0].Floor.Value));
                 }
                 floorNum++;
                 //Транзакция

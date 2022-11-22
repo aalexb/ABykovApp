@@ -149,6 +149,8 @@ namespace WorkApp
                     cFloors.Add(new GhostFloor(e));
                 }
             }
+
+            //Соотнести элементы отделки с помещениями
             RoomFinishing.SetFloorToRoom(cFloors, MainForm);
             RoomFinishing.SetWallToRoom(cWalls, MainForm);
 
@@ -177,7 +179,6 @@ namespace WorkApp
             using (Transaction tr = new Transaction(doc, "otdelka"))
             {
                 tr.Start();
-
                 if (!MainForm.groupFloorCheck)
                 {
                     RoomFinishing.FinishTableCommit(doc, MainForm);
@@ -186,8 +187,6 @@ namespace WorkApp
                 {
                     RoomFinishing.FloorTableCommit(MainForm.levels, MainForm.withnames, doc, MainForm,vs);
                 }
-                
-                
                 tr.Commit();
             }
             TaskDialog msg = new TaskDialog("Info");
