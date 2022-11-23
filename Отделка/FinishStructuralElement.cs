@@ -10,6 +10,7 @@ namespace WorkApp
         public string Text { get; set; }
         public double unitValue { get; set; }
         public double Value { get; set; }
+        public double Height { get; set; }
         public FinishStructuralElement()
         {
             unitValue = 0;

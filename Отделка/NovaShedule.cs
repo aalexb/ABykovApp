@@ -72,6 +72,13 @@ namespace WorkApp.Addons
             this.Data = Data;
             this.Type = Type;
         }
+        static public List<SheduleCell> Subtitle(string header)
+        {
+            return new List<SheduleCell>
+            {
+                new SheduleCell(header)
+            };
+        }
         static public List<SheduleCell> FloorRow(string listRoom, string typeNum, string text, double value, ElementId img = null)
         {
             //List<SheduleCell> operate = new List<SheduleCell>();
@@ -126,9 +133,9 @@ namespace WorkApp.Addons
                 tsd.RemoveRow(offset);
             }
         }
-        public void mergeCol()
+        public void mergeCol(int a)
         {
-            TableMergedCell mergedCell = new TableMergedCell( offset, 0, offset, tsd.NumberOfColumns-1);
+            TableMergedCell mergedCell = new TableMergedCell( offset+a, tsd.FirstColumnNumber, offset+a, tsd.NumberOfColumns-1);
             tsd.MergeCells(mergedCell);
 
         }

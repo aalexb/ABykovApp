@@ -13,6 +13,7 @@ namespace WorkApp
         public static List<List<RoomFinishing>> FloorTable = new List<List<RoomFinishing>>();
         public static IEnumerable<IGrouping<ElementId, RoomFinishing>> FloorTableGroup = null;
 
+
         public Element refElement { get; }
         public ElementId Id { get; }
         public string Name { get; }
@@ -20,6 +21,7 @@ namespace WorkApp
         public ElementId Level { get; set; }
         public string FinishGroup = "";
         public string FloorGroup = "";
+        string FloorTypeNumber { get; set; }
         //=============
         public FinishStructuralElement MainWall { get; set; }= new FinishStructuralElement();
         public List<FinishStructuralElement> LocalWallList { get; set; } = new List<FinishStructuralElement>();
@@ -44,8 +46,8 @@ namespace WorkApp
             Ceil.setType( e.LookupParameter("ОТД_Потолок").AsValueString(),e);
             MainWall.Type = e.LookupParameter("ОТД_Стены").AsValueString();
             Floor.Type = e.LookupParameter("ОТД_Пол").AsValueString();
-            FinishGroup= e.LookupParameter("ADSK_Группирование").AsValueString();
-            FloorGroup = e.LookupParameter("AG_Групп_Пол").AsValueString();
+            FinishGroup= e.LookupParameter("ADSK_Группирование").AsString();
+            FloorGroup = e.LookupParameter("AG_Групп_Пол").AsString();
 
             try
             {
@@ -111,6 +113,7 @@ namespace WorkApp
         {
 
             var grfn = Rooms.GroupBy(key => (
+            form.groupCheck? key.FinishGroup : null,
             form.splitLevel?key.Level:null,
             form.ColFromMat?key.Kolon.Text:key.Kolon.Type,
             key.Ceil.Type,
@@ -157,6 +160,7 @@ namespace WorkApp
         {
             var grfl = Rooms.GroupBy(
                 key =>(
+                form.groupFloorCheck?key.FloorGroup:null,
                 form.splitLevel? key.Level:null, 
                 key.Floor.Type, 
                 true?null:key.Plintus.Type));
@@ -180,9 +184,6 @@ namespace WorkApp
                 }
             }
         }
-
-        
-
         public static void FinishTableCommit(Document doc, FinishForm form) 
         {
             int i = 1;
@@ -337,9 +338,162 @@ namespace WorkApp
             }
         }
 
+
+        public static void FinishSheduleCommit(FinishForm form, ViewSchedule vs)
+        {
+            var shed = new NovaShedule(vs, 3);
+            var data = new List<List<SheduleCell>>();
+            List<int[]> groups = new List<int[]>();
+            var groupedRooms = Rooms
+                .GroupBy(p => p.FinishGroup)
+                .OrderBy(p => p.Key)
+                .Select(g => new
+                {
+                    Name = g.Key,
+                    Rooms = g
+                    .GroupBy(key => (
+                form.splitLevel ? key.Level : null,
+                form.ColFromMat ? key.Kolon.Text : key.Kolon.Type,
+                key.Ceil.Type,
+                key.MainWall.Type))
+                    .Select(key => new
+                    {
+                        Name = key.Key,
+                        r = key.Select(p => p)
+                    })
+                });
+            List<int> mergedCol = new List<int>();
+            int colCounter = 0;
+            foreach (var group in groupedRooms)
+            {
+                data.Add(SheduleCell.Subtitle(group.Name));
+                mergedCol.Add(colCounter);
+                colCounter++;
+                foreach (var item in group.Rooms)
+                {
+                    string fillText = Meta.shortLists(item.r.Select(y => y.Num).ToList()) + "\n";
+                    colCounter++;
+                    data.Add(SheduleCell.FinishRow(
+                            fillText,
+                            item.r.ElementAt(0).Ceil.Text,
+                            item.r.ElementAt(0).Ceil.Value,
+                            item.r.ElementAt(0).MainWall.Text,
+                            item.r.ElementAt(0).MainWall.Value,
+
+                            floorNum.ToString(),
+                            item.r.ElementAt(0).Floor.Text,
+                            item.r.ElementAt(0).Floor.Value));
+                    floorNum++;
+
+                }
+
+            }
+
+
+
+
+            shed.CreateRow(data);
+            foreach (var item in mergedCol)
+            {
+                shed.mergeCol(item);
+            }
+            shed.mergeRow(groups, 0);
+
+            shed.setHeight();
+
+            //shed.mergeRow(groups, 0);
+            //shed.mergeCol();
+            shed.setHeight();
+        }
+        public static void FloorSheduleCommit(FinishForm form, ViewSchedule vs)
+        {
+            var shed = new NovaShedule(vs, 2);
+            var data = new List<List<SheduleCell>>();
+            List<int[]> groups = new List<int[]>();
+            /*
+             Группируем помещения по группам отделки
+            Затем группируем по типам отделки
+             */
+            var groupedRooms = Rooms
+                .GroupBy(p => p.FloorGroup)
+                .OrderBy(p=>p.Key)
+                .Select(g => new
+                {
+                    Name = g.Key,
+                    Rooms = g
+                    .GroupBy(key => (
+                form.groupFloorCheck ? key.FloorGroup : null,
+                form.splitLevel ? key.Level : null,
+                key.Floor.Type,
+                true ? null : key.Plintus.Type))
+                    .Select(key => new
+                    {
+                        Name = key.Key,
+                        r = key.Select(p => p)
+                    })
+                });
+            int floorNum = 1;
+            List<int> mergedCol=new List<int>();
+            int colCounter = 0;
+            foreach (var group in groupedRooms)
+            {
+                data.Add(SheduleCell.Subtitle(group.Name));
+                mergedCol.Add(colCounter);
+                colCounter++;
+                foreach (var item in group.Rooms)
+                {
+                    string fillText= Meta.shortLists(item.r.Select(y => y.Num).ToList()) + "\n";
+                    if (item.r.ElementAt(0).FloorList.Count > 0)
+                    {
+                        
+                        groups.Add(new int[] { data.Count, data.Count + item.r.ElementAt(0).FloorList.Count - 1 });
+                        int suffix = 1;
+                        foreach (var fl in item.r.ElementAt(0).FloorList)
+                        {
+                            colCounter++;
+                            data.Add(SheduleCell.FloorRow(
+                                fillText,
+                                floorNum.ToString() + "." + suffix.ToString(),
+                                fl.Text,
+                                fl.Value));
+                            suffix++;
+                        }
+                    }
+                    else
+                    {
+                        colCounter++;
+                        data.Add(SheduleCell.FloorRow(
+                                fillText,
+                                floorNum.ToString(),
+                                item.r.ElementAt(0).Floor.Text,
+                                item.r.ElementAt(0).Floor.Value));
+                    }
+                    floorNum++;
+                    
+                }
+                
+            }
+
+
+
+
+            shed.CreateRow(data);
+            foreach (var item in mergedCol)
+            {
+                shed.mergeCol(item);
+            }
+            shed.mergeRow(groups, 0);
+            
+            shed.setHeight();
+
+            //shed.mergeRow(groups, 0);
+            //shed.mergeCol();
+            shed.setHeight();
+        }
+
         public static void FloorTableCommit(int MoreThenOneLevel, int withNames, Document doc, FinishForm form, ViewSchedule vs)
         {
-            var shed = new Addons.NovaShedule(vs, 2);
+            var shed = new NovaShedule(vs, 2);
             List<int[]> groups=new List<int[]>();
             //int[][] groups = null;
             List<List<SheduleCell>> data = new List<List<SheduleCell>>();
@@ -378,6 +532,7 @@ namespace WorkApp
                 {
                     fillText += Meta.shortLists(item.Select(y => y.Num).ToList()) + "\n";
                 }
+
                 if (item[0].FloorList.Count > 0)
                 {
                     groups.Add(new int[] { data.Count, data.Count + item[0].FloorList.Count-1 });
@@ -446,7 +601,7 @@ namespace WorkApp
             shed.CreateRow(data);
             
             shed.mergeRow(groups, 0);
-            shed.mergeCol();
+            //shed.mergeCol();
             shed.setHeight();
             
             

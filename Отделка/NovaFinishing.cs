@@ -9,6 +9,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
+using WorkApp.Addons;
 
 namespace WorkApp
 {
@@ -91,14 +92,15 @@ namespace WorkApp
                 msger.Show();
                 return Result.Failed;
             }
-            if (MainForm.groupCheck)
-            {
-                rooms = rooms.Where(x => x.LookupParameter("ADSK_Группирование").AsString() == MainForm.groupField).ToList();
-            }
-            if (MainForm.groupFloorCheck)
-            {
-                rooms = rooms.Where(x => x.LookupParameter("AG_Групп_Пол").AsString() == MainForm.groupFloorField).ToList();
-            }
+            
+            //if (MainForm.groupCheck)
+            //{
+            //    rooms = rooms.Where(x => x.LookupParameter("ADSK_Группирование").AsString() == MainForm.groupField).ToList();
+            //}
+            //if (MainForm.groupFloorCheck)
+            //{
+            //    rooms = rooms.Where(x => x.LookupParameter("AG_Групп_Пол").AsString() == MainForm.groupFloorField).ToList();
+            //}
 
             //Фильтр: Стены созданные на последней стадии
             var provider = new ParameterValueProvider(new ElementId((int)BuiltInParameter.PHASE_CREATED));
@@ -131,7 +133,6 @@ namespace WorkApp
             
             RoomFinishing.Rooms = RoomFinishing.Rooms.OrderBy(x => x.Num).ToList();
 
-            
             var cWalls = new List<GhostWall>();
             foreach (Element wall in allWalls)
             {
@@ -174,18 +175,21 @@ namespace WorkApp
             }
             
             RoomFinishing.makeFloor(MainForm);
-            RoomFinishing.makeFinish(MainForm);
+            //RoomFinishing.makeFinish(MainForm);
 
             using (Transaction tr = new Transaction(doc, "otdelka"))
             {
+                
                 tr.Start();
                 if (!MainForm.groupFloorCheck)
                 {
-                    RoomFinishing.FinishTableCommit(doc, MainForm);
+                    //RoomFinishing.FinishTableCommit(doc, MainForm);
+                    //RoomFinishing.FloorSheduleCommit();
                 }
                 if (!MainForm.groupCheck)
                 {
-                    RoomFinishing.FloorTableCommit(MainForm.levels, MainForm.withnames, doc, MainForm,vs);
+                    //RoomFinishing.FloorTableCommit(MainForm.levels, MainForm.withnames, doc, MainForm,vs);
+                    RoomFinishing.FloorSheduleCommit(MainForm,vs);
                 }
                 tr.Commit();
             }
