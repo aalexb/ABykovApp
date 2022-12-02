@@ -67,16 +67,22 @@ namespace WorkApp.Addons
     {
         public string Type { get; }
         public string Data { get; }
-         public SheduleCell(string Data,string Type = "Text")
+        public int minHeight { get; set; }
+        public static SheduleCell Empty()
+        {
+            return new SheduleCell("");
+        }
+         public SheduleCell(string Data,string Type = "Text",int minHeight=0)
         {
             this.Data = Data;
             this.Type = Type;
+            this.minHeight = minHeight;
         }
         static public List<SheduleCell> Subtitle(string header)
         {
             return new List<SheduleCell>
             {
-                new SheduleCell(header)
+                new SheduleCell(header,"Header")
             };
         }
         static public List<SheduleCell> FloorRow(string listRoom, string typeNum, string text, double value, ElementId img = null)
@@ -84,29 +90,29 @@ namespace WorkApp.Addons
             //List<SheduleCell> operate = new List<SheduleCell>();
             return new SheduleCell[]
             {
-                new SheduleCell(listRoom),
-                new SheduleCell(typeNum),
-                null,
+                new SheduleCell(listRoom,""),
+                new SheduleCell(typeNum,""),
+                new SheduleCell("","",27),
                 new SheduleCell(text),
-                new SheduleCell((value*Meta.FT*Meta.FT).ToString("F1"))
+                new SheduleCell((value*Meta.FT*Meta.FT).ToString("F1"),"")
             }.ToList();
         }
-        static public SheduleCell[] FinishRow(string listRoom, string CeilText, double CeilValue, string TopWallText, double TopWallValue, double TopWallHeight = 0, string BotWallText="", double BotWallValue=0, double BotWallHeight=0, string Note="")
+        static public List<SheduleCell> FinishRow(string listRoom, string CeilText, double CeilValue, string TopWallText, double TopWallValue, double TopWallHeight = 0, string BotWallText="", double BotWallValue=0, double BotWallHeight=0, string Note="")
         {
 
-            return new SheduleCell []
+            return new SheduleCell[]
             {
-                new SheduleCell (listRoom),
+                new SheduleCell (listRoom,""),
                 new SheduleCell(CeilText),
-                new SheduleCell ((CeilValue*Meta.FT*Meta.FT).ToString ("F1")),
+                CeilValue==0?Empty(): new SheduleCell ((CeilValue*Meta.FT*Meta.FT).ToString ("F1"),""),
                 new SheduleCell (TopWallText),
-                TopWallValue==0?null:new SheduleCell((TopWallValue*Meta.FT*Meta.FT).ToString ("F1")),
-                TopWallHeight==0?null:new SheduleCell((TopWallHeight*Meta.FT).ToString ("F1")),
-                new SheduleCell (BotWallText),
-                BotWallValue==0?null:new SheduleCell((BotWallValue*Meta.FT*Meta.FT).ToString ("F1")),
-                BotWallHeight==0?null: new SheduleCell((BotWallHeight*Meta.FT).ToString ("F1")),
-                new SheduleCell(Note)
-            };
+                TopWallValue==0?Empty():new SheduleCell((TopWallValue*Meta.FT*Meta.FT).ToString ("F1"),""),
+                TopWallHeight==0?Empty():new SheduleCell((TopWallHeight*Meta.FT).ToString ("F1"),""),
+                BotWallText==null?Empty(): new SheduleCell (BotWallText),
+                BotWallValue==0?Empty():new SheduleCell((BotWallValue*Meta.FT*Meta.FT).ToString ("F1"),""),
+                BotWallHeight==0?Empty(): new SheduleCell((BotWallHeight*Meta.FT).ToString ("F1"),""),
+                Note==null?Empty():new SheduleCell(Note)
+            }.ToList();
         }
         
     }
@@ -155,6 +161,7 @@ namespace WorkApp.Addons
             {
                 for (int k = 0; k < tsd.LastColumnNumber+1; k++)
                 {
+                    var b= tsd.GetColumnWidthInPixels(k)*304.8;
                     var h = tsd.GetRowHeight(i);
                     var t = tsd.GetCellText(i,k);
                     var m =tsd.GetMergedCell(i,k);
@@ -162,15 +169,10 @@ namespace WorkApp.Addons
                     foreach (var item in t.Split('\r'))
                     {
                         n++;
-                        if (item.Length>50)
-                        {
-                            n++;
-                        }
-                        
-                        
+                        n += Convert.ToInt32(Math.Floor(1940*item.Length / b));  
                     }
                     //var n=t.Split('-').Count();
-                    var nh = (n * 5 + 3) / 304.8;
+                    var nh = (n * 5 + 0) / 304.8;
                     if (nh>h&m.Bottom==m.Top)
                     {
                         tsd.SetRowHeight(i, nh);
@@ -181,7 +183,10 @@ namespace WorkApp.Addons
 
         public void CreateRow(List<List<SheduleCell>> data)
         {
-            var style=new TableCellStyle() { FontHorizontalAlignment=HorizontalAlignmentStyle.Left};
+            var style=new TableCellStyle() { FontHorizontalAlignment=HorizontalAlignmentStyle.Left, 
+                FontVerticalAlignment=VerticalAlignmentStyle.Top,};
+            var overstyle=new TableCellStyleOverrideOptions() { HorizontalAlignment=true };
+            style.SetCellStyleOverrideOptions(overstyle);
             clearTable();
             data.Reverse();
             foreach (var row in data)
@@ -196,8 +201,16 @@ namespace WorkApp.Addons
                         if (cell != null)
                         {
                             tsd.SetCellText(offset, k, cell.Data);
-                            tsd.ResetCellOverride(offset, k);
-                            tsd.SetCellStyle(offset, k, style);
+                            //tsd.ResetCellOverride(offset, k);
+                            if (cell.Type=="Text")
+                            {
+                                tsd.SetCellStyle(offset, k, style);
+                            }
+                            if ((cell.minHeight*304.8d)>tsd.GetRowHeight(offset))
+                            {
+                                tsd.SetRowHeight(offset, cell.minHeight / 304.8);
+                            }
+
                         }
                     }
                     k++;

@@ -128,9 +128,7 @@ namespace WorkApp
             {
                 new RoomFinishing(item);
             }
-            //var _=rooms.Select(x => new RoomFinishing(x));
 
-            
             RoomFinishing.Rooms = RoomFinishing.Rooms.OrderBy(x => x.Num).ToList();
 
             var cWalls = new List<GhostWall>();
@@ -154,6 +152,7 @@ namespace WorkApp
             //Соотнести элементы отделки с помещениями
             RoomFinishing.SetFloorToRoom(cFloors, MainForm);
             RoomFinishing.SetWallToRoom(cWalls, MainForm);
+            
 
             //Плинтус
             foreach (var d in doors)
@@ -166,16 +165,27 @@ namespace WorkApp
             {
                 foreach (var r in RoomFinishing.Rooms)
                 {
-                    if (item.fromRoom == r.Id | item.toRoom == r.Id)
+                    var doorInRoom = item.fromRoom == r.Id | item.toRoom == r.Id;
+
+                    if (doorInRoom)
                     {
                         r.Plintus.unitValue -= item.width;
                     }
                     
                 }
             }
-            
-            RoomFinishing.makeFloor(MainForm);
-            //RoomFinishing.makeFinish(MainForm);
+
+            RoomFinishing.fakeRoomForLocalWall();
+            if (MainForm.groupCheck)
+            {
+                RoomFinishing.makeFinish(MainForm);
+            }
+            if (MainForm.groupFloorCheck)
+            {
+                RoomFinishing.makeFloor(MainForm);
+            }
+                
+
 
             using (Transaction tr = new Transaction(doc, "otdelka"))
             {
@@ -183,6 +193,7 @@ namespace WorkApp
                 tr.Start();
                 if (!MainForm.groupFloorCheck)
                 {
+                    RoomFinishing.FinishSheduleCommit(MainForm, vs);
                     //RoomFinishing.FinishTableCommit(doc, MainForm);
                     //RoomFinishing.FloorSheduleCommit();
                 }

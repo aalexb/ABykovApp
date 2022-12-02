@@ -18,14 +18,17 @@ namespace WorkApp
         public ElementId Id { get; }
         public string Name { get; }
         public string Num { get; set; }
+        public string FinishNote = "";
+        public string FloorNote = "";
+        public string FinishEndNote = "";
         public ElementId Level { get; set; }
         public string FinishGroup = "";
         public string FloorGroup = "";
-        string FloorTypeNumber { get; set; }
+
         //=============
         public FinishStructuralElement MainWall { get; set; }= new FinishStructuralElement();
         public List<FinishStructuralElement> LocalWallList { get; set; } = new List<FinishStructuralElement>();
-        //public FinishStructuralElement LocalWall { get; set; } = new FinishStructuralElement();
+        public FinishStructuralElement LocalWall { get; set; } = new FinishStructuralElement();
         public FinishStructuralElement NewWall { get; set; } = new FinishStructuralElement();
         public FinishStructuralElement Kolon { get; set; } = new FinishStructuralElement();
         public FinishStructuralElement Floor { get; set; } = new FinishStructuralElement();
@@ -33,18 +36,58 @@ namespace WorkApp
         public FinishStructuralElement Ceil{ get; set; } = new FinishStructuralElement();
         public FinishStructuralElement Plintus { get; set; } = new FinishStructuralElement();
 
+        public RoomFinishing(RoomFinishing father)
+        {
+            Name = father.Name;
+            Num= father.Num;
+            FinishNote= father.FinishNote;
+            FloorNote=father.FloorNote;
+            FinishEndNote = father.FinishEndNote;
+            Level = father.Level;
+            Ceil.Type = father.Ceil.Type;
+            Ceil.unitValue = 0;
+
+            MainWall.Type = father.MainWall.Type;
+            MainWall.Text = father.MainWall.Text;
+            MainWall.unitValue = 0;
+
+            Kolon.Type = father.Kolon.Type;
+            Plintus.Type = father.Plintus.Type;
+            Plintus.unitValue = 0;
+
+            Floor.Type = father.Floor.Type;
+            Floor.Text=father.Floor.Text;
+            Floor.unitValue = 0;
+
+            FinishGroup=father.FinishGroup;
+            FloorGroup=father.FloorGroup;
+
+
+        }
         public RoomFinishing(Element e)
         {
             refElement = e;
             Id = e.Id;
             Name=e.get_Parameter(BuiltInParameter.ROOM_NAME).AsString();
             Num = e.get_Parameter(BuiltInParameter.ROOM_NUMBER).AsString();
+            FinishNote = e.LookupParameter("ПримечаниеТамбуры").AsString();
+            FloorNote = e.LookupParameter(":Примечание").AsString();
+
+            FinishEndNote = e.LookupParameter("ADSK_Примечание").AsString();
 
             Level = e.LevelId;
 
 
             Ceil.setType( e.LookupParameter("ОТД_Потолок").AsValueString(),e);
+            Ceil.unitValue = e.get_Parameter(BuiltInParameter.ROOM_AREA).AsDouble();
             MainWall.Type = e.LookupParameter("ОТД_Стены").AsValueString();
+            try
+            {
+                MainWall.Text = e.Document.GetElement(e.LookupParameter("ОТД_Стены").AsElementId()).LookupParameter("АР_Состав отделки").AsString();
+            }
+            catch (Exception)
+            {
+            }
             Floor.Type = e.LookupParameter("ОТД_Пол").AsValueString();
             FinishGroup= e.LookupParameter("ADSK_Группирование").AsString();
             FloorGroup = e.LookupParameter("AG_Групп_Пол").AsString();
@@ -73,9 +116,9 @@ namespace WorkApp
 
                     if (r.Id.IntegerValue == w.RoomID)
                     {
-                        if (w.typeName != form.WallType.Name& w.typeName != form.ColType.Name)
+                        if (w.typeName != form.WallType.Name& w.typeName != form.ColType.Name&w.sostav!=null)
                         {
-                            r.LocalWallList.Add(new FinishStructuralElement() { Text = w.sostav, unitValue = w.Area });
+                            r.LocalWallList.Add(new FinishStructuralElement() {Type=w.sostav, Text = w.sostav, unitValue = w.Area });
                         }
                         else if (w.typeName == form.ColType.Name)
                         {
@@ -102,46 +145,79 @@ namespace WorkApp
                 {
                     if (r.Id.IntegerValue == w.RoomID)
                     {
-                        r.FloorList.Add(new FinishStructuralElement() { Text = w.sostav, unitValue = w.Area });
+                        r.FloorList.Add(new FinishStructuralElement() {refEl=w.refEl, Text = w.sostav, unitValue = w.Area });
                     }
                 }
             }
         }
 
-
-        public static void makeFinish(FinishForm form)
+        public static void fakeRoomForLocalWall()
         {
-
-            var grfn = Rooms.GroupBy(key => (
-            form.groupCheck? key.FinishGroup : null,
-            form.splitLevel?key.Level:null,
-            form.ColFromMat?key.Kolon.Text:key.Kolon.Type,
-            key.Ceil.Type,
-            key.MainWall.Type
-            ));
-
-            foreach (var f in grfn)
+            List<RoomFinishing> fakerooms = new List<RoomFinishing>();
+            foreach (var r in Rooms)
             {
-                FinishTable.Add(f.Select(x => x).ToList());
-                List<FinishStructuralElement> fseLocal = new List<FinishStructuralElement>();
-                foreach (var r in f)
+                if (r.LocalWallList==null)
+                {
+                    continue;
+                }
+                if (r.LocalWallList.Count==0)
+                {
+                    continue;
+                }
+                if (r.LocalWallList.Select(x=>x.Text).Distinct().Count()==1)
+                {
+                    r.LocalWall=r.LocalWallList.First();
+                    r.LocalWall.unitValue=r.LocalWallList.Sum(x=>x.unitValue);
+                }
+                else
                 {
                     foreach (var item in r.LocalWallList)
                     {
-                        fseLocal.Add(item);
+                        var fakeroom = new RoomFinishing(r);
+                        fakeroom.LocalWall = item;
+                        fakerooms.Add(fakeroom);
                     }
                 }
-                var SimilarElementList = GroupModelledTypes(fseLocal);
-                foreach (RoomFinishing r in f)
+            }
+            foreach (var f in fakerooms)
+            {
+                Rooms.Add(f);
+            }
+        }
+        public static void makeFinish(FinishForm form)
+        {
+            var newgro = Rooms
+                .GroupBy(key => (
+                form.groupCheck ? key.FinishGroup : null,
+                key.FinishNote,
+                key.LocalWall.Type,
+                form.splitLevel ? key.Level : null,
+                form.ColFromMat ? key.Kolon.Text : key.Kolon.Type,
+                key.Ceil.Type,
+                key.MainWall.Type
+                ))
+                .Select(key => new
                 {
-                    r.MainWall.Value = f.Sum(x => x.MainWall.unitValue);
-                    r.LocalWallList = SimilarElementList;
-                    //r.LocalWall.Value = f.Sum(x => x.LocalWall.unitValue);
-                    r.Kolon.Value = f.Sum(x => x.Kolon.unitValue);
-                    if (form.countNewW)
-                    {
-                        r.NewWall.Value = f.Sum(x => x.NewWall.unitValue);
-                    }
+                    room = key.Select(p => p),
+                    sum=key.Sum(p=>p.MainWall.unitValue),
+                    ceilSum=key.Sum(p=>p.Ceil.unitValue),
+                    SEL=key.Select(p => p.LocalWallList),
+                    kolonSum=key.Sum(p=>p.Kolon.unitValue),
+                    newwallSum=key.Sum(p=>p.NewWall.unitValue),
+                    locSum=key.Sum(p=>p.LocalWall.unitValue)
+                }
+                    );
+
+            foreach (var group in newgro)
+            {
+                foreach (var r in group.room)
+                {
+                    r.MainWall.Value = group.sum;
+                    r.Ceil.Value = group.ceilSum;
+                    //r.LocalWallList= group.SEL;
+                    r.Kolon.Value=group.kolonSum;
+                    r.NewWall.Value = form.countNewW ? group.newwallSum : 0;
+                    r.LocalWall.Value = group.locSum;
                 }
             }
         }
@@ -347,19 +423,32 @@ namespace WorkApp
             var groupedRooms = Rooms
                 .GroupBy(p => p.FinishGroup)
                 .OrderBy(p => p.Key)
-                .Select(g => new
+                .Select(groupedRoomslambda => new
                 {
-                    Name = g.Key,
-                    Rooms = g
-                    .GroupBy(key => (
-                form.splitLevel ? key.Level : null,
-                form.ColFromMat ? key.Kolon.Text : key.Kolon.Type,
-                key.Ceil.Type,
-                key.MainWall.Type))
-                    .Select(key => new
+                    Name = groupedRoomslambda.Key,
+                    Rooms = groupedRoomslambda
+                    .GroupBy(finishLambda => (
+                        form.splitLevel ? finishLambda.Level : null,
+                        form.ColFromMat ? finishLambda.Kolon.Text : finishLambda.Kolon.Type,
+                        finishLambda.Ceil.Type,
+                        finishLambda.FinishNote,
+                        finishLambda.MainWall.Type,
+                        finishLambda.FinishEndNote))
+                    .Select(xxx => new
                     {
-                        Name = key.Key,
-                        r = key.Select(p => p)
+                        Name = xxx.Key,
+                        EndNote=xxx.Key.FinishEndNote,
+                        Note=xxx.Key.FinishNote,
+                        r = xxx.Select(p => p),
+                        SEL=xxx.Select(p=>p.LocalWallList),
+                        lvt=xxx
+                        .GroupBy(localLambda => (
+                            localLambda.LocalWall.Type))
+                        .Select(x => new
+                        {
+                            Name=x.Key,
+                            lvte=x.Select(p=>p.LocalWall)
+                        })
                     })
                 });
             List<int> mergedCol = new List<int>();
@@ -369,24 +458,45 @@ namespace WorkApp
                 data.Add(SheduleCell.Subtitle(group.Name));
                 mergedCol.Add(colCounter);
                 colCounter++;
+                
                 foreach (var item in group.Rooms)
                 {
+
                     string fillText = Meta.shortLists(item.r.Select(y => y.Num).ToList()) + "\n";
-                    colCounter++;
-                    data.Add(SheduleCell.FinishRow(
-                            fillText,
+                    
+                    if (item.lvt.Count()>1)
+                    {
+                        foreach (var lvtex in item.lvt)
+                        {
+                            colCounter++;
+                            data.Add(SheduleCell.FinishRow(
+                            String.Concat(fillText, " ", item.Note),
                             item.r.ElementAt(0).Ceil.Text,
                             item.r.ElementAt(0).Ceil.Value,
                             item.r.ElementAt(0).MainWall.Text,
                             item.r.ElementAt(0).MainWall.Value,
+                            BotWallText: lvtex.lvte.First().Text,
+                            BotWallValue: lvtex.lvte.First().Value,
+                            Note:item.EndNote
 
-                            floorNum.ToString(),
-                            item.r.ElementAt(0).Floor.Text,
-                            item.r.ElementAt(0).Floor.Value));
-                    floorNum++;
-
+                            ));
+                        }
+                    }
+                    else
+                    {
+                        colCounter++;
+                        data.Add(SheduleCell.FinishRow(
+                            String.Concat(fillText, " ", item.Note),
+                            item.r.ElementAt(0).Ceil.Text,
+                            item.r.ElementAt(0).Ceil.Value,
+                            item.r.ElementAt(0).MainWall.Text,
+                            item.r.ElementAt(0).MainWall.Value,
+                            BotWallText: item.r.ElementAt(0).LocalWall.Text,
+                            BotWallValue: item.r.ElementAt(0).LocalWall.Value,
+                            Note: item.EndNote
+                            ));
+                    }
                 }
-
             }
 
 
@@ -417,18 +527,20 @@ namespace WorkApp
             var groupedRooms = Rooms
                 .GroupBy(p => p.FloorGroup)
                 .OrderBy(p=>p.Key)
-                .Select(g => new
+                .Select(groupLambda => new
                 {
-                    Name = g.Key,
-                    Rooms = g
-                    .GroupBy(key => (
-                form.groupFloorCheck ? key.FloorGroup : null,
-                form.splitLevel ? key.Level : null,
-                key.Floor.Type,
-                true ? null : key.Plintus.Type))
+                    Name = groupLambda.Key,
+                    Rooms = groupLambda
+                    .GroupBy(floorLambda => (
+                        form.groupFloorCheck ? floorLambda.FloorGroup : null,
+                        form.splitLevel ? floorLambda.Level : null,
+                        floorLambda.Floor.Type,
+                        floorLambda.FloorNote,
+                        true ? null : floorLambda.Plintus.Type))
                     .Select(key => new
                     {
                         Name = key.Key,
+                        Note=key.Key.FloorNote,
                         r = key.Select(p => p)
                     })
                 });
@@ -443,16 +555,27 @@ namespace WorkApp
                 foreach (var item in group.Rooms)
                 {
                     string fillText= Meta.shortLists(item.r.Select(y => y.Num).ToList()) + "\n";
-                    if (item.r.ElementAt(0).FloorList.Count > 0)
+                    if (item.r.ElementAt(0).FloorList.Select(x=>x.Text).Distinct().Count() > 1)
                     {
                         
                         groups.Add(new int[] { data.Count, data.Count + item.r.ElementAt(0).FloorList.Count - 1 });
                         int suffix = 1;
+                        foreach (var r in item.r)
+                        {
+                            r.refElement.setP("Тип пола", "");
+                        }
                         foreach (var fl in item.r.ElementAt(0).FloorList)
                         {
                             colCounter++;
+                            try
+                            {
+                                fl.refEl.Document.GetElement(fl.refEl.GetTypeId()).setP("Маркировка типоразмера",String.Concat(floorNum.ToString() + "." + suffix.ToString()));
+                            }
+                            catch (Exception)
+                            {
+                            }
                             data.Add(SheduleCell.FloorRow(
-                                fillText,
+                                String.Concat(fillText, " ", item.Note),
                                 floorNum.ToString() + "." + suffix.ToString(),
                                 fl.Text,
                                 fl.Value));
@@ -462,8 +585,12 @@ namespace WorkApp
                     else
                     {
                         colCounter++;
+                        foreach (var r in item.r)
+                        {
+                            r.refElement.setP("Тип пола", floorNum.ToString());
+                        }
                         data.Add(SheduleCell.FloorRow(
-                                fillText,
+                                String.Concat(fillText," ",item.Note),
                                 floorNum.ToString(),
                                 item.r.ElementAt(0).Floor.Text,
                                 item.r.ElementAt(0).Floor.Value));
@@ -488,7 +615,7 @@ namespace WorkApp
 
             //shed.mergeRow(groups, 0);
             //shed.mergeCol();
-            shed.setHeight();
+            //shed.setHeight();
         }
 
         public static void FloorTableCommit(int MoreThenOneLevel, int withNames, Document doc, FinishForm form, ViewSchedule vs)

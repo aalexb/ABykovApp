@@ -7,6 +7,7 @@ namespace WorkApp
     public class FinishStructuralElement
     {
         public string Type { get; set; }
+        public Element refEl{get;set;}
         public string Text { get; set; }
         public double unitValue { get; set; }
         public double Value { get; set; }
