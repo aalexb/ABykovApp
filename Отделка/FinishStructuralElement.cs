@@ -12,12 +12,14 @@ namespace WorkApp
         public double unitValue { get; set; }
         public double Value { get; set; }
         public double Height { get; set; }
+        public string WallFunc { get; set; }
         public FinishStructuralElement()
         {
             unitValue = 0;
             Value = 0;
             Type = "";
             Text = "";
+            WallFunc = "";
         }
         public  void setType(string type, Element room)
         {

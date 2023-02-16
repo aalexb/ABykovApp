@@ -106,15 +106,23 @@
       <DependentUpon>addParamForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Class1.cs" />
+    <Compile Include="Deco\Decore.cs" />
     <Compile Include="doorObj.cs" />
+    <Compile Include="Renamer.cs" />
+    <Compile Include="Deco\DecoreClient.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Deco\DecoreClient.Designer.cs">
+      <DependentUpon>DecoreClient.cs</DependentUpon>
+    </Compile>
     <Compile Include="Отделка\FinishStructuralElement.cs" />
     <Compile Include="Отделка\NovaShedule.cs" />
     <Compile Include="PageNumerator.cs" />
-    <Compile Include="FinishEnterprise.cs">
+    <Compile Include="Отделка\StyleProt.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="FinishEnterprise.Designer.cs">
-      <DependentUpon>FinishEnterprise.cs</DependentUpon>
+    <Compile Include="Отделка\StyleProt.Designer.cs">
+      <DependentUpon>StyleProt.cs</DependentUpon>
     </Compile>
     <Compile Include="Log.cs" />
     <Compile Include="RemoveAfterGP2.cs" />
@@ -211,8 +219,11 @@
     <EmbeddedResource Include="DemEl.resx">
       <DependentUpon>DemEl.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="FinishEnterprise.resx">
-      <DependentUpon>FinishEnterprise.cs</DependentUpon>
+    <EmbeddedResource Include="Отделка\StyleProt.resx">
+      <DependentUpon>StyleProt.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Deco\DecoreClient.resx">
+      <DependentUpon>DecoreClient.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Отделка\FinishForm.resx">
       <DependentUpon>FinishForm.cs</DependentUpon>

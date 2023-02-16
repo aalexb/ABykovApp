@@ -19,19 +19,18 @@ namespace WorkApp
         
         Result IExternalCommand.Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
-            
-        
-
-
+            UIDocument uidoc;
+            Document doc;
+            IEnumerable<Element> ix;
             RoomFinishing.Rooms = new List<RoomFinishing>();
             RoomFinishing.FinishTable = new List<List<RoomFinishing>>();
             RoomFinishing.FloorTable = new List<List<RoomFinishing>>();
             UIApplication uiapp = commandData.Application;
-            UIDocument uidoc = uiapp.ActiveUIDocument;
+            uidoc = uiapp.ActiveUIDocument;
             Application app = uiapp.Application;
-            Document doc = uidoc.Document;
+            doc = uidoc.Document;
             var selx = uidoc.Selection.GetElementIds();
-            var ix = selx.Select(x => doc.GetElement(x));
+            ix = selx.Select(x => doc.GetElement(x));
 
             ViewSchedule vs = doc.GetElement((ix.ElementAt(0) as ScheduleSheetInstance).ScheduleId) as ViewSchedule;
 
@@ -42,10 +41,10 @@ namespace WorkApp
             var presel = false;
 
             GlobalParameter GlobePar2 = GlobalParametersManager.FindByName(doc, "FinData") != ElementId.InvalidElementId ?
-                doc.GetElement(GlobalParametersManager.FindByName(doc, "FinData")) as GlobalParameter :null;
+                doc.GetElement(GlobalParametersManager.FindByName(doc, "FinData")) as GlobalParameter : null;
             FinishForm MainForm = new FinishForm(doc);
-            List<Element> selEl=new List<Element>();
-            if (uidoc.Selection!=null& uidoc.Selection.GetElementIds().Count!=0)
+            List<Element> selEl = new List<Element>();
+            if (uidoc.Selection != null & uidoc.Selection.GetElementIds().Count != 0)
             {
                 presel = true;
                 foreach (var item in uidoc.Selection.GetElementIds())
@@ -54,9 +53,9 @@ namespace WorkApp
                 }
                 MainForm.selElem(selEl.Count.ToString());
             }
-            
+
             MainForm.ShowDialog();
-            using (Transaction tr=new Transaction(doc,"setGP"))
+            using (Transaction tr = new Transaction(doc, "setGP"))
             {
                 tr.Start();
                 GlobalParameter GlobePar = GlobalParametersManager.FindByName(doc, "FinData") != ElementId.InvalidElementId ?
@@ -65,6 +64,7 @@ namespace WorkApp
                 GlobePar.SetValue(new StringParameterValue(string.Join("|", MainForm.wTypeBoxes)));
                 //int MoreThenOneLevel = ((IntegerParameterValue)GlobePar.GetValue()).Value;
                 tr.Commit();
+
             }
 
             lastPhase = MainForm.retPhase;
@@ -85,14 +85,14 @@ namespace WorkApp
                 .WherePasses(room_filter)
                 //.WherePasses(roomSc_filter)
                 .ToElements();
-            if (MainForm.groupCheck&MainForm.groupFloorCheck)
+            if (MainForm.groupCheck & MainForm.groupFloorCheck)
             {
                 TaskDialog msger = new TaskDialog("Info");
                 msger.MainInstruction = "Не надо так делать";
                 msger.Show();
                 return Result.Failed;
             }
-            
+
             //if (MainForm.groupCheck)
             //{
             //    rooms = rooms.Where(x => x.LookupParameter("ADSK_Группирование").AsString() == MainForm.groupField).ToList();
@@ -136,10 +136,10 @@ namespace WorkApp
             {
                 if (wall.LookupParameter("Помещение_Имя").AsString() != null & wall.LookupParameter("Помещение_Имя").AsString() != "")
                 {
-                    cWalls.Add(new GhostWall(wall,MainForm.LocType));
+                    cWalls.Add(new GhostWall(wall, MainForm.LocType));
                 }
             }
-            var cFloors= new List<GhostFloor>();
+            var cFloors = new List<GhostFloor>();
             foreach (Element e in allFloors)
             {
                 //var par=e.LookupParameter("").AsString();
@@ -152,13 +152,13 @@ namespace WorkApp
             //Соотнести элементы отделки с помещениями
             RoomFinishing.SetFloorToRoom(cFloors, MainForm);
             RoomFinishing.SetWallToRoom(cWalls, MainForm);
-            
+
 
             //Плинтус
             foreach (var d in doors)
             {
                 new doorObj(d, lastPhase);
-                
+
             }
 
             foreach (var item in doorObj.AllDoorObj)
@@ -171,11 +171,12 @@ namespace WorkApp
                     {
                         r.Plintus.unitValue -= item.width;
                     }
-                    
+
                 }
             }
 
-            RoomFinishing.fakeRoomForLocalWall();
+            RoomFinishing.fakeRoomForMainWall();
+            //RoomFinishing.fakeRoomForLocalWall();
             if (MainForm.groupCheck)
             {
                 RoomFinishing.makeFinish(MainForm);
@@ -184,28 +185,33 @@ namespace WorkApp
             {
                 RoomFinishing.makeFloor(MainForm);
             }
-                
+
 
 
             using (Transaction tr = new Transaction(doc, "otdelka"))
             {
-                
+
                 tr.Start();
+                foreach (var item in rooms)
+                {
+                    item.LookupParameter("Room_ID").Set(item.Id);
+                }
                 if (!MainForm.groupFloorCheck)
                 {
-                    RoomFinishing.FinishSheduleCommit(MainForm, vs);
+                    RoomFinishing.FinishMEGACommit(vs,MainForm);
+                    //RoomFinishing.FinishSheduleCommit(MainForm, vs);
                     //RoomFinishing.FinishTableCommit(doc, MainForm);
                     //RoomFinishing.FloorSheduleCommit();
                 }
                 if (!MainForm.groupCheck)
                 {
                     //RoomFinishing.FloorTableCommit(MainForm.levels, MainForm.withnames, doc, MainForm,vs);
-                    RoomFinishing.FloorSheduleCommit(MainForm,vs);
+                    RoomFinishing.FloorSheduleCommit(MainForm, vs);
                 }
                 tr.Commit();
             }
             TaskDialog msg = new TaskDialog("Info");
-            msg.MainInstruction =  $"Выполнен расчет отделки для стадии \"{MainForm.retPhase.Name}\"";
+            msg.MainInstruction = $"Выполнен расчет отделки для стадии \"{MainForm.retPhase.Name}\"";
             msg.Show();
             return Result.Succeeded;
         }

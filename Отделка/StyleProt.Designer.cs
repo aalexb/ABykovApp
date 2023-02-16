@@ -1,6 +1,6 @@
 ﻿namespace WorkApp
 {
-    partial class FinishEnterprise
+    partial class StylePrototype
     {
         /// <summary>
         /// Required designer variable.

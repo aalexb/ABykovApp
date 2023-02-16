@@ -15,10 +15,10 @@ using System.Text.Json;
 
 namespace WorkApp
 {
-    public partial class FinishEnterprise : System.Windows.Forms.Form
+    public partial class StylePrototype : System.Windows.Forms.Form
     {
         List<FinishStyle> a = new List<FinishStyle>();
-        public FinishEnterprise(Document doc)
+        public StylePrototype(Document doc)
         {
             InitializeComponent();
             

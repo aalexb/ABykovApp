@@ -44,6 +44,7 @@ namespace WorkApp
         public int Secondary { get; set; }
         public bool isLocal = false;
         public bool countNewW = false;
+        public string WallChanger { get; set; }
         
 
         public GhostWall (string room, ElementId level, double area, bool isLocal)
@@ -57,6 +58,14 @@ namespace WorkApp
             refEl = wall;
             init();
             typeName = (wall as Wall).WallType.Name;
+            try
+            {
+                WallChanger = refEl.Document.GetElement(refEl.GetTypeId()).getP("ОтделкаФункция");
+            }
+            catch (Exception)
+            {
+            }
+
             if (LocWall!=null)
             {
                 isLocal = wall.Id == LocWall.Id;
