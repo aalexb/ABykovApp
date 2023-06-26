@@ -1,4 +1,5 @@
 ﻿using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,11 +9,13 @@ namespace WorkApp
 {
     public class RoomFinishing
     {
-        public static List<RoomFinishing> Rooms=new List<RoomFinishing>();
-        public static List<List<RoomFinishing>> FinishTable = new List<List<RoomFinishing>>();
-        public static List<List<RoomFinishing>> FloorTable = new List<List<RoomFinishing>>();
+        public static List<RoomFinishing> Rooms;
+        public static List<List<RoomFinishing>> FinishTable;
+        public static List<List<RoomFinishing>> FloorTable;
         public static IEnumerable<IGrouping<ElementId, RoomFinishing>> FloorTableGroup = null;
-        public static List<List<SheduleCell>> FinishData=new List<List<SheduleCell>>();
+        public static List<List<SheduleCell>> FinishData;
+        public int id;
+
 
         public Element refElement { get; }
         public ElementId Id { get; }
@@ -29,6 +32,8 @@ namespace WorkApp
 
 
         //=============
+        public List<Surface> unsort { get; set; } = new List<Surface>();
+
         public List<FinishStructuralElement> MainWallList { get; set; } = new List<FinishStructuralElement>();
         public List<FinishStructuralElement> UpWallList { get; set; } = new List<FinishStructuralElement>();
         public List<FinishStructuralElement> DownWallList { get; set; } = new List<FinishStructuralElement>();
@@ -42,54 +47,23 @@ namespace WorkApp
         public FinishStructuralElement Ceil{ get; set; } = new FinishStructuralElement();
         public FinishStructuralElement Plintus { get; set; } = new FinishStructuralElement();
 
-        public RoomFinishing(RoomFinishing father)
-        {
-            FakeRoom = true;
-            Name = father.Name;
-            Num= father.Num;
-            FinishNote= father.FinishNote;
-            FloorNote=father.FloorNote;
-            FinishEndNote = father.FinishEndNote;
-            Level = father.Level;
-            Ceil.Type = father.Ceil.Type;
-            Ceil.Text=father.Ceil.Text;
-            Ceil.unitValue = 0;
-
-            LocalWall = father.LocalWall;
-            LocalWall.unitValue = 0;
-
-            MainWall.Type = father.MainWall.Type;
-            MainWall.Text = father.MainWall.Text;
-            MainWall.unitValue = 0;
-
-            Kolon.Type = father.Kolon.Type;
-            Plintus.Type = father.Plintus.Type;
-            Plintus.unitValue = 0;
-
-            Floor.Type = father.Floor.Type;
-            Floor.Text=father.Floor.Text;
-            Floor.unitValue = 0;
-
-            FinishGroup=father.FinishGroup;
-            FloorGroup=father.FloorGroup;
-
-
-        }
         public RoomFinishing(Element e)
         {
             refElement = e;
             Id = e.Id;
+            id = Id.IntegerValue;
             Name=e.get_Parameter(BuiltInParameter.ROOM_NAME).AsString();
             Num = e.get_Parameter(BuiltInParameter.ROOM_NUMBER).AsString();
-            FinishNote = e.LookupParameter("ПримечаниеТамбуры").AsString();
-            FloorNote = e.LookupParameter(":Примечание").AsString();
+            FinishNote = e.LookupParameter("ПримечаниеТамбуры")==null?"": e.LookupParameter("ПримечаниеТамбуры").AsString();
+            FloorNote = e.LookupParameter(":Примечание")==null?"": e.LookupParameter(":Примечание").AsString();
+
 
             FinishEndNote = e.LookupParameter("ADSK_Примечание").AsString();
 
             Level = e.LevelId;
 
 
-            Ceil.setType( e.LookupParameter("ОТД_Потолок").AsValueString(),e);
+            Ceil.setType( e.LookupParameter("ОТД_Потолок")==null? "__Отделка : ---" : e.LookupParameter("ОТД_Потолок").AsValueString(),e);
             Ceil.unitValue = e.get_Parameter(BuiltInParameter.ROOM_AREA).AsDouble();
             MainWall.Type = e.LookupParameter("ОТД_Стены").AsValueString();
             try
@@ -101,7 +75,7 @@ namespace WorkApp
             }
             Floor.Type = e.LookupParameter("ОТД_Пол").AsValueString();
             FinishGroup= e.LookupParameter("ADSK_Группирование").AsString();
-            FloorGroup = e.LookupParameter("AG_Групп_Пол").AsString();
+            FloorGroup = e.LookupParameter("AG_Групп_Пол")==null?"":e.LookupParameter("AG_Групп_Пол").AsString();
 
             try
             {
@@ -115,155 +89,9 @@ namespace WorkApp
             Kolon.Type = e.LookupParameter("ОТД_Колонны").AsValueString();
             Plintus.Type = e.LookupParameter("ОТД_Плинтус").AsValueString();
             Plintus.unitValue = e.get_Parameter(BuiltInParameter.ROOM_PERIMETER).AsDouble();
-
-            Rooms.Add(this);
-        }
-        public static void SetWallToRoom(List<GhostWall> walls, FinishForm form)
-        {
-            foreach (var w in walls)
-            {
-                foreach (var r in RoomFinishing.Rooms)
-                {
-
-                    if (r.Id.IntegerValue == w.RoomID)
-                    {
-                        if (w.typeName != form.WallType.Name& w.typeName != form.ColType.Name&w.sostav!=null)
-                        {
-                            r.LocalWallList.Add(new FinishStructuralElement() {Type=w.sostav, Text = w.sostav, unitValue = w.Area,WallFunc=w.WallChanger });
-                        }
-                        else if (w.typeName == form.ColType.Name)
-                        {
-                            r.Kolon.unitValue += w.Area;
-                            r.Kolon.Text = w.sostav;
-                        }
-                        else
-                        {
-                            r.MainWall.unitValue += w.Area;
-                        }
-                        if (w.countNewW)
-                        {
-                            r.NewWall.unitValue += w.Area;
-                        }
-                    }
-                }
-            }
-        }
-        public static void SetFloorToRoom(List<GhostFloor> floors, FinishForm form)
-        {
-            foreach (var w in floors)
-            {
-                foreach (var r in RoomFinishing.Rooms)
-                {
-                    if (r.Id.IntegerValue == w.RoomID)
-                    {
-                        r.FloorList.Add(new FinishStructuralElement() {refEl=w.refEl, Text = w.sostav, unitValue = w.Area });
-                    }
-                }
-            }
         }
 
-        public static void fakeRoomForMainWall()
-        {
-            List<RoomFinishing> fakerooms = new List<RoomFinishing>();
-            foreach (var r in Rooms)
-            {
-                r.MainWallList.Add(r.MainWall);
-                if (r.LocalWallList.Where(x => x.WallFunc == "Основная").Count() != 0)
-                {
-                    foreach (var item in r.LocalWallList.Where(x => x.WallFunc == "Основная"))
-                    {
-                        r.MainWallList.Add(item);
-                    }
-                    
-                    r.LocalWallList = r.LocalWallList.Where(x => x.WallFunc != "Основная").ToList();
-                }
-                if (r.LocalWallList.Where(x=>x.WallFunc=="Верх").Count()!=0)
-                {
-                    foreach (var item in r.LocalWallList.Where(x => x.WallFunc == "Верх"))
-                    {
-                        r.UpWallList.Add(item);
-                    }
-
-                    r.LocalWallList = r.LocalWallList.Where(x => x.WallFunc != "Верх").ToList();
-                    foreach (var item in r.LocalWallList.Where(x => x.WallFunc == "Низ"))
-                    {
-                        r.DownWallList.Add(item);
-                    }
-
-                    r.LocalWallList = r.LocalWallList.Where(x => x.WallFunc != "Низ").ToList();
-                }
-            }
-        }
-        public static void fakeRoomForLocalWall()
-        {
-            List<RoomFinishing> fakerooms = new List<RoomFinishing>();
-            foreach (var r in Rooms)
-            {
-                if (r.LocalWallList==null)
-                {
-                    continue;
-                }
-                if (r.LocalWallList.Count==0)
-                {
-                    continue;
-                }
-                if (r.LocalWallList.Select(x=>x.Text).Distinct().Count()==1)
-                {
-                    r.LocalWall=r.LocalWallList.First();
-                    r.LocalWall.unitValue=r.LocalWallList.Sum(x=>x.unitValue);
-                }
-                else
-                {
-                    foreach (var item in r.LocalWallList)
-                    {
-                        var fakeroom = new RoomFinishing(r);
-                        fakeroom.LocalWall = item;
-                        fakerooms.Add(fakeroom);
-                    }
-                }
-            }
-            foreach (var f in fakerooms)
-            {
-                Rooms.Add(f);
-            }
-        }
-        public static void makeFinish(FinishForm form)
-        {
-            var newgro = Rooms
-                .GroupBy(key => (
-                form.groupCheck ? key.FinishGroup : null,
-                key.FinishNote,
-                key.LocalWall.Type,
-                form.splitLevel ? key.Level : null,
-                form.ColFromMat ? key.Kolon.Text : key.Kolon.Type,
-                key.Ceil.Type,
-                key.MainWall.Type
-                ))
-                .Select(key => new
-                {
-                    room = key.Select(p => p),
-                    sum=key.Sum(p=>p.MainWall.unitValue),
-                    ceilSum=key.Sum(p=>p.Ceil.unitValue),
-                    SEL=key.Select(p => p.LocalWallList),
-                    kolonSum=key.Sum(p=>p.Kolon.unitValue),
-                    newwallSum=key.Sum(p=>p.NewWall.unitValue),
-                    locSum=key.Sum(p=>p.LocalWall.unitValue)
-                }
-                    );
-
-            foreach (var group in newgro)
-            {
-                foreach (var r in group.room)
-                {
-                    r.MainWall.Value = group.sum;
-                    r.Ceil.Value = group.ceilSum;
-                    //r.LocalWallList= group.SEL;
-                    r.Kolon.Value=group.kolonSum;
-                    r.NewWall.Value = form.countNewW ? group.newwallSum : 0;
-                    r.LocalWall.Value = group.locSum;
-                }
-            }
-        }
+        
 
         private static List<FinishStructuralElement> GroupModelledTypes(List<FinishStructuralElement> eInRooms)
         {
@@ -303,159 +131,6 @@ namespace WorkApp
                 }
             }
         }
-        public static void FinishTableCommit(Document doc, FinishForm form) 
-        {
-            int i = 1;
-            foreach (List<RoomFinishing> item in FinishTable)
-            {
-                if (item == null)
-                {
-                    continue;
-                }
-                String fillText = "";
-
-                if (form.levels==1)
-                {
-                    foreach (ElementId lev in item.Select(x => x.Level).Distinct())
-                    {
-                        fillText += doc.GetElement(lev).LookupParameter("Название уровня").AsString() + ":\n";
-                        if (form.withnames == 1)
-                        {
-                            foreach (RoomFinishing gg in item.Where(x => x.Level == lev))
-                            {
-                                fillText += gg.Name + "-" + gg.Num + ", ";
-                            }
-                            fillText = fillText.Remove(fillText.Length - 2, 2) + "\n";
-                            continue;
-                        }
-                        fillText += Meta.shortLists(item.Where(x => x.Level == lev).Select(y => y.Num).ToList()) + "\n";
-                    }
-                }
-                else
-                {
-                    fillText += Meta.shortLists(item.Select(y => y.Num).ToList()) + "\n";
-                }
-
-                foreach (RoomFinishing r in item)
-                {
-                    try
-                    {
-                        r.refElement.LookupParameter("Н_Отделка").Set(i);
-                    }
-                    catch (Exception)
-                    {
-                    }
-
-
-
-                    if (form.countNewW)
-                    {
-
-                        if (r.NewWall.Value > 0)
-                        {
-                            r.refElement.setP("countNewW", $"В т.ч. по вновь устраиваемым перегородкам - {r.NewWall.Value * Meta.FT * Meta.FT:F1} м²");
-                        }
-                        else
-                        {
-                            r.refElement.setP("countNewW", "");
-                        }
-                    }
-                    r.refElement.LookupParameter("ОТД_Состав.Потолок").Set(r.Ceil.Type == "__Отделка : ---" ? "" : doc.GetElement(r.refElement.LookupParameter("ОТД_Потолок").AsElementId()).LookupParameter("АР_Состав отделки").AsString());
-
-                    try
-                    {
-                        r.refElement.LookupParameter("ОТД_Состав.Стены").Set(doc.GetElement(r.refElement.LookupParameter("ОТД_Стены").AsElementId()).LookupParameter("АР_Состав отделки").AsString());
-                    }
-                    catch (Exception)
-                    {
-
-                        r.refElement.LookupParameter("ОТД_Состав.Стены").Set("");
-                    }
-
-                    if (r.refElement.LookupParameter("ОТД_Кол.Колонны") != null)
-                    {
-                        if (form.groupCheck)
-                        {
-                            r.refElement.LookupParameter("ОТД_Кол.КолонныGROUP").Set(r.Kolon.Value > 0 ? (r.Kolon.Value * Meta.FT * Meta.FT).ToString("F1") : "");
-                        }
-                        else
-                        {
-                            r.refElement.LookupParameter("ОТД_Кол.Колонны").Set(r.Kolon.Value > 0 ? (r.Kolon.Value * Meta.FT * Meta.FT).ToString("F1") : "");
-                        }
-
-                        //r.refElement.LookupParameter("УДАЛИТЬ").Set(r.KolonWallVal > 0 ? r.KolonWallVal : 0);
-                        if (form.ColFromMat)
-                        {
-                            r.refElement.LookupParameter("ОТД_Состав.Колонны").Set(r.Kolon.Text);
-                        }
-                        else
-                        {
-                            try
-                            {
-                                r.refElement.LookupParameter("ОТД_Состав.Колонны").Set(doc.GetElement(r.refElement.LookupParameter("ОТД_Колонны").AsElementId()).LookupParameter("АР_Состав отделки").AsString());
-                            }
-                            catch (Exception)
-                            {
-
-                                r.refElement.LookupParameter("ОТД_Состав.Колонны").Set("");
-                            }
-
-                        }
-
-                    }
-                    if (r.refElement.LookupParameter("ОТД_Кол.Доп") == null)
-                    {
-                        Log.msg("Отсутствует параметр ОТД_Кол.Доп");
-                        return;
-                    }
-                    var localMultiText = form.groupCheck ? "ОТД_Кол.ДопGROUP" : "ОТД_Кол.Доп";
-                    if (r.refElement.LookupParameter(localMultiText) != null) //Проверяем что существует
-                    {
-                        
-                        r.refElement.LookupParameter(localMultiText).Set(r.LocalWallList.Count > 0 ? FinishStructuralElement.getMultiString(r.LocalWallList,"withNum") : "");
-                        
-
-                        //r.refElement.LookupParameter("ОТД_Состав.Доп").Set(r.LocalWall.Text);
-                    }
-
-                    if (form.groupCheck)
-                    {
-                        r.refElement.LookupParameter("WMulAdd").Set(fillText);
-                    }
-                    else
-                    {
-                        r.refElement.LookupParameter("testW").Set(fillText);
-                    }
-
-                    //r.refElement.LookupParameter("ОТД_Кол.Стены").Set(0);
-                    if (form.groupCheck)
-                    {
-                        r.refElement.LookupParameter("ОТД_Кол.СтеныGROUP").Set(r.MainWall.Value);
-                    }
-                    else
-                    {
-                        r.refElement.LookupParameter("ОТД_Кол.Стены").Set(r.MainWall.Value);
-                    }
-
-                    try
-                    {
-                        r.refElement.LookupParameter("ОТД_Пом.Стены").Set(r.MainWall.Value);
-                    }
-                    catch (Exception)
-                    {
-
-                    }
-
-
-                    //r.refElement.LookupParameter("PlintusTotal").Set(r.Perimeter);
-                    //item.Select(x => x.refElement.LookupParameter("testF").Set(fillText));
-                    //item.Select(x => x.refElement.LookupParameter("PlintusTotal").Set(x.SimilarPlintusVal));
-
-                }
-                i++;
-                
-            }
-        }
         public static void FormTableLine(IEnumerable<RoomFinishing> r, FinishForm form)
         {
             List<FinishStructuralElement> LocWallForLocWall = new List<FinishStructuralElement>();
@@ -467,7 +142,6 @@ namespace WorkApp
             {
                 foreach (var loc in item.LocalWallList)
                 {
-                    
                     LocWallForLocWall.Add(loc);
                 }
                 foreach (var loc in item.MainWallList)
@@ -565,55 +239,9 @@ namespace WorkApp
             
 
         }
-        public static void FinishMEGACommit(ViewSchedule vs, FinishForm form)
-        {
-            var shed = new NovaShedule(vs, 3);
+        
 
-            foreach (var r in Rooms)
-            {
-                r.LocalWallList=r.LocalWallList.OrderBy(x => x.Text).ToList();
-                r.CalculateControlSum();
-            }
-            var groups = Rooms
-                .GroupBy(p=>p.FinishGroup)
-                .OrderBy(p=>p.Key)
-                .Select(groupedRoomslambdda => new
-                {
-                    Name=groupedRoomslambdda.Key,
-                    Rooms=groupedRoomslambdda
-                    .GroupBy(x => (
-                        x.Ceil.Type,
-                        x.ControlSum,
-                        x.FinishEndNote))
-                    .Select(x => new
-                    {
-                        r = x.Select(p => p)
-                    })
-                });
-
-
-            List<int> mergedCol = new List<int>();
-            int colCounter = 0;
-            FinishData = new List<List<SheduleCell>>();
-            foreach (var group in groups)
-            {
-                FinishData.Add(SheduleCell.Subtitle(group.Name));
-                mergedCol.Add(colCounter);
-                colCounter++;
-                foreach (var item in group.Rooms)
-                {
-                    FormTableLine(item.r,form);
-                }
-                
-            }
-            shed.CreateRow(FinishData);
-
-            shed.setHeight();
-
-
-        }
-
-        private void CalculateControlSum()
+        public void CalculateControlSum()
         {
             this.ControlSum= String.Concat(MainWallList.Select(x => x.Text.ToString()).Distinct()) 
                 + "__"+String.Concat(LocalWallList.Select(x=>x.Text.ToString()).Distinct())
@@ -939,7 +567,7 @@ namespace WorkApp
                     
                     string floorParam = form.groupFloorCheck ? "FMulAdd" : "testF";
                     
-                    writePlintus(doc, r);
+                    //writePlintus(doc, r);
 
 
                     r.refElement.LookupParameter(floorParam).Set(fillText);
@@ -966,19 +594,5 @@ namespace WorkApp
             
         }
 
-
-        private static void writePlintus(Document doc, RoomFinishing r)
-        {
-            try
-            {
-                r.refElement.LookupParameter("ОТД_Состав.Плинтус").Set(doc.GetElement(r.refElement.LookupParameter("ОТД_Плинтус").AsElementId()).LookupParameter("АР_Состав отделки").AsString());
-            }
-            catch (Exception)
-            {
-                r.refElement.LookupParameter("ОТД_Состав.Плинтус").Set("");
-            }
-            r.refElement.LookupParameter("ОТД_Кол.Плинтус").Set(r.Plintus.Type == "__Отделка : ---" ? "" : (r.Plintus.Value * Meta.FT).ToString("F1"));
-            r.refElement.LookupParameter("PlintusTotal").Set(r.Plintus.Value);
-        }
     }
 }

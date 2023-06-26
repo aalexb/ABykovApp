@@ -22,7 +22,7 @@ namespace WorkApp
             Application app = uiapp.Application;
             Document doc = uidoc.Document;
 
-            FinishForm MainForm = new FinishForm(doc);
+            FinishForm MainForm = new FinishForm(null,null);
             MainForm.disableSomeElements("New");
             MainForm.ShowDialog();
 

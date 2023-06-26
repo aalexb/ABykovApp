@@ -28,28 +28,12 @@ namespace WorkApp
         public addParamForm(Document doc)
         {
             InitializeComponent();
-
-
             comboBox1.DataSource = Enum.GetValues(typeof(BuiltInParameterGroup));
             comboBox2.DataSource = Enum.GetValues(typeof(ParameterType));
-
         }
-
-        private void checkBox1_CheckedChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label1_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label3_Click(object sender, EventArgs e)
-        {
-
-        }
-
+        private void checkBox1_CheckedChanged(object sender, EventArgs e){}
+        private void label1_Click(object sender, EventArgs e){}
+        private void label3_Click(object sender, EventArgs e){}
         private void button1_Click(object sender, EventArgs e)
         {
             exempl = checkBox1.Checked;

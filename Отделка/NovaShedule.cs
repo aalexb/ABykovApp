@@ -128,6 +128,8 @@ namespace WorkApp.Addons
 
         public NovaShedule(ViewSchedule vs,int OFFSET)
         {
+            
+
             tsd=vs.GetTableData().GetSectionData(0);
             offset = OFFSET;
         }
@@ -200,7 +202,7 @@ namespace WorkApp.Addons
                     {
                         if (cell != null)
                         {
-                            tsd.SetCellText(offset, k, cell.Data);
+                            tsd.SetCellText(offset, k, cell.Data==null?"": cell.Data);
                             //tsd.ResetCellOverride(offset, k);
                             if (cell.Type=="Text")
                             {

@@ -14,26 +14,26 @@ using System.Threading.Tasks;
 
 namespace WorkApp
 {
+
+
+
 	[Autodesk.Revit.Attributes.Transaction(Autodesk.Revit.Attributes.TransactionMode.Manual)]
 	class PageNumerator : IExternalCommand
 	{
-		Result IExternalCommand.Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
+        Result IExternalCommand.Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
 		{
 			var uiapp = commandData.Application;
 			var uidoc = uiapp.ActiveUIDocument;
 			var doc = uidoc.Document;
 
 			var selectedSheets = uidoc.Selection.GetElementIds();
-			List<Element> sheets = new List<Element>();
+
 			List<PageToObj> StartList = new List<PageToObj>();
 
             foreach (var item in selectedSheets)
             {
 				StartList.Add(new PageToObj(doc.GetElement(item) as ViewSheet));
             }
-			//StartList = StartList.OrderBy(s => s.Num, new CustomComparer()).ToList();
-			//StartList = NaturalSort(StartList.Select(x=>x.Num)).ToList();                            // Extract the values
-			//StartList=StartList.OrderBy(x=>x.Num).ToList();
 			StartList = StartList.OrderBy(x => x.order).ToList();
             
 			
@@ -49,10 +49,32 @@ namespace WorkApp
 			using (Transaction tr = new Transaction(doc, "Нумерация листов"))
 			{
 				tr.Start();
-                foreach (var item in winform.EndList)
-                {
-					(item.refEl as ViewSheet).get_Parameter(BuiltInParameter.SHEET_NUMBER).Set(item.Num);
+				if (winform.resultParam==OutType.pageNum)
+				{
+                    foreach (var item in winform.pages)
+                    {
+
+                        (item.refEl as ViewSheet).get_Parameter(BuiltInParameter.SHEET_NUMBER).Set(item.newValue);
+                    }
                 }
+
+				if (winform.resultParam==OutType.param)
+				{
+                    foreach (var item in winform.pages)
+                    {
+
+                        (item.refEl as ViewSheet).get_Parameter(winform.par).Set(item.newValue);
+                    }
+                }
+
+				if (winform.resultParam==OutType.pageName)
+				{
+                    foreach (var item in winform.pages)
+                    {
+                        (item.refEl as ViewSheet).get_Parameter(BuiltInParameter.SHEET_NAME).Set(item.newValue);
+                    }
+                }
+                
 				//doc.Export(savePath.Substring(0, savePath.Length - 1), namePrefix, setOfPrintingPages, options);
 				tr.Commit();
 			}
@@ -62,34 +84,18 @@ namespace WorkApp
 		/*
 		 =====МЕТОДЫ=====
 		 */
-		public class CustomComparer : IComparer<string>
-		{
-			public int Compare(string x, string y)
-			{
-				var regex = new Regex("^(d+)");
 
-				// run the regex on both strings
-				var xRegexResult = regex.Match(x);
-				var yRegexResult = regex.Match(y);
-
-				// check if they are both numbers
-				if (xRegexResult.Success && yRegexResult.Success)
-				{
-					return int.Parse(xRegexResult.Groups[1].Value).CompareTo(int.Parse(yRegexResult.Groups[1].Value));
-				}
-
-				// otherwise return as string comparison
-				return x.CompareTo(y);
-			}
-		}
 		
 
 	}
+
 
 	public class PageToObj
     {
 		public Element refEl;
 		public string Name { get; set; }
+		
+		public string newValue { get; set; }
 		public string Num { get; set; }
 		public int order { get; set; }
 
@@ -103,7 +109,6 @@ namespace WorkApp
                 {
 					numericString=string.Concat(numericString, c.ToString());
                 }
-
 			}
 			order=int.Parse(numericString);
         }

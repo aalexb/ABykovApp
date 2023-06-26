@@ -13,6 +13,15 @@ namespace WorkApp
         public double Value { get; set; }
         public double Height { get; set; }
         public string WallFunc { get; set; }
+
+
+        public FinishStructuralElement(Surface surface)
+        {
+            Type = surface.typeName;
+            Text = surface.sostav;
+            unitValue = surface.Area;
+            WallFunc = surface.sur_func;
+        }
         public FinishStructuralElement()
         {
             unitValue = 0;
@@ -24,7 +33,12 @@ namespace WorkApp
         public  void setType(string type, Element room)
         {
             Type = type;
-            Text = type == "__Отделка : ---" ? "" : room.Document.GetElement(room.LookupParameter("ОТД_Потолок").AsElementId()).LookupParameter("АР_Состав отделки").AsString();
+            Text = (type == "__Отделка : ---"||type=="") ? "" : room.Document.GetElement(room.LookupParameter("ОТД_Потолок").AsElementId()).LookupParameter("АР_Состав отделки").AsString();
+            if (room.LookupParameter("Отделка_Потолок") != null)
+            {
+                Text = room.LookupParameter("Отделка_Потолок").AsString();
+                Type = Text;
+            }
         }
         public static string getMultiString(List<FinishStructuralElement> l, string withNum="")
         {

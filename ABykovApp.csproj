@@ -38,6 +38,15 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Enterprise|AnyCPU'">
     <OutputPath>bin\Enterprise\</OutputPath>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'share|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>..\..\Users\AG201\Documents\Share\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="AdWindows">
       <HintPath>..\..\Program Files\Autodesk\Revit 2020\AdWindows.dll</HintPath>
@@ -105,9 +114,17 @@
     <Compile Include="addParamForm.Designer.cs">
       <DependentUpon>addParamForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Class1.cs" />
     <Compile Include="Deco\Decore.cs" />
     <Compile Include="doorObj.cs" />
+    <None Include="FillContext.cs" />
+    <Compile Include="GlobSerde.cs" />
+    <Compile Include="Params.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Params.Designer.cs">
+      <DependentUpon>Params.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Prototype.cs" />
     <Compile Include="Renamer.cs" />
     <Compile Include="Deco\DecoreClient.cs">
       <SubType>Form</SubType>
@@ -115,22 +132,24 @@
     <Compile Include="Deco\DecoreClient.Designer.cs">
       <DependentUpon>DecoreClient.cs</DependentUpon>
     </Compile>
-    <Compile Include="Отделка\FinishStructuralElement.cs" />
-    <Compile Include="Отделка\NovaShedule.cs" />
-    <Compile Include="PageNumerator.cs" />
-    <Compile Include="Отделка\StyleProt.cs">
+    <Compile Include="RevitContext.cs" />
+    <Compile Include="SetParamLevel.cs" />
+    <Compile Include="Viewer.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Отделка\StyleProt.Designer.cs">
-      <DependentUpon>StyleProt.cs</DependentUpon>
+    <Compile Include="Viewer.Designer.cs">
+      <DependentUpon>Viewer.cs</DependentUpon>
     </Compile>
-    <Compile Include="Log.cs" />
+    <Compile Include="Surface.cs" />
+    <Compile Include="Отделка\Class1.cs" />
+    <Compile Include="Отделка\Context.cs" />
+    <Compile Include="Отделка\FinishProcessor.cs" />
+    <Compile Include="Отделка\FinishStructuralElement.cs" />
+    <Compile Include="Отделка\NovaShedule.cs" />
+    <Compile Include="_pages\PageNumerator.cs" />
     <Compile Include="RemoveAfterGP2.cs" />
-    <Compile Include="template.cs" />
-    <Compile Include="TestSelector.cs" />
     <Compile Include="App.cs" />
     <Compile Include="annot.cs" />
-    <Compile Include="Doors.cs" />
     <Compile Include="Book.cs" />
     <Compile Include="Cube.cs" />
     <Compile Include="DemEl.cs">
@@ -140,20 +159,20 @@
       <DependentUpon>DemEl.cs</DependentUpon>
     </Compile>
     <Compile Include="Empty.cs" />
-    <Compile Include="ExportDWFX2.cs" />
-    <Compile Include="ExportDWFX.cs" />
-    <Compile Include="ExportDWG.cs" />
-    <Compile Include="ExportPDFspec.cs" />
+    <Compile Include="_pages\ExportDWFX2.cs" />
+    <Compile Include="_pages\ExportDWFX.cs" />
+    <Compile Include="_pages\ExportDWG.cs" />
+    <Compile Include="_pages\ExportPDFspec.cs" />
     <Compile Include="Отделка\FinishForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Отделка\FinishForm.Designer.cs">
       <DependentUpon>FinishForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="PagesForm.cs">
+    <Compile Include="_pages\PagesForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="PagesForm.Designer.cs">
+    <Compile Include="_pages\PagesForm.Designer.cs">
       <DependentUpon>PagesForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Form2.cs">
@@ -162,7 +181,6 @@
     <Compile Include="Form2.Designer.cs">
       <DependentUpon>Form2.cs</DependentUpon>
     </Compile>
-    <Compile Include="FormLoader.cs" />
     <Compile Include="FullSpec.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -171,9 +189,7 @@
     </Compile>
     <Compile Include="GhostWall.cs" />
     <Compile Include="grouping.cs" />
-    <Compile Include="Hydra.cs" />
     <Compile Include="macros.cs" />
-    <Compile Include="macroses.cs" />
     <Compile Include="metall.cs" />
     <Content Include="Finishing.txt" />
     <Compile Include="Multiverse.cs" />
@@ -196,21 +212,11 @@
     <Compile Include="SPECA.cs" />
     <Compile Include="SuperTest.cs" />
     <Compile Include="TableDraw.cs" />
-    <Compile Include="testForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="testForm.Designer.cs">
-      <DependentUpon>testForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="UserControl1.xaml.cs">
-      <DependentUpon>UserControl1.xaml</DependentUpon>
-    </Compile>
     <Compile Include="WallLastStage.cs" />
     <Compile Include="Tools.cs" />
     <Compile Include="Universe.cs" />
     <Compile Include="wtf\Product.cs" />
     <Compile Include="wtf\Rebar.cs" />
-    <Compile Include="zWall.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="addParamForm.resx">
@@ -219,8 +225,11 @@
     <EmbeddedResource Include="DemEl.resx">
       <DependentUpon>DemEl.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Отделка\StyleProt.resx">
-      <DependentUpon>StyleProt.cs</DependentUpon>
+    <EmbeddedResource Include="Params.resx">
+      <DependentUpon>Params.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Viewer.resx">
+      <DependentUpon>Viewer.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Deco\DecoreClient.resx">
       <DependentUpon>DecoreClient.cs</DependentUpon>
@@ -228,7 +237,7 @@
     <EmbeddedResource Include="Отделка\FinishForm.resx">
       <DependentUpon>FinishForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="PagesForm.resx">
+    <EmbeddedResource Include="_pages\PagesForm.resx">
       <DependentUpon>PagesForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FullSpec.resx">
@@ -237,9 +246,6 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <EmbeddedResource Include="testForm.resx">
-      <DependentUpon>testForm.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
@@ -254,7 +260,6 @@
     <None Include="Resources\15903809461600702091-32.png" />
     <None Include="Resources\18531432621599996549-32.png" />
     <None Include="Resources\8495345821548330710-32.png" />
-    <Content Include="Добавить.txt" />
     <None Include="packages.config" />
     <Resource Include="Resources\gear.png" />
     <None Include="printing.bpj" />
@@ -279,12 +284,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="type1\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Page Include="UserControl1.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="packages\System.Text.Json.6.0.5\build\System.Text.Json.targets" Condition="Exists('packages\System.Text.Json.6.0.5\build\System.Text.Json.targets')" />

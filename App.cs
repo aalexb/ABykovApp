@@ -45,13 +45,12 @@ namespace WorkApp
             RibbonPanel panelSheet = ribbonPanel(app,"Листы");
             RibbonPanel panelFinish = ribbonPanel(app, "Отделка");
             RibbonPanel panelOther = ribbonPanel(app, "Прочее");
-            //PushButton buttonPDFspec = panelSheet.AddButton("ПДФ спец.", Resources.PDF, "ExportPDFspec");
 
             PushButton button110 = panelSheet.AddButton("Получить ПДФ", Resources.PDF, "ExportDWFX2");
             PushButton button120 = panelSheet.AddButton("Получить DWG", Resources.dwgpic, "ExportDWG");
             PushButton button130 = panelSheet.AddButton("Смена номера", Resources.tudaSyda, "SheetNum");
-            PushButton button140 = panelSheet.AddButton("Нумерация", Resources.block, "PageNumerator");
-            //PushButton button3 = panelOther.AddButton("Эл-ты помещ.", Resources.Peace, "RoomElements");
+            PushButton button140 = panelSheet.AddButton("Нумерация", Resources.block, "PagesForm");
+
 
 
 
@@ -75,9 +74,9 @@ namespace WorkApp
 
 
             PushButton button410 = panelOther.AddButton("Тесты", Resources.block, "TableDraw");
-            PushButton button420 = panelOther.AddButton("Тест дверей", Resources.block, "Doors");
             PushButton button430 = panelOther.AddButton("Перемычки", Resources.block, "RemoveAfterGP2");
             PushButton button440 = panelOther.AddButton("Отделка", Resources.block, "Decore");
+            PushButton button450 = panelOther.AddButton("Рабочие наборы", Resources.block, "Viewer");
 
 
 
@@ -117,8 +116,6 @@ namespace WorkApp
             try
             {
                 RibbonPanel panel = a.CreateRibbonPanel("АММО", name);
-                //RibbonPanel secondPanel = a.CreateRibbonPanel("АММО", "Общее");
-
             }
             catch { }
             List<RibbonPanel> panels = a.GetRibbonPanels("АММО");

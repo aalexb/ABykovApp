@@ -3,12 +3,18 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using Autodesk.Revit.DB;
-
+using WorkApp.Отделка;
 
 namespace WorkApp
 {
+    
     public partial class FinishForm : System.Windows.Forms.Form
     {
+        public StyleByFamily style_by;
+        public CheckBoxes check;
+        public ParamFields parnames;
+
+
         public int levels = 0;
         public int withnames = 0;
         public int poetagno = 0;
@@ -27,6 +33,8 @@ namespace WorkApp
         List<ElementId> defSet = new List<ElementId>();
         public List<string> wTypeBoxes = new List<string>();
         Document doc;
+        RevitContext rC;
+        Context C;
 
         void readFromGlobal()
         {
@@ -38,9 +46,11 @@ namespace WorkApp
             
         }
 
-        public FinishForm(Document Doc)
+        public FinishForm(RevitContext rc, Context context)
         {
-            this.doc = Doc;
+            rC= rc;
+            this.doc = rC.doc;
+            C=context;
             if (GlobalParametersManager.FindByName(doc, "FinData") != ElementId.InvalidElementId)
             {
                 GlobalParameter GlobePar2 = doc.GetElement(GlobalParametersManager.FindByName(doc, "FinData")) as GlobalParameter;
@@ -50,30 +60,23 @@ namespace WorkApp
                 wTypeBoxes = GPar.Split('|').ToList();
             }
             
-            PhaseArray xcom = doc.Phases;
+            PhaseArray doc_phases = doc.Phases;
             List<Element> walltypes1 = new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Walls).WhereElementIsElementType().ToList();
             walltypes1 = walltypes1.OrderBy(x => x.Name).ToList();
             List<Element> walltypes2 = walltypes1.Select(x=>x).ToList();
             List<Element> walltypes3 = walltypes1.Select(x => x).ToList();
 
             InitializeComponent();
-            GroupSelector.Enabled = false;
-            GroupFloorSelector.Enabled = false;
-            comboBox1.DataSource = walltypes1;
-            comboBox1.DisplayMember = "Name";
-            comboBox1.ValueMember = "Id";
-            
+            checkGroup(null,null);
+            MainFinSelector.DataSource = walltypes1;
+            MainFinSelector.DisplayMember = "Name";
+            MainFinSelector.ValueMember = "Id";
+
             try
             {
-                comboBox1.SelectedIndex = walltypes1.IndexOf(walltypes1.First(x => x.Name == wTypeBoxes[0]));
+                MainFinSelector.SelectedIndex = walltypes1.IndexOf(walltypes1.First(x => x.Name == wTypeBoxes[0]));
             }
-            catch (Exception)
-            {
-
-                
-            }
-            
-            
+            catch (Exception) { }
             LocFinSelector.DataSource = walltypes2;
             LocFinSelector.DisplayMember = "Name";
             LocFinSelector.ValueMember = "Id";
@@ -81,11 +84,7 @@ namespace WorkApp
             {
                 LocFinSelector.SelectedIndex = walltypes2.IndexOf(walltypes2.First(x => x.Name == wTypeBoxes[1]));
             }
-            catch (Exception)
-            {
-
-
-            }
+            catch (Exception) { }
             ColumnFinSelector.DataSource = walltypes3;
             ColumnFinSelector.DisplayMember = "Name";
             ColumnFinSelector.ValueMember = "Id";
@@ -93,60 +92,18 @@ namespace WorkApp
             {
                 ColumnFinSelector.SelectedIndex = walltypes3.IndexOf(walltypes3.First(x => x.Name == wTypeBoxes[2]));
             }
-            catch (Exception)
-            {
-
-
-            }
-
-            PhaseSelector.DataSource = xcom as IList<Phase>;
+            catch (Exception) { }
+            PhaseSelector.DataSource = doc_phases as IList<Phase>;
             PhaseSelector.DisplayMember = "Name";
             PhaseSelector.ValueMember = "Id";
-            foreach (Phase item in xcom)
+            foreach (Phase item in doc_phases)
             {
                 PhaseSelector.Items.Add(item);
             }
-            PhaseSelector.SelectedIndex = xcom.Size-1;
+            PhaseSelector.SelectedIndex = doc_phases.Size-1;
             var roomGroup = new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Rooms)
                  .WhereElementIsNotElementType()
-                 .ToElements();
-            try
-            {
-                var lll = roomGroup.Select(x => x.LookupParameter("ADSK_Группирование").AsString()).Distinct().ToList();
-                foreach (var item in lll)
-                {
-                    if (item != null)
-                    {
-                        GroupSelector.Items.Add(item);
-                    }
-
-                }
-                //GroupSelector.DataSource = lll;
-            }
-            catch (Exception)
-            {
-
-                
-            }
-            try
-            {
-                var lll = roomGroup.Select(x => x.LookupParameter("AG_Групп_Пол").AsString()).Distinct().ToList();
-                foreach (var item in lll)
-                {
-                    if (item != null)
-                    {
-                        GroupFloorSelector.Items.Add(item);
-                    }
-
-                }
-                //GroupSelector.DataSource = lll;
-            }
-            catch (Exception)
-            {
-
-                
-            }
-            
+                 .ToElements();            
         }
         public void disableSomeElements(string who)
         {
@@ -166,79 +123,102 @@ namespace WorkApp
 
         public void selElem(string a)
         {
-            SelNum.Text = a;
+            out_shed_name.Text = a;
         }
         private void button1_Click(object sender, EventArgs e)
         {
+            /*
+            style_by = new StyleByFamily{
+                Name = (comboBox1.SelectedItem as Family).Name,
+                ceil=textBox9.Text,
+                wall=textBox8.Text,
+                floor=textBox10.Text,
+                kolon=textBox11.Text,
+                plintus=textBox12.Text,
+                other=textBox13.Text,
+            };
+            check = new CheckBoxes{
+                room_names=RoomNames.Checked,
+                simple_names=checkBox4.Checked,
+                recon=checkBox1.Checked,
+                some_levels=SomeLevels.Checked,
+                diff_levels=chkSplitLevel.Checked,
+                grouped=checkBox5.Checked,
+                main_type=checkBox2.Checked,
+                local_type=checkBox3.Checked,
+                kolon_type=checkCol.Checked,
+                finish_mode=FinishMode.Checked,
+            };
+            parnames = new ParamFields
+            {
+                group_finish = finish_group_field.Text,
+                group_floor = floor_group_field.Text,
+                prefix_finish = textBox1.Text,
+                prefix_floor = textBox2.Text,
+                sostav = textBox5.Text,
+                sostav_ceil = ceil_sostav_field.Text,
+                wall_func = wall_func_field.Text,
+                note_finish = textBox6.Text,
+                note_floor = textBox7.Text,
+                endnote_finish = textBox3.Text,
+                endnote_floor = textBox4.Text,
+                floor_mark = textBox14.Text,
+            };
+            */
+
             levels = SomeLevels.Checked ? 1 : 0;
             withnames = RoomNames.Checked ? 1 : 0;
             ColFromMat = checkCol.Checked;
             splitLevel = chkSplitLevel.Checked;
             countNewW = checkBox1.Checked;
+            rC.selected_phase= (Phase)PhaseSelector.SelectedItem;
             retPhase = (Phase)PhaseSelector.SelectedItem;
-            WallType = (Element)comboBox1.SelectedItem;
+            WallType = (Element)MainFinSelector.SelectedItem;
             ColType = (Element)ColumnFinSelector.SelectedItem;
             LocType = (Element)LocFinSelector.SelectedItem;
-            wTypeBoxes = new List<string>();
-            wTypeBoxes.Add((comboBox1.SelectedItem as Element).Name);
-            wTypeBoxes.Add((LocFinSelector.SelectedItem as Element).Name);
-            wTypeBoxes.Add((ColumnFinSelector.SelectedItem as Element).Name);
-            groupCheck = checkGroup.Checked;
-            groupFloorCheck = checkFloorGroup.Checked;
-            locWallString = locWallParam.Text;
-            if (groupCheck)
+            wTypeBoxes = new List<string>
             {
-                groupField = GroupSelector.Text;
-            }
-            if (groupFloorCheck)
-            {
-                groupFloorField = GroupFloorSelector.Text;
-            }
+                (MainFinSelector.SelectedItem as Element).Name,
+                (LocFinSelector.SelectedItem as Element).Name,
+                (ColumnFinSelector.SelectedItem as Element).Name
+            };
+            groupCheck = FinishMode.Checked;
+            groupFloorCheck = FloorMode.Checked;
             this.Close();
         }
+        private void checkGroup(object sender, EventArgs e)
+        {
+            finish_group_field.Enabled = checkBox5.Checked && FinishMode.Checked;
+            textBox1.Enabled = FinishMode.Checked;
+            floor_group_field.Enabled = checkBox5.Checked && FloorMode.Checked;
+            textBox2.Enabled = FloorMode.Checked;
+        }
 
-        private void PhaseSelector_SelectedIndexChanged(object sender, EventArgs e)
+        private void checkFinComboBox(object sender, EventArgs e)
+        {
+            MainFinSelector.Enabled = !checkBox2.Checked;
+            LocFinSelector.Enabled = !checkBox3.Checked;
+            ColumnFinSelector.Enabled = !checkCol.Checked;
+        }
+
+        private void SomeLevels_CheckedChanged(object sender, EventArgs e)
         {
 
         }
 
-        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        private void FinishForm_Load(object sender, EventArgs e)
         {
 
         }
 
-        private void checkBox1_MouseHover(object sender, EventArgs e)
+        private void wall_func_field_TextChanged(object sender, EventArgs e)
         {
-            
+
         }
 
-        private void checkGroup_CheckedChanged(object sender, EventArgs e)
+        private void label18_Click(object sender, EventArgs e)
         {
-            if (checkGroup.Checked == false)
-            {
-                GroupSelector.Enabled = false;
-            }
-            else
-            {
-                GroupSelector.Enabled = true;
-            }
-        }
 
-        private void checkFloorGroup_CheckedChanged(object sender, EventArgs e)
-        {
-            if (checkFloorGroup.Checked == false)
-            {
-                GroupFloorSelector.Enabled = false;
-            }
-            else
-            {
-                GroupFloorSelector.Enabled = true;
-            }
-        }
-
-        private void GroupSelector_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            //SelNum.Text=roo GroupSelector.Text;
         }
     }
 }

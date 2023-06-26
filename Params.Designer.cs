@@ -1,6 +1,6 @@
 ﻿namespace WorkApp
 {
-    partial class testForm
+    partial class Params
     {
         /// <summary>
         /// Required designer variable.
@@ -28,34 +28,34 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.dataGrid = new System.Windows.Forms.DataGridView();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGrid)).BeginInit();
+            this.dataGridView1 = new System.Windows.Forms.DataGridView();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
             // dataGridView1
             // 
-            this.dataGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGrid.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dataGrid.Location = new System.Drawing.Point(0, 0);
-            this.dataGrid.Name = "dataGridView1";
-            this.dataGrid.Size = new System.Drawing.Size(542, 450);
-            this.dataGrid.TabIndex = 0;
+            this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridView1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.dataGridView1.Location = new System.Drawing.Point(0, 0);
+            this.dataGridView1.Name = "dataGridView1";
+            this.dataGridView1.Size = new System.Drawing.Size(800, 450);
+            this.dataGridView1.TabIndex = 0;
             // 
-            // testForm
+            // Params
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(542, 450);
-            this.Controls.Add(this.dataGrid);
-            this.Name = "testForm";
-            this.Text = "testForm";
-            ((System.ComponentModel.ISupportInitialize)(this.dataGrid)).EndInit();
+            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.dataGridView1);
+            this.Name = "Params";
+            this.Text = "Params";
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.ResumeLayout(false);
 
         }
 
         #endregion
 
-        private System.Windows.Forms.DataGridView dataGrid;
+        private System.Windows.Forms.DataGridView dataGridView1;
     }
 }
