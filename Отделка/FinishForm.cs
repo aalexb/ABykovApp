@@ -127,9 +127,9 @@ namespace WorkApp
         }
         private void button1_Click(object sender, EventArgs e)
         {
-            /*
+            
             style_by = new StyleByFamily{
-                Name = (comboBox1.SelectedItem as Family).Name,
+                Name = comboBox1.SelectedItem==null?"":(comboBox1.SelectedItem as Family).Name,
                 ceil=textBox9.Text,
                 wall=textBox8.Text,
                 floor=textBox10.Text,
@@ -137,6 +137,8 @@ namespace WorkApp
                 plintus=textBox12.Text,
                 other=textBox13.Text,
             };
+            
+            
             check = new CheckBoxes{
                 room_names=RoomNames.Checked,
                 simple_names=checkBox4.Checked,
@@ -149,6 +151,7 @@ namespace WorkApp
                 kolon_type=checkCol.Checked,
                 finish_mode=FinishMode.Checked,
             };
+            
             parnames = new ParamFields
             {
                 group_finish = finish_group_field.Text,
@@ -164,7 +167,7 @@ namespace WorkApp
                 endnote_floor = textBox4.Text,
                 floor_mark = textBox14.Text,
             };
-            */
+            
 
             levels = SomeLevels.Checked ? 1 : 0;
             withnames = RoomNames.Checked ? 1 : 0;

@@ -19,7 +19,14 @@ namespace WorkApp
             
             var selected_element_id = uidoc.Selection.GetElementIds();
             var selected_element = selected_element_id.Select(x => doc.GetElement(x));
-            var selected_view_schedule = doc.GetElement((selected_element.ElementAt(0) as ScheduleSheetInstance).ScheduleId) as ViewSchedule;
+            ViewSchedule selected_view_schedule = null;
+            try
+            {
+                selected_view_schedule = doc.GetElement((selected_element.ElementAt(0) as ScheduleSheetInstance).ScheduleId) as ViewSchedule;
+            }
+            catch (System.Exception)
+            {
+            }
             var name = "";
             try
             {
@@ -34,7 +41,7 @@ namespace WorkApp
 
             FinishForm MainForm = new FinishForm(RC,C);
             MainForm.selElem(name);
-            MainForm.ShowDialog();
+            MainForm.Show();
 
 
             FinishAbs root;

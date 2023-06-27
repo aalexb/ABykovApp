@@ -48,6 +48,7 @@ namespace WorkApp.Отделка
         {
             var rule = new FilterElementIdRule(provider, evaluator, form.retPhase.Id);
             var filter = new ElementParameterFilter(rule);
+            surfaces=new List<Surface>();
 
             var source = new FilteredElementCollector(doc).OfCategory(cat)
                 .WhereElementIsNotElementType()
@@ -69,7 +70,7 @@ namespace WorkApp.Отделка
                 .ToElements();
             foreach (var item in rooms)
                 Rooms.Add(new RoomFinishing(item));
-            Rooms = RoomFinishing.Rooms.OrderBy(x => x.Num).ToList();
+            Rooms = Rooms.OrderBy(x => x.Num).ToList();
         }
     }
 
@@ -80,7 +81,116 @@ namespace WorkApp.Отделка
 
         public override void Commit(ViewSchedule vs)
         {
-            
+            var shed = new NovaShedule(vs, 3);
+            var data = new List<List<SheduleCell>>();
+            List<int[]> groups = new List<int[]>();
+
+
+            var groupedRooms = Rooms
+                //1111111111111111111111
+                .GroupBy(p => p.FinishGroup)
+                .OrderBy(p => p.Key)
+                .Select(groupedRoomslambda => new
+                //111_Objects
+                {
+                    Name = groupedRoomslambda.Key,
+                    Rooms = groupedRoomslambda
+                    //22222222222222222222222
+                    .GroupBy(finishLambda => (
+                        form.splitLevel ? finishLambda.Level : null,
+                        form.ColFromMat ? finishLambda.Kolon.Text : finishLambda.Kolon.Type,
+                        finishLambda.Ceil.Type,
+                        finishLambda.FinishEndNote))
+                    .Select(xxx => new
+                    //222_Objects
+                    {
+                        EndNote = xxx.Key.FinishEndNote,
+                        r = xxx.Select(p => p),
+                        SEL = xxx.Select(p => p.LocalWallList),
+                        lvtz = xxx
+                        //333333333333333333333333
+                        .GroupBy(MainWallLambda => MainWallLambda.MainWall.Type)
+                        .Select(zzz => new
+                        //333_Objects
+                        {
+                            lvt = zzz
+                            //44444444444444444444
+                            .GroupBy(localLambda => (
+                            localLambda.LocalWall.Type))
+                            .Select(x => new
+                            //444_Objects
+                            {
+                                lvte = x.Select(p => p.LocalWall)
+                            })
+                        })
+                    })
+                });
+
+
+            List<int> mergedCol = new List<int>();
+            int colCounter = 0;
+            foreach (var group in groupedRooms)//11111111111111111111
+            {
+                //Заголовок группы
+                data.Add(SheduleCell.Subtitle(group.Name));
+                mergedCol.Add(colCounter);
+                colCounter++;
+
+                foreach (var item in group.Rooms)//2222222222222222222222222
+                {
+                    //Объединяем названия помещений
+                    string fillText = Meta.shortLists(item.r.Select(y => y.Num).ToList()) + "\n";
+                    foreach (var mwll in item.lvtz)//3333333333333333333333
+                    {
+                        if (mwll.lvt.Count() > 1)
+                        {
+                            foreach (var lvtex in mwll.lvt)//44444444444444444
+                            {
+                                colCounter++;
+                                data.Add(SheduleCell.FinishRow(
+                                String.Concat(fillText, " ", String.Concat(item.r.Select(x => x.FinishNote).Distinct())),
+                                item.r.ElementAt(0).Ceil.Text,
+                                item.r.ElementAt(0).Ceil.Value,
+                                item.r.ElementAt(0).MainWall.Text,
+                                item.r.ElementAt(0).MainWall.Value,
+                                BotWallText: lvtex.lvte.First().Text,
+                                BotWallValue: lvtex.lvte.First().Value,
+                                Note: item.EndNote
+
+                                ));
+                            }
+                        }
+                        else
+                        {
+                            colCounter++;
+                            data.Add(SheduleCell.FinishRow(
+                                String.Concat(fillText, " ", String.Concat(item.r.Select(x => x.FinishNote).Distinct())),
+                                item.r.ElementAt(0).Ceil.Text,
+                                item.r.ElementAt(0).Ceil.Value,
+                                item.r.ElementAt(0).MainWall.Text,
+                                item.r.ElementAt(0).MainWall.Value,
+                                BotWallText: item.r.ElementAt(0).LocalWall.Text,
+                                BotWallValue: item.r.ElementAt(0).LocalWall.Value,
+                                Note: item.EndNote
+                                ));
+                        }
+                    }
+
+                }
+            }
+
+            shed.CreateRow(data);
+            foreach (var item in mergedCol)
+            {
+                shed.mergeCol(item);
+            }
+            shed.mergeRow(groups, 0);
+
+            shed.setHeight();
+
+            //shed.mergeRow(groups, 0);
+            //shed.mergeCol();
+            shed.setHeight();
         }
 
         public override void Get()

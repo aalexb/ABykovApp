@@ -27,7 +27,9 @@ namespace WorkApp
             PhaseArray xcom = doc.Phases;
             Phase lastPhase = xcom.get_Item(xcom.Size - 1);
             ElementId idPhase = lastPhase.Id;
-            FinishForm MainForm = new FinishForm(null,null);
+            var C = new Context();
+            var RC = new RevitContext(doc);
+            FinishForm MainForm = new FinishForm(RC,C);
             MainForm.disableSomeElements("Number");
             MainForm.ShowDialog();
             lastPhase = MainForm.retPhase;

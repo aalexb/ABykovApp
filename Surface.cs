@@ -20,7 +20,17 @@ namespace WorkApp
         { 
             this.el = el;
             typeName= el.GetType().Name;
-            room_id=el.LookupParameter("Room_ID").AsInteger();
+            try
+            {
+                room_id = el.LookupParameter("Room_ID").AsInteger();
+            }
+            catch (Exception)
+            {
+                var msg = new Autodesk.Revit.UI.TaskDialog("Info");
+                msg.MainInstruction = "Добавьте параметр Room_ID";
+                msg.Show();
+                throw;
+            }
             Area = el.get_Parameter(BuiltInParameter.HOST_AREA_COMPUTED).AsDouble();
         }
 
